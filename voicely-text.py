@@ -141,15 +141,18 @@ async def check_empty_channel():
 
 # Slash command to set timeout
 @bot.tree.command()
-@app_commands.describe(minutes="Timeout duration in minutes")
-async def settimeout(interaction: discord.Interaction, minutes: int):
-    """Set the inactivity timeout duration"""
-    if minutes <= 0:
-        await interaction.response.send_message("Please enter a valid timeout duration in minutes (greater than 0).", ephemeral=True)
+@app_commands.describe(seconds="Timeout duration in seconds")
+async def settimeout(interaction: discord.Interaction, seconds: int):
+    """Set the inactivity timeout duration."""
+    if seconds <= 0:
+        await interaction.response.send_message("Please enter a valid timeout duration in seconds (greater than 0).", ephemeral=True)
         return
 
-    bot.voice_channel_timeouts[interaction.guild.id] = time.time() + (minutes * 60)
-    await interaction.response.send_message(f"Timeout set to {minutes} minute(s).", ephemeral=True)
+    bot.voice_channel_timeouts[interaction.guild.id] = time.time() + seconds
+    if seconds < 1:
+        await interaction.response.send_message(f"Timeout set to {seconds} seconds.", ephemeral=True)
+    else:
+        await interaction.response.send_message(f"Timeout set to {seconds} second.", ephemeral=True)
 
 # Command to make bot leave voice channel
 @bot.command()
