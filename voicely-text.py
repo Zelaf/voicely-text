@@ -107,7 +107,7 @@ async def on_message(message):
 
     message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message_content)
     
-    if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) == None:
+    if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
         print("Message contains no text, skipping.")
         return
     
