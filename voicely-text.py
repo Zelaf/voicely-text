@@ -161,7 +161,7 @@ async def setlanguage(interaction: discord.Interaction):
     embed.add_field() """
     await interaction.response.send_message("Set your preferred language", view=LanguagesView())
 
-# Slash command to set timeout
+# region Slash command to set timeout
 @bot.tree.command()
 @app_commands.describe(seconds="Timeout duration in seconds")
 async def settimeout(interaction: discord.Interaction, seconds: int):
@@ -178,7 +178,9 @@ async def settimeout(interaction: discord.Interaction, seconds: int):
 
     await interaction.response.send_message(f"Timeout set to {seconds} {unit}.", ephemeral=True)
 
-# Command to make bot leave voice channel
+# endregion
+
+# region Command to make bot leave voice channel
 @bot.command()
 async def leave(ctx):
     """Make the bot leave the voice channel."""
@@ -188,7 +190,9 @@ async def leave(ctx):
     else:
         await ctx.send("I'm not in a voice channel.")
 
-# Manual sync command to sync slash commands globally or to a specific guild
+# endregion
+
+# region Manual sync command to sync slash commands globally or to a specific guild
 @bot.command()
 # @app_commands.default_permissions()
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
@@ -202,7 +206,9 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 
 # endregion
 
-# Shutdown function for graceful exit
+# endregion
+
+# region Shutdown function for graceful exit
 async def shutdown():
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
@@ -214,6 +220,7 @@ async def shutdown():
             print("Queue task has been cancelled")
 
     await bot.close()
+# endregion
 
 def run_bot():
     loop = asyncio.new_event_loop()
