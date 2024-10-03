@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
+from discord import Permissions
 import asyncio
 import re
 from gtts import gTTS
@@ -141,6 +142,7 @@ async def check_empty_channel():
 # Slash command to set timeout
 @bot.tree.command()
 @app_commands.describe(seconds="Timeout duration in seconds")
+@app_commands.default_permissions([Permissions.elevated])
 async def settimeout(interaction: discord.Interaction, seconds: int):
     """Set the inactivity timeout duration."""
     if seconds <= 0:
@@ -167,6 +169,7 @@ async def leave(ctx):
 
 # Manual sync command to sync slash commands globally or to a specific guild
 @bot.command()
+@app_commands.default_permissions([Permissions.elevated])
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
     if guild:
