@@ -110,6 +110,7 @@ async def on_message(message):
     # This replaces <emote_name:123456789> with :emote_name:
     message_content = re.sub(r'<:(\w+):\d+>', r':\1:', message.content)
 
+    # Remove links, replacing it with an empty string
     message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message_content)
     
     if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
