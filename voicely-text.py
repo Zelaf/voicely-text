@@ -1,14 +1,12 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord import Permissions
 import asyncio
 import re
 from gtts import gTTS
 from gtts import lang
 import os
 import time
-# import re
 
 # Define intents
 intents = discord.Intents.default()
