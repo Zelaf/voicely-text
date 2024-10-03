@@ -5,6 +5,7 @@ from discord import Permissions
 import asyncio
 import re
 from gtts import gTTS
+from gtts import lang
 import os
 import time
 # import re
@@ -139,6 +140,29 @@ async def check_empty_channel():
         await asyncio.sleep(60)  # Check every 60 seconds
 
 # region Commands
+class Languages(discord.ui.Select):
+    def __init__(self):
+        options = []
+        langs = lang.tts_langs()
+        for thisLang in langs:
+            options.append(discord.SelectOption(label=thisLang, value=thisLang, description=langs[thisLang]))
+        
+        super().__init__(placeholder="Select a language", max_values=1, min_values=1, options=options)
+    
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True)
+
+class LanguagesView(discord.ui.View):
+    def __init__(self, *, timeout = 600):
+        super().__init__(timeout=timeout)
+        self.add_item(Languages())
+
+@bot.tree.command()
+async def setlanguage(interaction: discord.Interaction):
+    """ embed = discord.Embed(title="Set your preferred language", description="Choose from the languages below for Voicely Text to read your messages in that language.")
+    embed.add_field() """
+    await interaction.response.send_message("Set your preferred language", view=LanguagesView())
+
 # Slash command to set timeout
 @bot.tree.command()
 @app_commands.describe(seconds="Timeout duration in seconds")
