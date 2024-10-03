@@ -150,9 +150,11 @@ async def settimeout(interaction: discord.Interaction, seconds: int):
 
     bot.voice_channel_timeouts[interaction.guild.id] = time.time() + seconds
     if seconds < 1:
-        await interaction.response.send_message(f"Timeout set to {seconds} seconds.", ephemeral=True)
+        unit = "seconds"
     else:
-        await interaction.response.send_message(f"Timeout set to {seconds} second.", ephemeral=True)
+        unit = "second"
+
+    await interaction.response.send_message(f"Timeout set to {seconds} {unit}.", ephemeral=True)
 
 # Command to make bot leave voice channel
 @bot.command()
