@@ -153,7 +153,7 @@ class Languages(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True)
 
-@bot.command()
+@bot.hybrid_command()
 async def setlanguage(ctx):
     """ Set the language and accent you want me to read your messages in. """
     embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
@@ -163,7 +163,7 @@ async def setlanguage(ctx):
 # endregion
 
 # region Slash command to set timeout
-@bot.tree.command()
+@bot.hybrid_command()
 @app_commands.describe(seconds="Timeout duration in seconds")
 async def settimeout(interaction: discord.Interaction, seconds: int):
     """Set the inactivity timeout duration."""
@@ -182,7 +182,7 @@ async def settimeout(interaction: discord.Interaction, seconds: int):
 # endregion
 
 # region Command to make bot leave voice channel
-@bot.command()
+@bot.hybrid_command()
 async def leave(ctx):
     """Make the bot leave the voice channel."""
     if ctx.voice_client:
