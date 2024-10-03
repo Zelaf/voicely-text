@@ -25,6 +25,7 @@ class Bot(commands.Bot):
         self.queue_task = None
         self.voice_channel_timeouts = {}
         self.default_timeout = 300  # 5 minutes in seconds
+        self.user_languages = {}
         self.user_accents = {}
 
     async def setup_hook(self):
