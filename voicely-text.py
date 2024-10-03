@@ -7,6 +7,7 @@ from gtts import gTTS
 from gtts import lang
 import os
 import time
+import math
 
 # Define intents
 intents = discord.Intents.default()
@@ -153,12 +154,44 @@ async def check_empty_channel():
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True) """
 
+class LanguagesView(discord.ui.View):
+    # options = []
+    
+    langs = lang.tts_langs()
+    keys = list(langs.keys())
+    # iterated = 0
+
+    select_count = math.ceil(len(langs) / 25)
+    # print(f"select_count = {select_count}")
+    
+    for x in range(select_count):
+        options = []
+        # print(f"x = {x}")
+
+        for y in range(25):
+            # print(f"y = {y}")
+            index = (x * 25) + y
+            # print(f"index = {index}")
+            # print(index)
+            # key = keys[index]
+            # options.append(discord.SelectOption(label=key, value=key, description=langs[key]))
+
+        # options.append(options)
+        # iterated += 1
+
+        @discord.ui.select(placeholder="Select a language/accent", options=options)
+        async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+            return await interaction.response.send_message(f"You selected {select.values[0].mention}")
+
+        
+
 @bot.hybrid_command()
 async def setlanguage(ctx):
-    """ Set the language and accent you want me to read your messages in. """
+    """Set the language and accent you want me to read your messages in."""
+
     embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
-    embed.add_field(Languages())
-    await ctx.send(embed=embed)
+
+    await ctx.send(embed=embed, view=LanguagesView())
 
 # endregion
 
