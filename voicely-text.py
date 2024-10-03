@@ -95,6 +95,7 @@ async def process_queue():
             print("Voice client is not connected; task done")
             bot.tts_queue.task_done()
 
+# region When a message is sent
 @bot.event
 async def on_message(message):
     if message.author == bot.user or not message.guild:
@@ -127,6 +128,9 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+# endregion
+
+# region Leave voice channel when empty
 # Check if the bot is alone in the voice channel and disconnect if empty
 async def check_empty_channel():
     """Periodically check if the bot is alone in the voice channel and disconnect."""
@@ -140,6 +144,8 @@ async def check_empty_channel():
                     print(f"Disconnected from {guild.name} as it was empty.")
                     del bot.voice_channel_timeouts[guild_id]
         await asyncio.sleep(60)  # Check every 60 seconds
+
+# endregion
 
 # region Commands
 
