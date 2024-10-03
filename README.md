@@ -7,5 +7,5 @@ Voicely Text is another text-to-speech bot for Discord, but instead of linking t
 - The ability to trigger TTS without using a command beforehand.
     - `/start` and `/stop` speaking text with slash commands.
     - Members can enable text to speech for all their messages when they join a voice channel by default.
-- A `/tts` slash command to read just a single message if without needing to use the `/start` command.
+- A `/tts` slash command to read just a single message without needing to use the `/start` command.
 - Individual members can set their preferred language.
