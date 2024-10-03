@@ -200,7 +200,7 @@ async def setlanguage(ctx):
 
     embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
 
-    await ctx.send(embed=embed, view=LanguagesView())
+    await ctx.send(embed=embed, view=LanguagesView(), ephemeral=True)
 
 # endregion
 
@@ -262,7 +262,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
         for command in synced_commands:
             command_list += f"\n- {command.name}"
             
-        await ctx.send(f"Commands synced to the guild: {guild.name}{command_list}")
+        await ctx.send(f"Commands synced to the guild: {guild.name}{command_list}", ephemeral=True)
         
     else:
         synced_commands = await bot.tree.sync()
@@ -270,7 +270,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
         for command in synced_commands:
             command_list += f"\n- {command.name}"
 
-        await ctx.send(f"Commands synced globally:{command_list}\nPlease note it may take up to an hour to propagate globally.")
+        await ctx.send(f"Commands synced globally:{command_list}\nPlease note it may take up to an hour to propagate globally.", ephemeral=True)
 
 # endregion
 
