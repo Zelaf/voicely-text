@@ -85,7 +85,7 @@ async def process_queue():
 
             # Play the audio file in the voice channel
             print("Playing the TTS message in the voice channel...")
-            voice_client.play(discord.FFmpegPCMAudio("tts.mp3", executable='bot-env\\ffmpeg-7.1-essentials_build\\ffmpeg-7.1-essentials_build\\bin\\ffmpeg.exe'), after=after_playing)
+            voice_client.play(discord.FFmpegPCMAudio("tts.mp3", executable='venv\\ffmpeg-7.1-essentials_build\\ffmpeg-7.1-essentials_build\\bin\\ffmpeg.exe'), after=after_playing)
 
             # Wait until the current message is finished playing
             while voice_client.is_playing():
