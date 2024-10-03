@@ -25,6 +25,7 @@ class Bot(commands.Bot):
         self.queue_task = None
         self.voice_channel_timeouts = {}
         self.default_timeout = 300  # 5 minutes in seconds
+        self.user_accents = {}
 
     async def setup_hook(self):
         print(f"Setup complete for {self.user}")
@@ -192,6 +193,18 @@ async def setlanguage(ctx):
     embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
 
     await ctx.send(embed=embed, view=LanguagesView())
+
+# endregion
+
+# region Command for accents
+@bot.hybrid_command()
+@app_commands.describe(tld="A localized top-level domain the accent will be read with. For example, entering 'us' will make me sound like I'm from the United States and entering 'co.uk' will make me sound like I'm from the United Kingdom.")
+async def setaccent(interaction: discord.Interaction, tld: str):
+    """Set the accent you want me to read your messages in."""
+
+    user_id = interaction.user.id
+    bot.user_accents[user_id] = tld
+
 
 # endregion
 
