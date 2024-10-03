@@ -1,6 +1,5 @@
 # Voicely Text
 Voicely Text is another text-to-speech bot for Discord, but instead of linking text channels to voice channels, it speaks text from a voice channel's associated chat channel into said voice channel, without the need for commands beforehand.
-
 # Features
 - Reads text messages from a voice channel's associated chat channel.
     - No need to be in a voice channel for the bot to read the text: it will read it in the associated voice channel.
