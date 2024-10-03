@@ -6,6 +6,7 @@ import re
 from gtts import gTTS
 import os
 import time
+# import re
 
 # Define intents
 intents = discord.Intents.default()
@@ -96,9 +97,9 @@ async def on_message(message):
         return
 
     # Ignore messages with long numbers (e.g., numbers longer than 8 digits)
-    if re.search(r'\d{8,}', message.content):
+    """ if re.search(r'\d{8,}', message.content):
         print("Message contains a long number, skipping.")
-        return
+        return """
 
     # Remove emote IDs, leaving only emote names (e.g., :emote_name:) 
     # This replaces <emote_name:123456789> with :emote_name:
