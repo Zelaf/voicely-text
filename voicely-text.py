@@ -105,7 +105,7 @@ async def on_message(message):
     # This replaces <emote_name:123456789> with :emote_name:
     message_content = re.sub(r'<:(\w+):\d+>', r':\1:', message.content)
 
-    message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message.content)
+    message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message_content)
     
     if message == "":
         print("Message contains no text, skipping.")
