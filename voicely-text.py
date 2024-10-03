@@ -50,7 +50,7 @@ async def on_ready():
 async def process_queue():
     while True:
         print("Waiting for the next message in the queue...")
-        message, text = await bot.tts_queue.get()
+        message, text, voice_channel = await bot.tts_queue.get()
         print(f"Processing message: {text}")
 
         # Convert the text to speech using gTTS
@@ -58,6 +58,11 @@ async def process_queue():
         tts.save("tts.mp3")
 
         voice_client = message.guild.voice_client
+        
+        if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
+            await bot.voice_clients[0].move_to(voice_channel)
+        elif not bot.voice_clients:
+            await voice_channel.connect()
 
         if voice_client and voice_client.is_connected():
             def after_playing(error):
@@ -120,13 +125,8 @@ async def on_message(message):
     voice_channel = discord.utils.get(message.guild.voice_channels, name=text_channel_name)
 
     if voice_channel:
-        if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
-            await bot.voice_clients[0].move_to(voice_channel)
-        elif not bot.voice_clients:
-            await voice_channel.connect()
-
         # Add the filtered message content to the queue
-        await bot.tts_queue.put((message, message_content))
+        await bot.tts_queue.put((message, message_content, voice_channel))
         print(f"Added message to queue: {message_content}")
         bot.voice_channel_timeouts[message.guild.id] = time.time() + bot.default_timeout  # Reset timeout
 
