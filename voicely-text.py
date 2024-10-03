@@ -176,13 +176,11 @@ class LanguagesView(discord.ui.View):
         options = []
         # print(f"x = {x}")
 
-        for y in range(25):
-            # print(f"y = {y}")
-            index = (x * 25) + y
-            # print(f"index = {index}")
-            # print(index)
-            # key = keys[index]
-            # options.append(discord.SelectOption(label=key, value=key, description=langs[key]))
+        new_keys = keys[(x * 25):min((x * 25) + 25, len(keys))]
+
+        for y in range(len(new_keys)):
+            key = keys[y]
+            options.append(discord.SelectOption(label=langs[key], value=key, description=key))
 
         # options.append(options)
         # iterated += 1
