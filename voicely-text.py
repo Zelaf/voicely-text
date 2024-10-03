@@ -198,13 +198,18 @@ async def setlanguage(ctx):
 # endregion
 
 # region Command for accents
+
+def to_lower(argument):
+    return argument.lower()
+
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain the accent will be read with. For example, entering 'us' will make me sound like I'm from the United States and entering 'co.uk' will make me sound like I'm from the United Kingdom.")
-async def setaccent(interaction: discord.Interaction, tld: str):
+async def setaccent(ctx, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
-    user_id = interaction.user.id
+    user_id = ctx.author.id
     bot.user_accents[user_id] = tld
+    print(f"{user_id}'s accent set to {tld}")
 
 
 # endregion
