@@ -139,6 +139,7 @@ async def check_empty_channel():
                     del bot.voice_channel_timeouts[guild_id]
         await asyncio.sleep(60)  # Check every 60 seconds
 
+# region Commands
 # Slash command to set timeout
 @bot.tree.command()
 @app_commands.describe(seconds="Timeout duration in seconds")
@@ -177,6 +178,8 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
     else:
         await bot.tree.sync()
         await ctx.send("Commands synced globally. Please note it may take up to an hour to propagate globally.")
+
+# endregion
 
 # Shutdown function for graceful exit
 async def shutdown():
