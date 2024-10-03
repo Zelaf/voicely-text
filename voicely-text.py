@@ -34,9 +34,8 @@ class Bot(commands.Bot):
 bot = Bot()
 
 # Read the bot token from external file
-with open('token.txt', 'r') as file:
+with open('../token.txt', 'r') as file:
     TOKEN = file.read().strip()
-    print(file.name)
 
 # Regular expression to match URLs
 # url_pattern = re.compile(r'(https?://\S+|www\.\S+)')
