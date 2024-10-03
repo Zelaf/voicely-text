@@ -34,7 +34,7 @@ with open('../voicely-text.txt', 'r') as file:
     TOKEN = file.read().strip()
 
 # Regular expression to match URLs
-url_pattern = re.compile(r'(https?://\S+|www\.\S+)')
+# url_pattern = re.compile(r'(https?://\S+|www\.\S+)')
 
 @bot.event
 async def on_ready():
@@ -107,7 +107,7 @@ async def on_message(message):
 
     message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message_content)
     
-    if message == "":
+    if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) == None:
         print("Message contains no text, skipping.")
         return
     
