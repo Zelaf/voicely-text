@@ -112,6 +112,10 @@ async def on_message(message):
 
     # Remove links, replacing it with an empty string
     message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message_content)
+
+    # Remove long numbers (e.g., numbers longer than 8 digits)
+    # Replaces it with an empty string
+    message_content = re.sub(r'\d{8,}', "", message_content)
     
     if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
         print("Message contains no text, skipping.")
