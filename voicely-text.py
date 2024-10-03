@@ -63,6 +63,7 @@ async def process_queue():
             await bot.voice_clients[0].move_to(voice_channel)
         elif not bot.voice_clients:
             await voice_channel.connect()
+            await asyncio.sleep(1)
 
         if voice_client and voice_client.is_connected():
             def after_playing(error):
