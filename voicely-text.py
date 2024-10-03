@@ -96,16 +96,6 @@ async def on_message(message):
     if message.author == bot.user or not message.guild:
         return
 
-    # Ignore messages that contain images (attachments)
-    """ if message.attachments:
-        print("Message contains an image, skipping.")
-        return """
-
-    # Ignore messages with long numbers (e.g., numbers longer than 8 digits)
-    """ if re.search(r'\d{8,}', message.content):
-        print("Message contains a long number, skipping.")
-        return """
-
     # Remove emote IDs, leaving only emote names (e.g., :emote_name:) 
     # This replaces <emote_name:123456789> with :emote_name:
     message_content = re.sub(r'<:(\w+):\d+>', r':\1:', message.content)
@@ -120,10 +110,6 @@ async def on_message(message):
     if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
         print("Message contains no text, skipping.")
         return
-    
-    # Ignore messages that contain links
-    """ if url_pattern.search(message_content):
-        return """
 
     # Check if there is a voice channel with the same name as the text channel
     text_channel_name = message.channel.name
