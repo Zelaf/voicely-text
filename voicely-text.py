@@ -141,7 +141,7 @@ async def check_empty_channel():
 # region Commands
 
 # region Languages
-class Languages(discord.ui.Select):
+""" class Languages(discord.ui.Select):
     def __init__(self):
         options = []
         langs = lang.tts_langs()
@@ -151,7 +151,7 @@ class Languages(discord.ui.Select):
         super().__init__(placeholder="Select a language", max_values=1, min_values=1, options=options)
     
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True)
+        await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True) """
 
 @bot.hybrid_command()
 async def setlanguage(ctx):
