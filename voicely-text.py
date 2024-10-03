@@ -224,19 +224,19 @@ async def setaccent(ctx, tld: to_lower):
 # region Slash command to set timeout
 @bot.hybrid_command()
 @app_commands.describe(seconds="Timeout duration in seconds")
-async def settimeout(interaction: discord.Interaction, seconds: int):
+async def settimeout(ctx, seconds: int):
     """Set the inactivity timeout duration."""
     if seconds <= 0:
-        await interaction.response.send_message("Please enter a valid timeout duration in seconds (greater than 0).", ephemeral=True)
+        await ctx.send("Please enter a valid timeout duration in seconds (greater than 0).", ephemeral=True)
         return
 
-    bot.voice_channel_timeouts[interaction.guild.id] = time.time() + seconds
+    bot.voice_channel_timeouts[ctx.guild.id] = time.time() + seconds
     if seconds < 1:
         unit = "seconds"
     else:
         unit = "second"
 
-    await interaction.response.send_message(f"Timeout set to {seconds} {unit}.", ephemeral=True)
+    await ctx.send(f"Timeout set to {seconds} {unit}.", ephemeral=True)
 
 # endregion
 
