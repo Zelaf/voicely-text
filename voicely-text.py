@@ -28,7 +28,7 @@ class Bot(commands.Bot):
 
 bot = Bot()
 
-# Replace 'your-bot-token' with your bot token
+# Read the bot token from external file
 with open('../voicely-text.txt', 'r') as file:
     TOKEN = file.read().strip()
 
