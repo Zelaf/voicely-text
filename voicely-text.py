@@ -138,6 +138,8 @@ async def check_empty_channel():
         await asyncio.sleep(60)  # Check every 60 seconds
 
 # region Commands
+
+# region Languages
 class Languages(discord.ui.Select):
     def __init__(self):
         options = []
@@ -150,16 +152,14 @@ class Languages(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True)
 
-class LanguagesView(discord.ui.View):
-    def __init__(self, *, timeout = 600):
-        super().__init__(timeout=timeout)
-        self.add_item(Languages())
+@bot.command()
+async def setlanguage(ctx):
+    """ Set the language and accent you want me to read your messages in. """
+    embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
+    embed.add_field(Languages())
+    await ctx.send(embed=embed)
 
-@bot.tree.command()
-async def setlanguage(interaction: discord.Interaction):
-    """ embed = discord.Embed(title="Set your preferred language", description="Choose from the languages below for Voicely Text to read your messages in that language.")
-    embed.add_field() """
-    await interaction.response.send_message("Set your preferred language", view=LanguagesView())
+# endregion
 
 # region Slash command to set timeout
 @bot.tree.command()
