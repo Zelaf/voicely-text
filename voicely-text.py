@@ -498,14 +498,14 @@ async def leave(ctx: commands.Context):
 # endregion
 
 # region Manual sync command to sync slash commands globally or to a specific guild
-@bot.hybrid_command()
+@bot.command()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, *, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
 
     print("sync triggered")
 
-    if guild and guild != None:
+    if guild:
         synced_commands = await bot.tree.sync(guild=guild)
         command_list = ""
         for command in synced_commands:
