@@ -455,7 +455,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
                 bot.members_settings[ctx.author.id]["language"] = languagetag
             else:
                 bot.members_settings[ctx.author.id] = {"language": languagetag}
-            ctx.send(f"Your language has been set to {langs[key]}.", ephemeral=True)
+            await ctx.send(f"Your language has been set to {langs[key]}.", ephemeral=True)
         else:
             language_error = f"`{languagetag}` is not a valid IETF language tag! Supported tags include:"
             keys = list(langs.keys())
@@ -464,7 +464,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 
             language_error += "\nRerun `/setlanguage` without arguments to generate dropdowns to choose from."
             
-            ctx.send(language_error, ephemeral=True)
+            await ctx.send(language_error, ephemeral=True)
     else:
         embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
 
