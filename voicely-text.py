@@ -104,7 +104,7 @@ async def process_queue():
             if guild_id in bot.active_timeouts:
                 bot.active_timeouts[guild_id].cancel()
 
-            bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout())
+            bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
 
             try:
                 await bot.active_timeouts[guild_id]
