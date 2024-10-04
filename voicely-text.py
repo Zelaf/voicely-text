@@ -444,7 +444,7 @@ class LanguagesView(discord.ui.View):
 
 
 @bot.hybrid_command()
-async def setlanguage(ctx: commands.Context, languagetag: to_lower = None):
+async def setlanguage(ctx: commands.Context, *, languagetag: to_lower = None):
     """Set the language you want me to read your messages in."""
 
     if not languagetag:
