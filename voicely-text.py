@@ -106,10 +106,7 @@ async def process_queue():
 
             bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
 
-            try:
-                await bot.active_timeouts[guild_id]
-            except asyncio.CancelledError:
-                print(f'Timeout cancelled for {guild.name}')
+            await bot.active_timeouts[guild_id]
 
         else:
             print("Voice client is not connected; task done")
@@ -177,7 +174,7 @@ async def leave_after_timeout(guild: discord.Guild):
             timeout = bot.voice_channel_timeouts[guild.id]
         await asyncio.sleep(timeout)
     except asyncio.CancelledError:
-        raise
+        print(f'Timeout cancelled for {guild.name}')
     finally:
         await guild.voice_client.disconnect()
         print(f'Disconnected from {guild.name} due to timeout.')
