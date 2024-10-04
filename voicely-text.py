@@ -85,8 +85,7 @@ async def process_queue():
             requests.get(f"https://translate.google.{accent}")
         except requests.ConnectionError:
             await message.reply(f"I cannot read your message because https://translate.google.{accent} is currently down. Please run `/setaccent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
-            bot.tts_queue.task_done()
-            return
+            continue
         
         else:
             tts = gTTS(text=text, lang=language, tld=accent)
