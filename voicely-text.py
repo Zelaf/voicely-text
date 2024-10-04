@@ -305,10 +305,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
                 default = bot.servers_settings[ctx.guild.id]["autoread"]
             else:
                 default = bot.default_settings["autoread"]
-            await ctx.send(f"Autoread has been **reset** to the server default (`{default}`)", ephemeral=True)
+            await ctx.send(f"Autoread has been **reset** to the server default *({str(default).lower()})*", ephemeral=True)
             return
         case _:
-            await ctx.send(f"`enabled` must be set to either `True` or `False`.", ephemeral=True)
+            await ctx.send(f"`enabled` must be set to either `true` or `false`.", ephemeral=True)
             return
 
     if ctx.author.id in bot.members_settings:
@@ -446,7 +446,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
 
 # endregion
 
-# region Slash command to set timeout
+# region Set timeout
 def return_seconds(argument):
     try:
         return int(argument)
@@ -463,7 +463,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
     if seconds == "reset" or seconds == bot.default_settings["timeout"]:
         if ctx.guild.id in bot.voice_channel_timeouts:
             del bot.voice_channel_timeouts[ctx.guild.id]
-        await ctx.send(f"Timeout reset to `{bot.default_settings['timeout']} seconds`.", ephemeral=True)
+        await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", ephemeral=True)
     elif isinstance(seconds, int):
         if seconds <= 0:
             await ctx.send(error_message, ephemeral=True)
@@ -475,7 +475,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
             unit = "second"
 
         bot.voice_channel_timeouts[ctx.guild.id] = seconds
-        await ctx.send(f"Timeout set to `{seconds} {unit}`.", ephemeral=True)
+        await ctx.send(f"Timeout set to **{seconds} {unit}**.", ephemeral=True)
     else:
         await ctx.send(error_message, ephemeral=True)
 
@@ -485,7 +485,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
 
 # endregion
 
-# region Command to make bot leave voice channel
+# region Leave
 @bot.hybrid_command()
 async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
@@ -497,13 +497,13 @@ async def leave(ctx: commands.Context):
 
 # endregion
 
-# region Manual sync command to sync slash commands globally or to a specific guild
+# region Sync
 @bot.hybrid_command()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
 
-    print("sync triggered")
+    # print("sync triggered")
 
     if guild:
         synced_commands = await bot.tree.sync(guild=guild)
@@ -522,7 +522,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
             print(f"Forbidden: {error}")
         except discord.app_commands.TranslationError as error:
             print(f"TranslationError: {error}")
-        print("synced commands globally")
+        # print("synced commands globally")
         command_list = ""
         for command in synced_commands:
             command_list += f"\n- `/{command.name}`"
@@ -532,7 +532,8 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 
 # endregion
 
-# region Shutdown function for graceful exit
+# region shutdown
+# shutdown function for graceful exit
 async def shutdown():
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
