@@ -498,9 +498,9 @@ async def leave(ctx: commands.Context):
 # endregion
 
 # region Manual sync command to sync slash commands globally or to a specific guild
-@bot.command()
+@bot.hybrid_command()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
-async def sync(ctx: commands.Context, *, guild: discord.Guild = None):
+async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
 
     print("sync triggered")
@@ -512,7 +512,16 @@ async def sync(ctx: commands.Context, *, guild: discord.Guild = None):
             command_list += f"\n- {command.name}"
         await ctx.send(f"Commands synced to the guild: {guild.name}{command_list}\nPlease note it may take up to an hour to propagate globally.", ephemeral=True)
     else:
-        synced_commands = await bot.tree.sync()
+        try:
+            synced_commands = await bot.tree.sync()
+        except discord.app_commands.CommandSyncFailure as error:
+            print(f"CommandSyncFailure: {error}")
+        except discord.HTTPException as error:
+            print(f"HTTPException: {error}")
+        except discord.Forbidden as error:
+            print(f"Forbidden: {error}")
+        except discord.app_commands.TranslationError as error:
+            print(f"TranslationError: {error}")
         print("synced commands globally")
         command_list = ""
         for command in synced_commands:
