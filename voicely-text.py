@@ -61,13 +61,13 @@ async def process_queue():
         # Convert the text to speech using gTTS
         tts = gTTS(text=text, lang='en')
         tts.save("tts.mp3")
-
-        voice_client = message.guild.voice_client
         
         if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
             await bot.voice_clients[0].move_to(voice_channel)
         elif not bot.voice_clients:
             await voice_channel.connect()
+            
+        voice_client = message.guild.voice_client
 
         if voice_client and voice_client.is_connected():
             def after_playing(error):
