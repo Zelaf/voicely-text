@@ -6,7 +6,6 @@ import re
 from gtts import gTTS
 from gtts import lang
 import os
-import time
 import math
 import requests
 
