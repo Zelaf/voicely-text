@@ -186,9 +186,7 @@ async def leave_after_timeout(guild: discord.Guild):
 def to_lower(argument):
     return argument.lower()
 
-def return_same(argument):
-    if argument == "":
-        return None
+def return_same_or_none(argument = None):
     return argument
 
 # region settings
@@ -472,7 +470,7 @@ async def leave(ctx: commands.Context):
 
 # region Manual sync command to sync slash commands globally or to a specific guild
 @bot.hybrid_command()
-async def sync(ctx: commands.Context, guild: return_same):
+async def sync(ctx: commands.Context, guild: return_same_or_none):
     """Sync slash commands either globally or for a specific guild."""
     if guild:
         synced_commands = await bot.tree.sync(guild=guild)
