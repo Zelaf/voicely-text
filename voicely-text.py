@@ -200,7 +200,7 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
 
     settings = {}
 
-    if language:
+    if language != None:
         langs = lang.tts_langs()
 
         if language in langs:
@@ -213,12 +213,12 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
                 language_error += f"\n\t- `{key}` *({langs[key]})*"
             error_message.append(f"`{language}` is not a valid IETF language tag! Supported tags include:")
 
-    if accent:
+    if accent!= None:
         settings["accent"] = accent
         success_message.append(f"Your accent's top-level domain has been set to {accent}.\n**Please note:** there is currently no way to check whether the top-level domain is valid!")
 
 
-    if autoread:
+    if autoread!= None:
         match autoread:
             case "true":
                 settings["autoread"] = True
@@ -232,10 +232,12 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
 
     if len(error_message) != 0:
         final_error = "\n\n".join(error_message)
-        ctx.send(final_error, ephemeral=True)
+        await ctx.send(final_error, ephemeral=True)
+    elif language == None and accent == None and autoread == None:
+        await ctx.send(f"You must provide at least one value!", ephermeral=True)
     else:
         final_message = "\n\n".join(success_message)
-        ctx.send(final_message, ephermeral=True)
+        await ctx.send(final_message, ephermeral=True)
 
         
 # endregion
