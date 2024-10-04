@@ -194,7 +194,6 @@ class LanguagesView(discord.ui.View):
             bot.user_languages[user_id] = select.values[0]
             return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
 
-        
 
 @bot.hybrid_command()
 async def setlanguage(ctx):
