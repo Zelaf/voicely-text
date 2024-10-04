@@ -305,10 +305,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
                 default = bot.servers_settings[ctx.guild.id]["autoread"]
             else:
                 default = bot.default_settings["autoread"]
-            await ctx.send(f"Autoread has been **reset** to the server default *({default})*", ephemeral=True)
+            await ctx.send(f"Autoread has been **reset** to the server default (`{default}`)", ephemeral=True)
             return
         case _:
-            await ctx.send(f"`enabled` must be set to either `true` or `false`.", ephemeral=True)
+            await ctx.send(f"`enabled` must be set to either `True` or `False`.", ephemeral=True)
             return
 
     if ctx.author.id in bot.members_settings:
@@ -387,7 +387,7 @@ class LanguagesView(discord.ui.View):
 
         """ for component in interaction.message.components:
             component.disabled = True """
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
+        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (2)", options=options[1])
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
@@ -401,7 +401,7 @@ class LanguagesView(discord.ui.View):
         select.disabled = True
         """ for component in interaction.message.components:
             component.disabled = True """
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
+        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (3)", options=options[2])
     async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
@@ -415,7 +415,7 @@ class LanguagesView(discord.ui.View):
         select.disabled = True
         """ for component in interaction.message.components:
             component.disabled = True """
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
+        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
 
 
 @bot.hybrid_command()
@@ -439,7 +439,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
         bot.members_settings[user_id]["accent"] = tld
     else:
         bot.members_settings[user_id] = {"accent": tld}
-    await ctx.send(f"Your accent's top-level domain has been set to {tld}.", ephemeral=True)
+    await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
 
 
 # endregion
@@ -463,7 +463,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
     if seconds == "reset" or seconds == bot.default_settings["timeout"]:
         if ctx.guild.id in bot.voice_channel_timeouts:
             del bot.voice_channel_timeouts[ctx.guild.id]
-        await ctx.send(f"Timeout reset to {bot.default_settings['timeout']} seconds.", ephemeral=True)
+        await ctx.send(f"Timeout reset to `{bot.default_settings['timeout']} seconds`.", ephemeral=True)
     elif isinstance(seconds, int):
         if seconds <= 0:
             await ctx.send(error_message, ephemeral=True)
@@ -475,7 +475,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
             unit = "second"
 
         bot.voice_channel_timeouts[ctx.guild.id] = seconds
-        await ctx.send(f"Timeout set to {seconds} {unit}.", ephemeral=True)
+        await ctx.send(f"Timeout set to `{seconds} {unit}`.", ephemeral=True)
     else:
         await ctx.send(error_message, ephemeral=True)
 
