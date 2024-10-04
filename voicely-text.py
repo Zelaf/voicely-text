@@ -353,7 +353,7 @@ class LanguagesView(discord.ui.View):
         else:
             bot.members_settings[user_id] = {"language": select.values[0]}
         
-        interaction.message.delete()
+        interaction.delete_original_response()
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (2)", options=options[1])
@@ -365,7 +365,7 @@ class LanguagesView(discord.ui.View):
         else:
             bot.members_settings[user_id] = {"language": select.values[0]}
         
-        interaction.message.delete()
+        interaction.delete_original_response()
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (3)", options=options[2])
@@ -377,7 +377,7 @@ class LanguagesView(discord.ui.View):
         else:
             bot.members_settings[user_id] = {"language": select.values[0]}
         
-        interaction.message.delete()
+        interaction.delete_original_response()
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
 
 
