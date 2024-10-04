@@ -187,6 +187,8 @@ def to_lower(argument):
     return argument.lower()
 
 def return_same(argument):
+    if argument == "":
+        return None
     return argument
 
 # region settings
