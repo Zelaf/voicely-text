@@ -190,7 +190,7 @@ def to_lower(argument):
 # region members
 @bot.hybrid_command()
 @app_commands.describe(language="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.", accent="A localized top-level domain (as in www.google.<accent>) the accent will be read with.", autoread="Whether your messages are automatically read when you join a voice channel.")
-async def settings(ctx: commands.Context, *, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
+async def settings(ctx: commands.Context, *, language: to_lower | None = None, accent: to_lower | None = None, autoread: to_lower | None = None):
     """Set up your personal settings for Voicely Text."""
 
     success_message = []
@@ -468,7 +468,7 @@ async def leave(ctx: commands.Context):
 # region Manual sync command to sync slash commands globally or to a specific guild
 @bot.hybrid_command()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
-async def sync(ctx: commands.Context, *, guild: discord.Guild = None):
+async def sync(ctx: commands.Context, *, guild: discord.Guild | None = None):
     """Sync slash commands either globally or for a specific guild."""
 
     print("sync triggered")
