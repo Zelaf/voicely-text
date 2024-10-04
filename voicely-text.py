@@ -216,6 +216,8 @@ def to_lower(argument):
 #         return None
 #     return argument
 
+# @bot.hybrid_group(name="User settings")
+
 # region settings
 
 # region members
