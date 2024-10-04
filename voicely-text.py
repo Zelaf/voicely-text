@@ -186,7 +186,9 @@ async def leave_after_timeout(guild: discord.Guild):
 def to_lower(argument):
     return argument.lower()
 
-def return_same_or_none(argument = None):
+def return_same_or_none(argument = ""):
+    if argument == "":
+        return None
     return argument
 
 # region settings
