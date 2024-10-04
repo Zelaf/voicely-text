@@ -454,6 +454,7 @@ def return_seconds(argument):
         return argument.lower()
 
 @bot.hybrid_command()
+@commands.has_guild_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
 async def settimeout(ctx: commands.Context, seconds: return_seconds):
     """Set the number of seconds of inactivity after which the bot will leave the voice channel."""
@@ -487,6 +488,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
 
 # region Leave
 @bot.hybrid_command()
+@commands.has_permissions(administrator=True)
 async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
     if ctx.voice_client:
@@ -499,6 +501,7 @@ async def leave(ctx: commands.Context):
 
 # region Sync
 @bot.hybrid_command()
+@commands.has_guild_permissions(administrator=True)
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
