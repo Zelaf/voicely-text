@@ -277,10 +277,10 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
 
 # region Slash command to set timeout
 def return_seconds(argument: int | str):
-    if isinstance(argument, str):
+    if argument.isdigit():
+        return int(argument)
+    else:
         return argument.lower
-    elif isinstance(argument, int):
-        return argument
 
 @bot.hybrid_command()
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' or 'default' to reset to default.")
@@ -289,17 +289,10 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
 
     error_message = f"Please enter a valid timeout duration in seconds (greater than 0).\nAlternatively, type 'reset' or default' to reset the timeout to the default value ({bot.default_timeout} seconds)."
 
-    if isinstance(seconds, str):
-        seconds = seconds.lower()
-
     if seconds == "reset" or seconds == "default" or seconds == bot.default_timeout:
         del bot.voice_channel_timeouts[ctx.guild.id]
         await ctx.send(f"Timeout reset to {bot.default_timeout} seconds.", ephemeral=True)
     elif isinstance(seconds, int):
-        if seconds <= 0:
-            await ctx.send(error_message, ephemeral=True)
-            return
-        
         if seconds > 1:
             unit = "seconds"
         else:
