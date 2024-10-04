@@ -444,12 +444,31 @@ class LanguagesView(discord.ui.View):
 
 
 @bot.hybrid_command()
-async def setlanguage(ctx: commands.Context):
+async def setlanguage(ctx: commands.Context, languagetag: to_lower = None):
     """Set the language you want me to read your messages in."""
 
-    embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
+    if not languagetag:
+        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
 
-    await ctx.send(embed=embed, view=LanguagesView(), ephemeral=True)
+        await ctx.send(embed=embed, view=LanguagesView(), ephemeral=True)
+    else:
+        langs = lang.tts_langs()
+
+        if languagetag in langs:
+            if ctx.author.id in bot.members_settings:
+                bot.members_settings[ctx.author.id]["language"] = languagetag
+            else:
+                bot.members_settings[ctx.author.id] = {"language": languagetag}
+            ctx.send(f"Your language has been set to {langs[key]}.", ephemeral=True)
+        else:
+            language_error = f"`{languagetag}` is not a valid IETF language tag! Supported tags include:"
+            keys = list(langs.keys())
+            for key in keys:
+                language_error += f"\n- `{key}` *({langs[key]})*"
+
+            language_error += "\nRerun `/setlanguage` without arguments to generate dropdowns to choose from."
+                
+            ctx.send(language_error, ephemeral=True)
 
 # endregion
 
