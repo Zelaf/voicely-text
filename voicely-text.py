@@ -453,16 +453,15 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
 
     validation = validators.url(f"https://www.google.{tld}")
 
-    if not validation:
-        await ctx.send(f"`{tld}` is not a valid top-level domain: https://www.google.**{tld}** is not a valid url.")
-        return
-
-    user_id = ctx.author.id
-    if user_id in bot.members_settings:
-        bot.members_settings[user_id]["accent"] = tld
+    if validation:
+        user_id = ctx.author.id
+        if user_id in bot.members_settings:
+            bot.members_settings[user_id]["accent"] = tld
+        else:
+            bot.members_settings[user_id] = {"accent": tld}
+        await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
     else:
-        bot.members_settings[user_id] = {"accent": tld}
-    await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
+        await ctx.send(f"`{tld}` is not a valid top-level domain: https://www.google.**{tld}** is not a valid url.")
 
 
 # endregion
