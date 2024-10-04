@@ -183,8 +183,7 @@ async def leave_after_timeout(guild: discord.Guild):
 
 # region Commands
 
-def to_lower(argument):
-    return argument.lower()
+
 
 # region settings
 
@@ -254,6 +253,8 @@ def to_lower(argument):
 # region autoread
 
 # region members
+def to_lower(argument):
+    return argument.lower()
 
 @bot.hybrid_command()
 @app_commands.describe(enabled="'True' or 'False'")
@@ -399,6 +400,8 @@ async def setlanguage(ctx: commands.Context):
 # endregion
 
 # region Command for accents
+def to_lower(argument):
+    return argument.lower()
 
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
@@ -469,6 +472,7 @@ async def leave(ctx: commands.Context):
 @bot.hybrid_command()
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
+
     if guild:
         synced_commands = await bot.tree.sync(guild=guild)
         command_list = ""
