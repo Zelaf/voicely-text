@@ -451,6 +451,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
         langs = lang.tts_langs()
 
         if languagetag in langs:
+            print('got languagetag in langs')
             if ctx.author.id in bot.members_settings:
                 bot.members_settings[ctx.author.id]["language"] = languagetag
             else:
