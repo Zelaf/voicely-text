@@ -165,7 +165,7 @@ async def check_empty_channel():
         await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True) """
 
 class LanguagesView(discord.ui.View):
-    # options = []
+    options = []
     
     langs = lang.tts_langs()
     keys = list(langs.keys())
@@ -175,24 +175,45 @@ class LanguagesView(discord.ui.View):
     # print(f"select_count = {select_count}")
     
     for x in range(select_count):
-        options = []
+        options.append([])
         # print(f"x = {x}")
 
         new_keys = keys[(x * 25):min((x * 25) + 25, len(keys))]
 
         for y in range(len(new_keys)):
             key = keys[y]
-            options.append(discord.SelectOption(label=langs[key], value=key, description=key))
+            options[x].append(discord.SelectOption(label=langs[key], value=key, description=key))
 
         # options.append(options)
         # iterated += 1
 
-        @discord.ui.select(placeholder="Select a language/accent", options=options, custom_id=f"language_dropdown_{x}")
+        """ @discord.ui.select(placeholder="Select a language/accent", options=options, custom_id=f"language_dropdown_{x}")
         async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
             langs = lang.tts_langs()
             user_id = interaction.user.id
             bot.user_languages[user_id] = select.values[0]
-            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True) """
+
+    @discord.ui.select(placeholder="Select a language/accent", options=options[0])
+    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+        langs = lang.tts_langs()
+        user_id = interaction.user.id
+        bot.user_languages[user_id] = select.values[0]
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+    
+    @discord.ui.select(placeholder="Select a language/accent", options=options[1])
+    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+        langs = lang.tts_langs()
+        user_id = interaction.user.id
+        bot.user_languages[user_id] = select.values[0]
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+    
+    @discord.ui.select(placeholder="Select a language/accent", options=options[2])
+    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+        langs = lang.tts_langs()
+        user_id = interaction.user.id
+        bot.user_languages[user_id] = select.values[0]
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
 
 
 @bot.hybrid_command()
