@@ -338,28 +338,40 @@ class LanguagesView(discord.ui.View):
         async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
             langs = lang.tts_langs()
             user_id = interaction.user.id
-            bot.user_languages[user_id] = select.values[0]
+            if user_id in bot.members_settings:
+                bot.members_settings[user_id]["language"] = select.values[0]
+            else:
+                bot.members_settings[user_id] = {"language": select.values[0]}
             return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True) """
 
     @discord.ui.select(placeholder="Select a language (1)", options=options[0])
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
-        bot.user_languages[user_id] = select.values[0]
+        if user_id in bot.members_settings:
+            bot.members_settings[user_id]["language"] = select.values[0]
+        else:
+            bot.members_settings[user_id] = {"language": select.values[0]}
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (2)", options=options[1])
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
-        bot.user_languages[user_id] = select.values[0]
+        if user_id in bot.members_settings:
+            bot.members_settings[user_id]["language"] = select.values[0]
+        else:
+            bot.members_settings[user_id] = {"language": select.values[0]}
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (3)", options=options[2])
     async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
-        bot.user_languages[user_id] = select.values[0]
+        if user_id in bot.members_settings:
+            bot.members_settings[user_id]["language"] = select.values[0]
+        else:
+            bot.members_settings[user_id] = {"language": select.values[0]}
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
 
 
