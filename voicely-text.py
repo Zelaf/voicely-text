@@ -328,7 +328,7 @@ class LanguagesView(discord.ui.View):
         new_keys = keys[(x * 25):min((x * 25) + 25, len(keys))]
 
         for y in range(len(new_keys)):
-            key = keys[y]
+            key = new_keys[y]
             options[x].append(discord.SelectOption(label=langs[key], value=key, description=key))
 
         # options.append(options)
