@@ -213,12 +213,12 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
                 language_error += f"\n\t- `{key}` *({langs[key]})*"
             error_message.append(f"`{language}` is not a valid IETF language tag! Supported tags include:")
 
-    if accent!= None:
+    if accent != None:
         settings["accent"] = accent
         success_message.append(f"Your accent's top-level domain has been set to {accent}.\n**Please note:** there is currently no way to check whether the top-level domain is valid!")
 
 
-    if autoread!= None:
+    if autoread != None:
         match autoread:
             case "true":
                 settings["autoread"] = True
