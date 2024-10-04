@@ -452,7 +452,8 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
     print(str(tld))
-    url = "https:/www.google." + str(tld).strip('"')
+    url = "https:/www.google." + str(tld)
+    print(url)
 
     validation = validators.url(url)
 
