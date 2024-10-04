@@ -513,6 +513,7 @@ async def sync(ctx: commands.Context, *, guild: discord.Guild = None):
         await ctx.send(f"Commands synced to the guild: {guild.name}{command_list}\nPlease note it may take up to an hour to propagate globally.", ephemeral=True)
     else:
         synced_commands = await bot.tree.sync()
+        print("synced commands globally")
         command_list = ""
         for command in synced_commands:
             command_list += f"\n- {command.name}"
