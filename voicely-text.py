@@ -151,6 +151,25 @@ async def check_empty_channel():
 
 # endregion
 
+# region leave after timeout
+async def leave_after_timeout(guild: discord.Guild):
+    """Disconnect from the voice channel after the timeout has passed."""
+
+    print(f'Timeout set for {guild.name}.')
+    try:
+        timeout = bot.default_timeout
+        if guild.id in bot.voice_channel_timeouts:
+            timeout = bot.voice_channel_timeouts[guild.id]
+        await asyncio.sleep(timeout)
+    except asyncio.CancelledError:
+        print(f'Timeout cancelled for {guild.name}.')
+        raise
+    finally:
+        await guild.voice_client.disconnect()
+        print(f'Disconnected from {guild.name} due to timeout.')
+
+# endregion
+
 # region Commands
 
 # region Languages
