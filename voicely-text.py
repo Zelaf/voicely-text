@@ -195,21 +195,21 @@ def to_lower(argument):
 # region settings
 
 # region members
-def member_commands(argument: str):
-    if not argument or argument == "":
-        return {
-            "language": None,
-            "accent": None,
-            "autoread": None
-        }
+# def member_commands(argument: str):
+#     if not argument or argument == "":
+#         return {
+#             "language": None,
+#             "accent": None,
+#             "autoread": None
+#         }
 
-    args = argument.lower().split()
+#     args = argument.lower().split()
 
-    return {
-        "language": args[0],
-        "accent": args[1],
-        "autoread": args[2]
-    }
+#     return {
+#         "language": args[0],
+#         "accent": args[1],
+#         "autoread": args[2]
+#     }
 
 
 # @bot.hybrid_command()
