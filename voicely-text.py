@@ -84,12 +84,15 @@ async def process_queue():
             tts = gTTS(text=text, lang=language, tld=accent)
         except AssertionError as error:
             print(error)
+            bot.tts_queue.task_done()
             return
         except ValueError as error:
             print(error)
+            bot.tts_queue.task_done()
             return
         except RuntimeError as error:
             print(error)
+            bot.tts_queue.task_done()
             return
 
         tts.save("tts.mp3")
