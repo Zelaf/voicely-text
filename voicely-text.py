@@ -106,7 +106,7 @@ async def process_queue():
 
             bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
 
-            await bot.active_timeouts[guild_id]
+            bot.active_timeouts[guild_id]
 
         else:
             print("Voice client is not connected; task done")
