@@ -305,10 +305,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
                 default = bot.servers_settings[ctx.guild.id]["autoread"]
             else:
                 default = bot.default_settings["autoread"]
-            await ctx.send(f"Autoread has been **reset** to the server default *({str(default).lower()})*", ephemeral=True)
+            await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", ephemeral=True)
             return
         case _:
-            await ctx.send(f"`enabled` must be set to either `true` or `false`.", ephemeral=True)
+            await ctx.send(f"`enabled` must be set to either `True` or `False`.", ephemeral=True)
             return
 
     if ctx.author.id in bot.members_settings:
