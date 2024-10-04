@@ -218,7 +218,7 @@ async def setaccent(ctx, tld: to_lower):
 
     user_id = ctx.author.id
     bot.user_accents[user_id] = tld
-    ctx.send(f"Your top-level domain has been set to {tld}", ephemeral=True)
+    await ctx.send(f"Your top-level domain has been set to {tld}", ephemeral=True)
 
 
 # endregion
