@@ -39,9 +39,6 @@ with open('../token.txt', 'r') as file:
     TOKEN = file.read().strip()
     # print(TOKEN)
 
-# Regular expression to match URLs
-# url_pattern = re.compile(r'(https?://\S+|www\.\S+)')
-
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
@@ -215,7 +212,7 @@ def to_lower(argument):
     return argument.lower()
 
 @bot.hybrid_command()
-@app_commands.describe(tld="A localized top-level domain the accent will be read with. For example, entering 'us' will make me sound like I'm from the United States and entering 'co.uk' will make me sound like I'm from the United Kingdom.")
+@app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
 async def setaccent(ctx, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
