@@ -285,7 +285,7 @@ async def settimeout(ctx, seconds: int):
         return
 
     bot.voice_channel_timeouts[ctx.guild.id] = seconds
-    if seconds < 1:
+    if seconds > 1:
         unit = "seconds"
     else:
         unit = "second"
