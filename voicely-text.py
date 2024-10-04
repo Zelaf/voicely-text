@@ -23,11 +23,16 @@ class Bot(commands.Bot):
         super().__init__(command_prefix="!", intents=intents)
         self.tts_queue = asyncio.Queue()
         self.queue_task = None
+        self.default_settings = {
+            "language": "en",
+            "accent": "com",
+            "autoread": False,
+            "timeout": 300
+        }
+        self.members_settings = {}
+        self.servers_settings = {}
         self.voice_channel_timeouts = {}
         self.active_timeouts = {}
-        self.default_timeout = 300  # 5 minutes in seconds
-        self.user_languages = {}
-        self.user_accents = {}
 
     async def setup_hook(self):
         print(f"Setup complete for {self.user}")
@@ -93,11 +98,6 @@ async def process_queue():
             while voice_client.is_playing():
                 await asyncio.sleep(1)
             print("Audio finished playing")
-            
-            """ timeout = bot.default_timeout
-            if message.guild.id in bot.voice_channel_timeouts:
-                timeout = bot.voice_channel_timeouts[message.guild.id] """
-            # bot.active_timeouts[message.guild.id] = time.time() + timeout  # Reset timeout
 
             guild_id = guild.id
 
@@ -169,7 +169,7 @@ async def leave_after_timeout(guild: discord.Guild):
 
     print(f'Timeout set for {guild.name}.')
     try:
-        timeout = bot.default_timeout
+        timeout = bot.default_settings["timeout"]
         if guild.id in bot.voice_channel_timeouts:
             timeout = bot.voice_channel_timeouts[guild.id]
         await asyncio.sleep(timeout)
@@ -182,6 +182,101 @@ async def leave_after_timeout(guild: discord.Guild):
 # endregion
 
 # region Commands
+
+def to_lower(argument):
+    return argument.lower()
+
+# region settings
+
+# region members
+@bot.hybrid_command()
+@app_commands.describe(language="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.", accent="A localized top-level domain (as in www.google.<accent>) the accent will be read with.", autoread="Whether your messages are automatically read when you join a voice channel.")
+async def settings(ctx: commands.Context, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
+    """Set whether your messages are automatically read when you join a voice channel."""
+
+    success_message = []
+
+    error_message = []
+
+    settings = {}
+
+    if language:
+        langs = lang.tts_langs()
+
+        if language in langs:
+            settings["language"] = language
+            success_message.append(f"Your language has been set to {langs[key]}.")
+        else:
+            language_error = f"`{language}` is not a valid IETF language tag! Supported tags include:"
+            keys = list(langs.keys())
+            for key in keys:
+                language_error += f"\n\t- `{key}` *({langs[key]})*"
+            error_message.append(f"`{language}` is not a valid IETF language tag! Supported tags include:")
+
+    if accent:
+        settings["accent"] = accent
+        success_message.append(f"Your accent's top-level domain has been set to {accent}.\n**Please note:** there is currently no way to check whether the top-level domain is valid!")
+
+
+    if autoread:
+        match autoread:
+            case "true":
+                settings["autoread"] = True
+                success_message.append(f"Autoread has been **enabled**.\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\nThis will be disabled when you leave the voice channel.")
+            case "false":
+                settings["autoread"] = False
+                    
+                success_message.append(f"Autoread has been **disabled**.\nYou will need to type `/start` for me to start reading your messages.\nAlternatively, you can type `/tts [your message]` for me to read a single message.")
+            case _:
+                error_message.append(f"`enabled` must be set to either `true` or `false`.")
+
+    if len(error_message) != 0:
+        final_error = "\n\n".join(error_message)
+        ctx.send(final_error, ephemeral=True)
+    else:
+        final_message = "\n\n".join(success_message)
+        ctx.send(final_message, ephermeral=True)
+
+        
+# endregion
+
+# region servers
+# endregion
+
+# endregion
+
+# region autoread
+
+# region members
+
+@bot.hybrid_command()
+@app_commands.describe(enabled="'True' or 'False'")
+async def autoread(ctx: commands.Context, enabled: to_lower):
+    """Set whether your messages are automatically read when you join a voice channel."""
+
+    match enabled:
+        case "true":
+            if ctx.author.id not in bot.autoread_members:
+                bot.autoread_members.append(ctx.author.id)
+            await ctx.send(f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\n\nThis will be disabled when you leave the voice channel.", ephemeral=True)
+        case "false":
+            if ctx.author.id in bot.autoread_members:
+                bot.autoread_members.remove(ctx.author.id)
+                
+            await ctx.send(f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message.", ephemeral=True)
+        case _:
+            await ctx.send(f"`enabled` must be set to either `true` or `false`.", ephemeral=True)
+
+# endregion
+
+# region servers
+""" @bot.hybrid_command()
+async def serversautoread() """
+# endregion
+
+# endregion
+
+# region Languages and accents
 
 # region Languages
 """ class Languages(discord.ui.Select):
@@ -250,7 +345,7 @@ class LanguagesView(discord.ui.View):
 
 @bot.hybrid_command()
 async def setlanguage(ctx: commands.Context):
-    """Set the language and accent you want me to read your messages in."""
+    """Set the language you want me to read your messages in."""
 
     embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
 
@@ -259,9 +354,6 @@ async def setlanguage(ctx: commands.Context):
 # endregion
 
 # region Command for accents
-
-def to_lower(argument):
-    return argument.lower()
 
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
@@ -272,6 +364,8 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
     bot.user_accents[user_id] = tld
     await ctx.send(f"Your top-level domain has been set to {tld}", ephemeral=True)
 
+
+# endregion
 
 # endregion
 
@@ -287,12 +381,12 @@ def return_seconds(argument):
 async def settimeout(ctx: commands.Context, seconds: return_seconds):
     """Set the number of seconds of after which the bot will leave the voice channel if no messages are being read."""
 
-    error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` or `default` to **reset the timeout** to the default value *({bot.default_timeout} seconds)*."
+    error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` or `default` to **reset the timeout** to the default value *({bot.default_settings["timeout"]} seconds)*."
 
-    if seconds == "reset" or seconds == "default" or seconds == bot.default_timeout:
+    if seconds == "reset" or seconds == "default" or seconds == bot.default_settings["timeout"]:
         if ctx.guild.id in bot.voice_channel_timeouts:
             del bot.voice_channel_timeouts[ctx.guild.id]
-        await ctx.send(f"Timeout reset to {bot.default_timeout} seconds.", ephemeral=True)
+        await ctx.send(f"Timeout reset to {bot.default_settings["timeout"]} seconds.", ephemeral=True)
     elif isinstance(seconds, int):
         if seconds <= 0:
             await ctx.send(error_message, ephemeral=True)
