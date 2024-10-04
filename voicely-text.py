@@ -183,6 +183,8 @@ async def leave_after_timeout(guild: discord.Guild):
 
 # region Commands
 def to_lower(argument):
+    if argument or argument == "":
+        return None
     return argument.lower()
 
 # region settings
@@ -190,7 +192,7 @@ def to_lower(argument):
 # region members
 @bot.hybrid_command()
 @app_commands.describe(language="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.", accent="A localized top-level domain (as in www.google.<accent>) the accent will be read with.", autoread="Whether your messages are automatically read when you join a voice channel.")
-async def settings(ctx: commands.Context, *, language: to_lower | None = None, accent: to_lower | None = None, autoread: to_lower | None = None):
+async def settings(ctx: commands.Context, *, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
     """Set up your personal settings for Voicely Text."""
 
     success_message = []
