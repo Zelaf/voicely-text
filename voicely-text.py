@@ -401,12 +401,12 @@ def return_seconds(argument):
 async def settimeout(ctx: commands.Context, seconds: return_seconds):
     """Set the number of seconds of after which the bot will leave the voice channel if no messages are being read."""
 
-    error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings["timeout"]} seconds)*."
+    error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings['timeout']} seconds)*."
 
     if seconds == "reset" or seconds == bot.default_settings["timeout"]:
         if ctx.guild.id in bot.voice_channel_timeouts:
             del bot.voice_channel_timeouts[ctx.guild.id]
-        await ctx.send(f"Timeout reset to {bot.default_settings["timeout"]} seconds.", ephemeral=True)
+        await ctx.send(f"Timeout reset to {bot.default_settings['timeout']} seconds.", ephemeral=True)
     elif isinstance(seconds, int):
         if seconds <= 0:
             await ctx.send(error_message, ephemeral=True)
