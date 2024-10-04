@@ -293,6 +293,10 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
         del bot.voice_channel_timeouts[ctx.guild.id]
         await ctx.send(f"Timeout reset to {bot.default_timeout} seconds.", ephemeral=True)
     elif isinstance(seconds, int):
+        if seconds <= 0:
+            await ctx.send(error_message, ephemeral=True)
+            return
+        
         if seconds > 1:
             unit = "seconds"
         else:
