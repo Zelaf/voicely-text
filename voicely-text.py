@@ -287,7 +287,7 @@ def return_seconds(argument):
 async def settimeout(ctx: commands.Context, seconds: return_seconds):
     """Set the inactivity timeout duration."""
 
-    error_message = f"Please enter a **positive whole number** to set the timeout duration in **seconds**.\n\nAlternatively, type `reset` or `default` to reset the timeout to the default value *({bot.default_timeout} seconds)*."
+    error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` or `default` to **reset the timeout** to the default value *({bot.default_timeout} seconds)*."
 
     if seconds == "reset" or seconds == "default" or seconds == bot.default_timeout:
         if ctx.guild.id in bot.voice_channel_timeouts:
