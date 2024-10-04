@@ -187,14 +187,14 @@ class LanguagesView(discord.ui.View):
         # options.append(options)
         # iterated += 1
 
-        """ @discord.ui.select(placeholder="Select a language/accent", options=options, custom_id=f"language_dropdown_{x}")
+        @discord.ui.select(placeholder=f"Select a language ({x})", options=options[x], custom_id=f"language_dropdown_{x}")
         async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
             langs = lang.tts_langs()
             user_id = interaction.user.id
             bot.user_languages[user_id] = select.values[0]
-            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True) """
+            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
 
-    @discord.ui.select(placeholder="Select a language/accent", options=options[0])
+    """ @discord.ui.select(placeholder="Select a language/accent", options=options[0])
     async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
@@ -213,7 +213,7 @@ class LanguagesView(discord.ui.View):
         langs = lang.tts_langs()
         user_id = interaction.user.id
         bot.user_languages[user_id] = select.values[0]
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True) """
 
 
 @bot.hybrid_command()
