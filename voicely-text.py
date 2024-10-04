@@ -458,23 +458,18 @@ async def setlanguage(ctx: commands.Context):
 async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
-    user_id = ctx.author.id
-    if user_id in bot.members_settings:
-        bot.members_settings[user_id]["accent"] = tld
-    else:
-        bot.members_settings[user_id] = {"accent": tld}
-    await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
+    try:
+        requests.get(f"https://translate.google.{tld}")
+    except requests.ConnectionError:
+        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\nhttps://translate.google.{tld} is not a valid url or is otherwise temporarily unavailable.\n\nEither try another value or try again later.")
 
-    """ response = requests.get(f"https://translate.google.{tld}")
-    if response.status_code == 200: # website exists
+    else:
         user_id = ctx.author.id
         if user_id in bot.members_settings:
             bot.members_settings[user_id]["accent"] = tld
         else:
             bot.members_settings[user_id] = {"accent": tld}
         await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
-    else:
-        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\nhttps://translate.google.{tld} is not a valid url or is otherwise temporarily unavailable.\n\nEither try another value or try again later.") """
 
 
 # endregion
