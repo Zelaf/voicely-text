@@ -182,8 +182,8 @@ async def leave_after_timeout(guild: discord.Guild):
 # endregion
 
 # region Commands
-
-
+def to_lower(argument):
+    return argument.lower()
 
 # region settings
 
@@ -253,9 +253,6 @@ async def leave_after_timeout(guild: discord.Guild):
 # region autoread
 
 # region members
-def to_lower(argument):
-    return argument.lower()
-
 @bot.hybrid_command()
 @app_commands.describe(enabled="'True' or 'False'")
 async def autoread(ctx: commands.Context, enabled: to_lower):
@@ -400,16 +397,16 @@ async def setlanguage(ctx: commands.Context):
 # endregion
 
 # region Command for accents
-def to_lower(argument):
-    return argument.lower()
-
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
 async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
     user_id = ctx.author.id
-    bot.user_accents[user_id] = tld
+    if user_id in bot.members_settings:
+        bot.members_settings[user_id]["accent"] = tld
+    else:
+        bot.members_settings[user_id] = {"accent": tld}
     await ctx.send(f"Your top-level domain has been set to {tld}", ephemeral=True)
 
 
