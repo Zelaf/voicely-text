@@ -36,7 +36,7 @@ bot = Bot()
 # Read the bot token from external file
 with open('../token.txt', 'r') as file:
     TOKEN = file.read().strip()
-    print(TOKEN)
+    # print(TOKEN)
 
 # Regular expression to match URLs
 # url_pattern = re.compile(r'(https?://\S+|www\.\S+)')
