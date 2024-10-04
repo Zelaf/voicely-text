@@ -232,11 +232,15 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
 
     if len(error_message) != 0:
         final_error = "\n\n".join(error_message)
+        print(f"{ctx.author.name} used `/settings` but received {len(error_message)} errors.")
         await ctx.send(final_error, ephemeral=True)
     elif language == None and accent == None and autoread == None:
+        print(f"{ctx.author.name} used `/settings` but did not provide any values.")
         await ctx.send(f"You must provide at least one value!", ephermeral=True)
     else:
         final_message = "\n\n".join(success_message)
+        bot.members_settings[ctx.author.id] = settings
+        print(f"{ctx.author.name}'s settings were set to: {settings}")
         await ctx.send(final_message, ephermeral=True)
 
         
