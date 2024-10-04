@@ -209,7 +209,7 @@ async def settings(ctx: commands.Context, *, language: to_lower = None, accent: 
             language_error = f"`{language}` is not a valid IETF language tag! Supported tags include:"
             keys = list(langs.keys())
             for key in keys:
-                language_error += f"\n\t- `{key}` *({langs[key]})*"
+                language_error += f"\n- `{key}` *({langs[key]})*"
             error_message.append(f"`{language}` is not a valid IETF language tag! Supported tags include:")
 
     if accent != None:
@@ -473,17 +473,17 @@ async def sync(ctx: commands.Context, *, guild: discord.Guild = None):
 
     print("sync triggered")
 
-    if guild:
+    if guild and guild != None:
         synced_commands = await bot.tree.sync(guild=guild)
         command_list = ""
         for command in synced_commands:
-            command_list += f"\n\t- {command.name}"
+            command_list += f"\n- {command.name}"
         await ctx.send(f"Commands synced to the guild: {guild.name}{command_list}\nPlease note it may take up to an hour to propagate globally.", ephemeral=True)
     else:
         synced_commands = await bot.tree.sync()
         command_list = ""
         for command in synced_commands:
-            command_list += f"\n\t- {command.name}"
+            command_list += f"\n- {command.name}"
         await ctx.send(f"Commands synced globally:{command_list}\nPlease note it may take up to an hour to propagate globally.", ephemeral=True)
 
 # endregion
