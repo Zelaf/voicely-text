@@ -342,7 +342,7 @@ class LanguagesView(discord.ui.View):
                 bot.members_settings[user_id]["language"] = select.values[0]
             else:
                 bot.members_settings[user_id] = {"language": select.values[0]}
-            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True) """
+            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True) """
 
     @discord.ui.select(placeholder="Select a language (1)", options=options[0])
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
@@ -352,7 +352,9 @@ class LanguagesView(discord.ui.View):
             bot.members_settings[user_id]["language"] = select.values[0]
         else:
             bot.members_settings[user_id] = {"language": select.values[0]}
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+        
+        interaction.message.delete()
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (2)", options=options[1])
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
@@ -362,7 +364,9 @@ class LanguagesView(discord.ui.View):
             bot.members_settings[user_id]["language"] = select.values[0]
         else:
             bot.members_settings[user_id] = {"language": select.values[0]}
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+        
+        interaction.message.delete()
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
     
     @discord.ui.select(placeholder="Select a language (3)", options=options[2])
     async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
@@ -372,7 +376,9 @@ class LanguagesView(discord.ui.View):
             bot.members_settings[user_id]["language"] = select.values[0]
         else:
             bot.members_settings[user_id] = {"language": select.values[0]}
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+        
+        interaction.message.delete()
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True)
 
 
 @bot.hybrid_command()
