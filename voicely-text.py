@@ -8,6 +8,7 @@ from gtts import lang
 import os
 import time
 import math
+import validators
 
 # Define intents
 intents = discord.Intents.default()
@@ -80,21 +81,7 @@ async def process_queue():
         else:
             accent = bot.default_settings["accent"]
 
-        try:
-            tts = gTTS(text=text, lang=language, tld=accent)
-        except AssertionError as error:
-            print(error)
-            bot.tts_queue.task_done()
-            return
-        except ValueError as error:
-            print(error)
-            bot.tts_queue.task_done()
-            return
-        except RuntimeError as error:
-            print(error)
-            bot.tts_queue.task_done()
-            return
-
+        tts = gTTS(text=text, lang=language, tld=accent)
         tts.save("tts.mp3")
         
         if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
@@ -463,6 +450,12 @@ async def setlanguage(ctx: commands.Context):
 @app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
 async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
+
+    validation = validators.url(f"https://www.google.{tld}")
+
+    if not validation:
+        await ctx.send(f"`{tld}` is not a valid top-level domain: https://www.google.**{tld}** is not a valid url.")
+        return
 
     user_id = ctx.author.id
     if user_id in bot.members_settings:
