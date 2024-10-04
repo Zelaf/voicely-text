@@ -24,6 +24,7 @@ class Bot(commands.Bot):
         self.tts_queue = asyncio.Queue()
         self.queue_task = None
         self.voice_channel_timeouts = {}
+        self.active_timeouts = {}
         self.default_timeout = 300  # 5 minutes in seconds
         self.user_languages = {}
         self.user_accents = {}
@@ -93,6 +94,9 @@ async def process_queue():
             while voice_client.is_playing():
                 await asyncio.sleep(1)
             print("Audio finished playing")
+            
+            timeout = bot.voice_channel_timeouts[message.guild.id]
+            bot.active_timeouts[message.guild.id] = time.time() + timeout  # Reset timeout
         else:
             print("Voice client is not connected; task done")
             bot.tts_queue.task_done()
@@ -126,7 +130,6 @@ async def on_message(message):
         # Add the filtered message content to the queue
         await bot.tts_queue.put((message, message_content, voice_channel))
         print(f"Added message to queue: {message_content}")
-        bot.voice_channel_timeouts[message.guild.id] = time.time() + bot.default_timeout  # Reset timeout
 
     await bot.process_commands(message)
 
@@ -232,7 +235,7 @@ async def settimeout(ctx, seconds: int):
         await ctx.send("Please enter a valid timeout duration in seconds (greater than 0).", ephemeral=True)
         return
 
-    bot.voice_channel_timeouts[ctx.guild.id] = time.time() + seconds
+    bot.voice_channel_timeouts[ctx.guild.id] = seconds
     if seconds < 1:
         unit = "seconds"
     else:
