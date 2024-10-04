@@ -236,10 +236,15 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
                 language_error += f"\n- `{key}` *({langs[key]})*"
                 
             error_message.append(language_error)
+    else:
+        success_message.append("Your language has been set to the server default.")
 
     if accent:
         settings["accent"] = accent
         success_message.append(f"Your accent's top-level domain has been set to {accent}.\n**Please note:** there is currently no way to check whether the top-level domain is valid!")
+    else:
+        success_message.append("Your accent's top-level domain has been set to the server default.")
+    
 
 
     if autoread:
@@ -253,6 +258,8 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
                 success_message.append(f"Autoread has been **disabled**.\nYou will need to type `/start` for me to start reading your messages.\nAlternatively, you can type `/tts [your message]` for me to read a single message.")
             case _:
                 error_message.append(f"`enabled` must be set to either `true` or `false`.")
+    else:
+        success_message.append("Autoread has been set to the server default.")
 
     if len(error_message) != 0:
         final_error = "\n\n".join(error_message)
