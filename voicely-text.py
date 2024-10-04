@@ -175,7 +175,7 @@ class LanguagesView(discord.ui.View):
     # print(f"select_count = {select_count}")
     
     for x in range(select_count):
-        options[x] = []
+        options.append([])
         # print(f"x = {x}")
 
         new_keys = keys[(x * 25):min((x * 25) + 25, len(keys))]
