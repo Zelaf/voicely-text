@@ -461,7 +461,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
             language_error = f"`{languagetag}` is not a valid IETF language tag! Supported tags include:"
             keys = list(langs.keys())
             for key in keys:
-                language_error += f"\n- `{key}` *({langs[key]})*"
+                language_error += f"\n- `{key}` - *{langs[key]}*"
 
             language_error += "\nRerun `/setlanguage` without arguments to generate dropdowns to choose from."
             
