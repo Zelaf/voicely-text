@@ -467,7 +467,7 @@ async def leave(ctx: commands.Context):
 
 # region Manual sync command to sync slash commands globally or to a specific guild
 @bot.hybrid_command()
-async def sync(ctx, guild: discord.Guild = None):
+async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
     if guild:
         synced_commands = await bot.tree.sync(guild=guild)
