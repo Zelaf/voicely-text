@@ -93,6 +93,8 @@ async def process_queue():
             print("Audio finished playing")
             
             timeout = bot.voice_channel_timeouts[message.guild.id]
+            if not timeout:
+                timeout = bot.default_timeout
             bot.active_timeouts[message.guild.id] = time.time() + timeout  # Reset timeout
         else:
             print("Voice client is not connected; task done")
