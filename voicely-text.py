@@ -376,31 +376,31 @@ def return_seconds(argument):
     except:
         return argument.lower()
 
-@bot.hybrid_command()
-@app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' or 'default' to reset to default.")
-async def settimeout(ctx: commands.Context, seconds: return_seconds):
-    """Set the number of seconds of after which the bot will leave the voice channel if no messages are being read."""
+# @bot.hybrid_command()
+# @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' or 'default' to reset to default.")
+# async def settimeout(ctx: commands.Context, seconds: return_seconds):
+#     """Set the number of seconds of after which the bot will leave the voice channel if no messages are being read."""
 
-    error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` or `default` to **reset the timeout** to the default value *({bot.default_settings["timeout"]} seconds)*."
+#     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` or `default` to **reset the timeout** to the default value *({bot.default_settings["timeout"]} seconds)*."
 
-    if seconds == "reset" or seconds == "default" or seconds == bot.default_settings["timeout"]:
-        if ctx.guild.id in bot.voice_channel_timeouts:
-            del bot.voice_channel_timeouts[ctx.guild.id]
-        await ctx.send(f"Timeout reset to {bot.default_settings["timeout"]} seconds.", ephemeral=True)
-    elif isinstance(seconds, int):
-        if seconds <= 0:
-            await ctx.send(error_message, ephemeral=True)
-            return
+#     if seconds == "reset" or seconds == "default" or seconds == bot.default_settings["timeout"]:
+#         if ctx.guild.id in bot.voice_channel_timeouts:
+#             del bot.voice_channel_timeouts[ctx.guild.id]
+#         await ctx.send(f"Timeout reset to {bot.default_settings["timeout"]} seconds.", ephemeral=True)
+#     elif isinstance(seconds, int):
+#         if seconds <= 0:
+#             await ctx.send(error_message, ephemeral=True)
+#             return
         
-        if seconds > 1:
-            unit = "seconds"
-        else:
-            unit = "second"
+#         if seconds > 1:
+#             unit = "seconds"
+#         else:
+#             unit = "second"
 
-        bot.voice_channel_timeouts[ctx.guild.id] = seconds
-        await ctx.send(f"Timeout set to {seconds} {unit}.", ephemeral=True)
-    else:
-        await ctx.send(error_message, ephemeral=True)
+#         bot.voice_channel_timeouts[ctx.guild.id] = seconds
+#         await ctx.send(f"Timeout set to {seconds} {unit}.", ephemeral=True)
+#     else:
+#         await ctx.send(error_message, ephemeral=True)
 
 
     
