@@ -189,59 +189,59 @@ def to_lower(argument):
 # region settings
 
 # region members
-@bot.tree.command()
-@app_commands.describe(language="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.", accent="A localized top-level domain (as in www.google.<accent>) the accent will be read with.", autoread="Whether your messages are automatically read when you join a voice channel.")
-async def settings(ctx: commands.Context, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
-    """Set up your personal settings for Voicely Text."""
+# @bot.tree.command()
+# @app_commands.describe(language="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.", accent="A localized top-level domain (as in www.google.<accent>) the accent will be read with.", autoread="Whether your messages are automatically read when you join a voice channel.")
+# async def settings(interaction: discord.Interaction, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
+#     """Set up your personal settings for Voicely Text."""
 
-    success_message = []
+#     success_message = []
 
-    error_message = []
+#     error_message = []
 
-    settings = {}
+#     settings = {}
 
-    if language != None:
-        langs = lang.tts_langs()
+#     if language != None:
+#         langs = lang.tts_langs()
 
-        if language in langs:
-            settings["language"] = language
-            success_message.append(f"Your language has been set to {langs[key]}.")
-        else:
-            language_error = f"`{language}` is not a valid IETF language tag! Supported tags include:"
-            keys = list(langs.keys())
-            for key in keys:
-                language_error += f"\n\t- `{key}` *({langs[key]})*"
-            error_message.append(f"`{language}` is not a valid IETF language tag! Supported tags include:")
+#         if language in langs:
+#             settings["language"] = language
+#             success_message.append(f"Your language has been set to {langs[key]}.")
+#         else:
+#             language_error = f"`{language}` is not a valid IETF language tag! Supported tags include:"
+#             keys = list(langs.keys())
+#             for key in keys:
+#                 language_error += f"\n\t- `{key}` *({langs[key]})*"
+#             error_message.append(f"`{language}` is not a valid IETF language tag! Supported tags include:")
 
-    if accent != None:
-        settings["accent"] = accent
-        success_message.append(f"Your accent's top-level domain has been set to {accent}.\n**Please note:** there is currently no way to check whether the top-level domain is valid!")
+#     if accent != None:
+#         settings["accent"] = accent
+#         success_message.append(f"Your accent's top-level domain has been set to {accent}.\n**Please note:** there is currently no way to check whether the top-level domain is valid!")
 
 
-    if autoread != None:
-        match autoread:
-            case "true":
-                settings["autoread"] = True
-                success_message.append(f"Autoread has been **enabled**.\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\nThis will be disabled when you leave the voice channel.")
-            case "false":
-                settings["autoread"] = False
+#     if autoread != None:
+#         match autoread:
+#             case "true":
+#                 settings["autoread"] = True
+#                 success_message.append(f"Autoread has been **enabled**.\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\nThis will be disabled when you leave the voice channel.")
+#             case "false":
+#                 settings["autoread"] = False
                     
-                success_message.append(f"Autoread has been **disabled**.\nYou will need to type `/start` for me to start reading your messages.\nAlternatively, you can type `/tts [your message]` for me to read a single message.")
-            case _:
-                error_message.append(f"`enabled` must be set to either `true` or `false`.")
+#                 success_message.append(f"Autoread has been **disabled**.\nYou will need to type `/start` for me to start reading your messages.\nAlternatively, you can type `/tts [your message]` for me to read a single message.")
+#             case _:
+#                 error_message.append(f"`enabled` must be set to either `true` or `false`.")
 
-    if len(error_message) != 0:
-        final_error = "\n\n".join(error_message)
-        print(f"{ctx.author.name} used `/settings` but received {len(error_message)} errors.")
-        await ctx.send(final_error, ephemeral=True)
-    elif language == None and accent == None and autoread == None:
-        print(f"{ctx.author.name} used `/settings` but did not provide any values.")
-        await ctx.send(f"You must provide at least one value!", ephermeral=True)
-    else:
-        final_message = "\n\n".join(success_message)
-        bot.members_settings[ctx.author.id] = settings
-        print(f"{ctx.author.name}'s settings were set to: {settings}")
-        await ctx.send(final_message, ephermeral=True)
+#     if len(error_message) != 0:
+#         final_error = "\n\n".join(error_message)
+#         print(f"{interaction.user.id} used `/settings` but received {len(error_message)} errors.")
+#         await interaction.response.send_message(final_error, ephemeral=True)
+#     elif language == None and accent == None and autoread == None:
+#         print(f"{interaction.user.name} used `/settings` but did not provide any values.")
+#         await interaction.response.send_message(f"You must provide at least one value!", ephermeral=True)
+#     else:
+#         final_message = "\n\n".join(success_message)
+#         bot.members_settings[interaction.user.id] = settings
+#         print(f"{interaction.user.name}'s settings were set to: {settings}")
+#         await interaction.response.send_message(final_message, ephermeral=True)
 
         
 # endregion
@@ -262,16 +262,30 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 
     match enabled:
         case "true":
-            if ctx.author.id not in bot.autoread_members:
-                bot.autoread_members.append(ctx.author.id)
-            await ctx.send(f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\n\nThis will be disabled when you leave the voice channel.", ephemeral=True)
+            enabled_bool = True
+            confirm_message = f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\n\nThis will be disabled when you leave the voice channel."
         case "false":
-            if ctx.author.id in bot.autoread_members:
-                bot.autoread_members.remove(ctx.author.id)
-                
-            await ctx.send(f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message.", ephemeral=True)
+            enabled_bool = False
+            confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message."
+        case "reset":
+            if ctx.author.id in bot.members_settings and "autoread" in bot.members_settings[ctx.author.id]:
+                del bot.members_settings[ctx.author.id]["autoread"]
+            
+            if ctx.guild.id in bot.servers_settings and "autoread" in bot.servers_settings[ctx.guild.id]:
+                default = bot.servers_settings[ctx.guild.id]["autoread"]
+            else:
+                default = bot.default_settings["autoread"]
+            await ctx.send(f"Autoread has been **reset** to the server default *({default})*", ephemeral=True)
+            return
         case _:
             await ctx.send(f"`enabled` must be set to either `true` or `false`.", ephemeral=True)
+            return
+
+    if ctx.author.id in bot.members_settings:
+        bot.members_settings[ctx.author.id]["autoread"] = enabled_bool
+    else:
+        bot.members_settings[ctx.author.id] = {"autoread": enabled_bool}
+    await ctx.send(confirm_message, ephemeral=True)
 
 # endregion
 
@@ -320,33 +334,33 @@ class LanguagesView(discord.ui.View):
         # options.append(options)
         # iterated += 1
 
-        @discord.ui.select(placeholder=f"Select a language ({x})", options=options[x], custom_id=f"language_dropdown_{x}")
+        """ @discord.ui.select(placeholder=f"Select a language ({x})", options=options[x], custom_id=f"language_dropdown_{x}")
         async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
             langs = lang.tts_langs()
             user_id = interaction.user.id
             bot.user_languages[user_id] = select.values[0]
-            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
+            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True) """
 
-    """ @discord.ui.select(placeholder="Select a language/accent", options=options[0])
-    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+    @discord.ui.select(placeholder="Select a language (1)", options=options[0])
+    async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
         bot.user_languages[user_id] = select.values[0]
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
     
-    @discord.ui.select(placeholder="Select a language/accent", options=options[1])
-    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+    @discord.ui.select(placeholder="Select a language (2)", options=options[1])
+    async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
         bot.user_languages[user_id] = select.values[0]
         return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
     
-    @discord.ui.select(placeholder="Select a language/accent", options=options[2])
-    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+    @discord.ui.select(placeholder="Select a language (3)", options=options[2])
+    async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
         bot.user_languages[user_id] = select.values[0]
-        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True) """
+        return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}", ephemeral=True)
 
 
 @bot.hybrid_command()
@@ -382,31 +396,31 @@ def return_seconds(argument):
     except:
         return argument.lower()
 
-# @bot.hybrid_command()
-# @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' or 'default' to reset to default.")
-# async def settimeout(ctx: commands.Context, seconds: return_seconds):
-#     """Set the number of seconds of after which the bot will leave the voice channel if no messages are being read."""
+@bot.hybrid_command()
+@app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
+async def settimeout(ctx: commands.Context, seconds: return_seconds):
+    """Set the number of seconds of after which the bot will leave the voice channel if no messages are being read."""
 
-#     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` or `default` to **reset the timeout** to the default value *({bot.default_settings["timeout"]} seconds)*."
+    error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings["timeout"]} seconds)*."
 
-#     if seconds == "reset" or seconds == "default" or seconds == bot.default_settings["timeout"]:
-#         if ctx.guild.id in bot.voice_channel_timeouts:
-#             del bot.voice_channel_timeouts[ctx.guild.id]
-#         await ctx.send(f"Timeout reset to {bot.default_settings["timeout"]} seconds.", ephemeral=True)
-#     elif isinstance(seconds, int):
-#         if seconds <= 0:
-#             await ctx.send(error_message, ephemeral=True)
-#             return
+    if seconds == "reset" or seconds == bot.default_settings["timeout"]:
+        if ctx.guild.id in bot.voice_channel_timeouts:
+            del bot.voice_channel_timeouts[ctx.guild.id]
+        await ctx.send(f"Timeout reset to {bot.default_settings["timeout"]} seconds.", ephemeral=True)
+    elif isinstance(seconds, int):
+        if seconds <= 0:
+            await ctx.send(error_message, ephemeral=True)
+            return
         
-#         if seconds > 1:
-#             unit = "seconds"
-#         else:
-#             unit = "second"
+        if seconds > 1:
+            unit = "seconds"
+        else:
+            unit = "second"
 
-#         bot.voice_channel_timeouts[ctx.guild.id] = seconds
-#         await ctx.send(f"Timeout set to {seconds} {unit}.", ephemeral=True)
-#     else:
-#         await ctx.send(error_message, ephemeral=True)
+        bot.voice_channel_timeouts[ctx.guild.id] = seconds
+        await ctx.send(f"Timeout set to {seconds} {unit}.", ephemeral=True)
+    else:
+        await ctx.send(error_message, ephemeral=True)
 
 
     
