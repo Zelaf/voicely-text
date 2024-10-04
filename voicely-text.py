@@ -249,7 +249,7 @@ class LanguagesView(discord.ui.View):
 
 
 @bot.hybrid_command()
-async def setlanguage(ctx):
+async def setlanguage(ctx: commands.Context):
     """Set the language and accent you want me to read your messages in."""
 
     embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
@@ -265,7 +265,7 @@ def to_lower(argument):
 
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
-async def setaccent(ctx, tld: to_lower):
+async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
     user_id = ctx.author.id
@@ -296,7 +296,7 @@ async def settimeout(ctx, seconds: int):
 
 # region Command to make bot leave voice channel
 @bot.hybrid_command()
-async def leave(ctx):
+async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
