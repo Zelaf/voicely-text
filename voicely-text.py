@@ -263,8 +263,8 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
         await ctx.send(f"You must provide at least one value!", ephermeral=True)
     else:
         final_message = "\n\n".join(success_message)
-        bot.members_settings[ctx.author.id] = settings
         print(f"{ctx.author.name}'s settings were set to: {settings}")
+        bot.members_settings[ctx.author.id] = settings
         await ctx.send(final_message, ephermeral=True)
 
         
