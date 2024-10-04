@@ -64,8 +64,10 @@ async def process_queue():
             await bot.voice_clients[0].move_to(voice_channel)
         elif not bot.voice_clients:
             await voice_channel.connect()
+
+        guild = message.guild
             
-        voice_client = message.guild.voice_client
+        voice_client = guild.voice_client
 
         if voice_client and voice_client.is_connected():
             def after_playing(error):
@@ -97,7 +99,7 @@ async def process_queue():
                 timeout = bot.voice_channel_timeouts[message.guild.id] """
             # bot.active_timeouts[message.guild.id] = time.time() + timeout  # Reset timeout
 
-            guild_id = message.guild.id
+            guild_id = guild.id
 
             if guild_id in bot.active_timeouts:
                 bot.active_timeouts[guild_id].cancel()
