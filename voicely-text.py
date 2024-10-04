@@ -407,7 +407,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
         bot.members_settings[user_id]["accent"] = tld
     else:
         bot.members_settings[user_id] = {"accent": tld}
-    await ctx.send(f"Your top-level domain has been set to {tld}", ephemeral=True)
+    await ctx.send(f"Your accent's top-level domain has been set to {tld}.", ephemeral=True)
 
 
 # endregion
