@@ -277,9 +277,9 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
 
 # region Slash command to set timeout
 def return_seconds(argument: int | str):
-    if argument.isdigit():
+    try:
         return int(argument)
-    else:
+    except:
         return argument.lower
 
 @bot.hybrid_command()
