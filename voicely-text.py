@@ -444,14 +444,10 @@ class LanguagesView(discord.ui.View):
 
 
 @bot.hybrid_command()
-async def setlanguage(ctx: commands.Context, *, languagetag: to_lower = None):
+async def setlanguage(ctx: commands.Context, languagetag: str = None):
     """Set the language you want me to read your messages in."""
 
-    if not languagetag:
-        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
-
-        await ctx.send(embed=embed, view=LanguagesView(), ephemeral=True)
-    else:
+    if languagetag:
         langs = lang.tts_langs()
 
         if languagetag in langs:
@@ -467,8 +463,12 @@ async def setlanguage(ctx: commands.Context, *, languagetag: to_lower = None):
                 language_error += f"\n- `{key}` *({langs[key]})*"
 
             language_error += "\nRerun `/setlanguage` without arguments to generate dropdowns to choose from."
-                
+            
             ctx.send(language_error, ephemeral=True)
+    else:
+        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
+
+        await ctx.send(embed=embed, view=LanguagesView(), ephemeral=True)
 
 # endregion
 
