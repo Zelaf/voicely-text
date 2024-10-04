@@ -451,21 +451,17 @@ async def setlanguage(ctx: commands.Context):
 async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
-    print(str(tld))
-    url = "https:/www.google." + str(tld)
-    print(url)
+    validation = validators.url(f"https:/www.google.{tld}")
 
-    validation = validators.url(url)
-
-    if validation:
+    if validation == validators.ValidationError:
+        await ctx.send(f"`{tld}` is not a valid top-level domain: https:/www.google.**{tld}** is not a valid url.")
+    else:
         user_id = ctx.author.id
         if user_id in bot.members_settings:
             bot.members_settings[user_id]["accent"] = tld
         else:
             bot.members_settings[user_id] = {"accent": tld}
         await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
-    else:
-        await ctx.send(f"`{tld}` is not a valid top-level domain: https://www.google.**{tld}** is not a valid url.")
 
 
 # endregion
