@@ -58,11 +58,29 @@ async def on_ready():
 async def process_queue():
     while True:
         print("Waiting for the next message in the queue...")
-        message, text, voice_channel = await bot.tts_queue.get()
+        message, text, voice_channel, user_id = await bot.tts_queue.get()
         print(f"Processing message: {text}")
 
         # Convert the text to speech using gTTS
-        tts = gTTS(text=text, lang='en')
+        
+        guild = message.guild
+        guild_id = guild.id
+
+        if user_id in bot.members_settings and "language" in bot.members_settings[user_id]:
+            language = bot.members_settings[user_id]["language"]
+        elif guild_id in bot.servers_settings and "language" in bot.servers_settings[guild_id]:
+            language = bot.servers_settings[guild_id]["language"]
+        else:
+            language = bot.default_settings["language"]
+
+        if user_id in bot.members_settings and "accent" in bot.members_settings[user_id]:
+            accent = bot.members_settings[user_id]["accent"]
+        elif guild_id in bot.servers_settings and "accent" in bot.servers_settings[guild_id]:
+            accent = bot.servers_settings[guild_id]["accent"]
+        else:
+            accent = bot.default_settings["accent"]
+
+        tts = gTTS(text=text, lang=language, tld=accent)
         tts.save("tts.mp3")
         
         if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
@@ -70,7 +88,6 @@ async def process_queue():
         elif not bot.voice_clients:
             await voice_channel.connect()
 
-        guild = message.guild
             
         voice_client = guild.voice_client
 
@@ -99,7 +116,6 @@ async def process_queue():
                 await asyncio.sleep(1)
             print("Audio finished playing")
 
-            guild_id = guild.id
 
             if guild_id in bot.active_timeouts:
                 bot.active_timeouts[guild_id].cancel()
@@ -114,7 +130,7 @@ async def process_queue():
 
 # region When a message is sent
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author == bot.user or not message.guild:
         return
 
@@ -139,7 +155,7 @@ async def on_message(message):
 
     if voice_channel:
         # Add the filtered message content to the queue
-        await bot.tts_queue.put((message, message_content, voice_channel))
+        await bot.tts_queue.put((message, message_content, voice_channel, message.author.id))
         print(f"Added message to queue: {message_content}")
 
     await bot.process_commands(message)
