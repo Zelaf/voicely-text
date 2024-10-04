@@ -276,11 +276,11 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
 # endregion
 
 # region Slash command to set timeout
-def return_seconds(argument: int | str):
+def return_seconds(argument):
     try:
         return int(argument)
     except:
-        return argument.lower
+        return argument.lower()
 
 @bot.hybrid_command()
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' or 'default' to reset to default.")
