@@ -452,9 +452,9 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 
         if languagetag in langs:
             if ctx.author.id in bot.members_settings:
-                print('got here')
                 bot.members_settings[ctx.author.id]["language"] = languagetag
             else:
+                print('got here')
                 bot.members_settings[ctx.author.id] = {"language": languagetag}
             await ctx.send(f"Your language has been set to {langs[key]}.", ephemeral=True)
         else:
