@@ -223,7 +223,7 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
 
     settings = {}
 
-    if language != None:
+    if language:
         langs = lang.tts_langs()
 
         if language in langs:
@@ -237,12 +237,12 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
                 
             error_message.append(language_error)
 
-    if accent != None:
+    if accent:
         settings["accent"] = accent
         success_message.append(f"Your accent's top-level domain has been set to {accent}.\n**Please note:** there is currently no way to check whether the top-level domain is valid!")
 
 
-    if autoread != None:
+    if autoread:
         match autoread:
             case "true":
                 settings["autoread"] = True
@@ -258,14 +258,14 @@ async def settings(ctx: commands.Context, language: to_lower = None, accent: to_
         final_error = "\n\n".join(error_message)
         print(f"{ctx.author.id} used `/settings` but received {len(error_message)} errors.")
         await ctx.send(final_error, ephemeral=True)
-    elif language == None and accent == None and autoread == None:
+    elif not language and not accent and not autoread:
         print(f"{ctx.author.name} used `/settings` but did not provide any values.")
-        await ctx.send(f"You must provide at least one value!", ephermeral=True)
+        await ctx.send("You must provide at least one value!", ephemeral=True)
     else:
         final_message = "\n\n".join(success_message)
-        print(f"{ctx.author.name}'s settings were set to: {settings}")
         bot.members_settings[ctx.author.id] = settings
-        await ctx.send(final_message, ephermeral=True)
+        print(f"{ctx.author.name}'s settings were set to: {settings}")
+        await ctx.send(final_message, ephemeral=True)
 
         
 # endregion
