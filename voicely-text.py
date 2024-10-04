@@ -187,7 +187,7 @@ class LanguagesView(discord.ui.View):
         # options.append(options)
         # iterated += 1
 
-        @discord.ui.select(placeholder="Select a language/accent", options=options[x])
+        @discord.ui.select(placeholder="Select a language/accent", options=options, custom_id=f"language_dropdown_{x}")
         async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
             langs = lang.tts_langs()
             user_id = interaction.user.id
