@@ -452,7 +452,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
     try:
-        validation = validators.url(f"https:/www.google.{tld}")
+        validators.url(f"https:/www.google.{tld}")
     except validators.ValidationError:
         await ctx.send(f"`{tld}` is not a valid top-level domain: https:/www.google.**{tld}** is not a valid url.")
     finally:
