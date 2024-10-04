@@ -195,9 +195,26 @@ def same_or_none(argument):
 # region settings
 
 # region members
+def member_commands(argument: str):
+    if not argument or argument == "":
+        return {
+            "language": None,
+            "accent": None,
+            "autoread": None
+        }
+
+    args = argument.lower().split()
+
+    return {
+        "language": args[0],
+        "accent": args[1],
+        "autoread": args[2]
+    }
+
+
 @bot.hybrid_command()
 @app_commands.describe(language="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.", accent="A localized top-level domain (as in www.google.<accent>) the accent will be read with.", autoread="Whether your messages are automatically read when you join a voice channel.")
-async def settings(ctx: commands.Context, *, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
+async def settings(ctx: commands.Context, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
     """Set up your personal settings for Voicely Text."""
 
     success_message = []
@@ -217,7 +234,8 @@ async def settings(ctx: commands.Context, *, language: to_lower = None, accent: 
             keys = list(langs.keys())
             for key in keys:
                 language_error += f"\n- `{key}` *({langs[key]})*"
-            error_message.append(f"`{language}` is not a valid IETF language tag! Supported tags include:")
+                
+            error_message.append(language_error)
 
     if accent != None:
         settings["accent"] = accent
