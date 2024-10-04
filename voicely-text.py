@@ -456,8 +456,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
             else:
                 bot.members_settings[ctx.author.id] = {"language": languagetag}
             
-            await ctx.send(f"Your language has been set to {langs[key]}.", ephemeral=True)
-            print('got here')
+            await ctx.send(f"Your language has been set to {langs[languagetag]}.", ephemeral=True)
         else:
             language_error = f"`{languagetag}` is not a valid IETF language tag! Supported tags include:"
             keys = list(langs.keys())
