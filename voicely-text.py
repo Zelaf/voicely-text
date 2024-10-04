@@ -285,7 +285,7 @@ def return_seconds(argument):
 @bot.hybrid_command()
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' or 'default' to reset to default.")
 async def settimeout(ctx: commands.Context, seconds: return_seconds):
-    """Set the inactivity timeout duration."""
+    """Set the number of seconds of after which the bot will leave the voice channel if no messages are being read."""
 
     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` or `default` to **reset the timeout** to the default value *({bot.default_timeout} seconds)*."
 
