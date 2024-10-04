@@ -80,53 +80,60 @@ async def process_queue():
         else:
             accent = bot.default_settings["accent"]
 
-        tts = gTTS(text=text, lang=language, tld=accent)
-        tts.save("tts.mp3")
-        
-        if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
-            await bot.voice_clients[0].move_to(voice_channel)
-        elif not bot.voice_clients:
-            await voice_channel.connect()
-
+        try:
+            tts = gTTS(text=text, lang=language, tld=accent)
+            tts.save("tts.mp3")
             
-        voice_client = guild.voice_client
+            if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
+                await bot.voice_clients[0].move_to(voice_channel)
+            elif not bot.voice_clients:
+                await voice_channel.connect()
 
-        if voice_client and voice_client.is_connected():
-            def after_playing(error):
-                if error:
-                    print(f"Error occurred during playback: {error}")
+                
+            voice_client = guild.voice_client
 
-                # Indicate that the current task is done
-                bot.loop.call_soon_threadsafe(bot.tts_queue.task_done)
+            if voice_client and voice_client.is_connected():
+                def after_playing(error):
+                    if error:
+                        print(f"Error occurred during playback: {error}")
 
-                # Clean up the audio file
-                try:
-                    os.remove("tts.mp3")
-                    print("Cleaned up the TTS file")
-                except OSError:
-                    print("Error cleaning up the TTS file.")
+                    # Indicate that the current task is done
+                    bot.loop.call_soon_threadsafe(bot.tts_queue.task_done)
 
-            # Play the audio file in the voice channel
-            print("Playing the TTS message in the voice channel...")
-            voice_client.play(discord.FFmpegPCMAudio("tts.mp3", executable='bot-env/ffmpeg/bin/ffmpeg'), after=after_playing)
-            # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
+                    # Clean up the audio file
+                    try:
+                        os.remove("tts.mp3")
+                        print("Cleaned up the TTS file")
+                    except OSError:
+                        print("Error cleaning up the TTS file.")
 
-            # Wait until the current message is finished playing
-            while voice_client.is_playing():
-                await asyncio.sleep(1)
-            print("Audio finished playing")
+                # Play the audio file in the voice channel
+                print("Playing the TTS message in the voice channel...")
+                voice_client.play(discord.FFmpegPCMAudio("tts.mp3", executable='bot-env/ffmpeg/bin/ffmpeg'), after=after_playing)
+                # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
+
+                # Wait until the current message is finished playing
+                while voice_client.is_playing():
+                    await asyncio.sleep(1)
+                print("Audio finished playing")
 
 
-            if guild_id in bot.active_timeouts:
-                bot.active_timeouts[guild_id].cancel()
+                if guild_id in bot.active_timeouts:
+                    bot.active_timeouts[guild_id].cancel()
 
-            bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
+                bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
 
-            bot.active_timeouts[guild_id]
+                bot.active_timeouts[guild_id]
 
-        else:
-            print("Voice client is not connected; task done")
-            bot.tts_queue.task_done()
+            else:
+                print("Voice client is not connected; task done")
+                bot.tts_queue.task_done()
+        except AssertionError as error:
+            print(error)
+        except ValueError as error:
+            print(error)
+        except RuntimeError as error:
+            print(error)
 
 # region When a message is sent
 @bot.event
