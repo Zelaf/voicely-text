@@ -8,7 +8,7 @@ from gtts import lang
 import os
 import time
 import math
-import validators
+import requests
 
 # Define intents
 intents = discord.Intents.default()
@@ -81,7 +81,12 @@ async def process_queue():
         else:
             accent = bot.default_settings["accent"]
 
-        tts = gTTS(text=text, lang=language, tld=accent)
+        response = requests.get(f"https://translate.google.{accent}")
+        if response.status_code == 200: # website exists
+            tts = gTTS(text=text, lang=language, tld=accent)
+        else:
+            await message.reply(f"I cannot read your message because https://translate.google.{accent} is currently down. Please run `/setaccent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
+            return
         tts.save("tts.mp3")
         
         if bot.voice_clients and bot.voice_clients[0].channel != voice_channel:
@@ -451,19 +456,23 @@ async def setlanguage(ctx: commands.Context):
 async def setaccent(ctx: commands.Context, tld: to_lower):
     """Set the accent you want me to read your messages in."""
 
-    validation = validators.url(f"https://www.google.{tld}")
+    user_id = ctx.author.id
+    if user_id in bot.members_settings:
+        bot.members_settings[user_id]["accent"] = tld
+    else:
+        bot.members_settings[user_id] = {"accent": tld}
+    await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
 
-    print(validation)
-
-    if validation == True:
+    """ response = requests.get(f"https://translate.google.{tld}")
+    if response.status_code == 200: # website exists
         user_id = ctx.author.id
         if user_id in bot.members_settings:
             bot.members_settings[user_id]["accent"] = tld
         else:
             bot.members_settings[user_id] = {"accent": tld}
         await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
-    elif validation == validators.ValidationError:
-        await ctx.send(f"`{tld}` is not a valid top-level domain: https://www.google.{tld} is not a valid url.")
+    else:
+        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\nhttps://translate.google.{tld} is not a valid url or is otherwise temporarily unavailable.\n\nEither try another value or try again later.") """
 
 
 # endregion
