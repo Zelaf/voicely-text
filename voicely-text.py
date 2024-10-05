@@ -457,7 +457,6 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 # region Command for accents
 class AccentsView(discord.ui.View):
     response = requests.get("https://www.google.com/supported_domains")
-    print(response.text)
     string = response.text.strip('.google.')
     tld_list = string.split('\n.google.')
 
@@ -465,13 +464,15 @@ class AccentsView(discord.ui.View):
     
     select_count = math.ceil(len(tld_list) / 25)
 
+    print(select_count)
+
     for x in range(select_count):
         options.append([])
 
         new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
 
         for y in range(len(new_list)):
-            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"As in www.google.{new_list[y]}"))
+            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
     
         
     async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
