@@ -457,6 +457,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 # region Command for accents
 class AccentsView(discord.ui.View):
     response = requests.get("https://www.google.com/supported_domains")
+    print(response.text)
     string = response.text.strip('.google.')
     tld_list = string.split(' .google.')
 
