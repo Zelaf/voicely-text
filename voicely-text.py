@@ -100,59 +100,53 @@ async def process_queue(guild: discord.Guild):
 
         else:
             tts = gTTS(text=text, lang=language, tld=accent)
-            try:
-                tts.save(f"voice_files/{guild_id}-tts.mp3")
-            except gTTSError as write_error:
-                print(f"{guild_id}: Cannot write to voice_files/{guild_id}-tts.mp3:\n\t{write_error}")
-                await message.reply(f"I encountered an error reading your message. Please [create a bug report](https://github.com/Erallie/voicely-text/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=%5BBug%5D+) and include the following error:\n\n```\n{write_error}\n```")
-                continue
+            tts.save(f"voice_files/{guild_id}-tts.mp3")
             
+            voice_client = guild.voice_client
+
+            if voice_client and voice_client.channel != voice_channel:
+                await voice_client.move_to(voice_channel)
+            elif not voice_client:
+                await voice_channel.connect()
+
+            voice_client = guild.voice_client
+
+            if voice_client and voice_client.is_connected():
+                def after_playing(error):
+                    if error:
+                        print(f"{guild.name}: Error occurred during playback: {error}")
+
+                    # Indicate that the current task is done
+                    bot.loop.call_soon_threadsafe(bot.tts_queue.task_done)
+
+                    # Clean up the audio file
+                    try:
+                        os.remove(f"voice_files/{guild_id}-tts.mp3")
+                        print(f"{guild.name}: Cleaned up the TTS file")
+                    except OSError as remove_error:
+                        print(f"{guild.name}: Error cleaning up the TTS file:\n\t{remove_error}")
+
+                # Play the audio file in the voice channel
+                print(f"{guild.name}: Playing the TTS message in {message.channel.name}...")
+                voice_client.play(discord.FFmpegPCMAudio(f"voice_files/{guild_id}-tts.mp3", executable='bot-env/ffmpeg/bin/ffmpeg'), after=after_playing)
+                # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
+
+                # Wait until the current message is finished playing
+                while voice_client.is_playing():
+                    await asyncio.sleep(1)
+                print(f"{guild.name}: Audio finished playing")
+
+
+                if guild_id in bot.active_timeouts:
+                    bot.active_timeouts[guild_id].cancel()
+
+                bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
+
+                bot.active_timeouts[guild_id]
+
             else:
-                voice_client = guild.voice_client
-
-                if voice_client and voice_client.channel != voice_channel:
-                    await voice_client.move_to(voice_channel)
-                elif not voice_client:
-                    await voice_channel.connect()
-
-                voice_client = guild.voice_client
-
-                if voice_client and voice_client.is_connected():
-                    def after_playing(error):
-                        if error:
-                            print(f"{guild.name}: Error occurred during playback: {error}")
-
-                        # Indicate that the current task is done
-                        bot.loop.call_soon_threadsafe(bot.tts_queue.task_done)
-
-                        # Clean up the audio file
-                        try:
-                            os.remove(f"voice_files/{guild_id}-tts.mp3")
-                            print(f"{guild.name}: Cleaned up the TTS file")
-                        except OSError as remove_error:
-                            print(f"{guild.name}: Error cleaning up the TTS file:\n\t{remove_error}")
-
-                    # Play the audio file in the voice channel
-                    print(f"{guild.name}: Playing the TTS message in {message.channel.name}...")
-                    voice_client.play(discord.FFmpegPCMAudio(f"voice_files/{guild_id}-tts.mp3", executable='bot-env/ffmpeg/bin/ffmpeg'), after=after_playing)
-                    # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
-
-                    # Wait until the current message is finished playing
-                    while voice_client.is_playing():
-                        await asyncio.sleep(1)
-                    print(f"{guild.name}: Audio finished playing")
-
-
-                    if guild_id in bot.active_timeouts:
-                        bot.active_timeouts[guild_id].cancel()
-
-                    bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
-
-                    bot.active_timeouts[guild_id]
-
-                else:
-                    print(f"{guild.name}: Voice client is not connected; task done")
-                    bot.tts_queue.task_done()
+                print(f"{guild.name}: Voice client is not connected; task done")
+                bot.tts_queue.task_done()
 
 # region When a message is sent
 @bot.event
