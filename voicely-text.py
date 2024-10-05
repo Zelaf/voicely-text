@@ -627,7 +627,7 @@ async def shutdown(loop: asyncio.AbstractEventLoop):
 def run_bot():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    atexit.register(shutdown, loop)
+    # atexit.register(shutdown, loop)
     # signal.signal(signal.SIGINT, shutdown(loop))
     # signal.signal(signal.SIGTERM, shutdown(loop))
 
