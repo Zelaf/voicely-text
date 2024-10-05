@@ -67,8 +67,9 @@ async def on_ready():
 async def process_queue(guild: discord.Guild):
     while True:
         print("Waiting for the next message in the queue...")
-        message, text, voice_channel, user_id = await bot.queue[guild.id]["queue"].get()
         print(f"Processing message: {text}")
+        message, text, voice_channel = await bot.queue[guild.id]["queue"].get()
+        user_id = message.author.id
 
         # Convert the text to speech using gTTS
         
@@ -173,7 +174,7 @@ async def on_message(message: discord.Message):
 
     if voice_channel:
         # Add the filtered message content to the queue
-        await bot.queue[message.guild.id]["queue"].put((message, message_content, voice_channel, message.author.id))
+        await bot.queue[message.guild.id]["queue"].put((message, message_content, voice_channel))
         print(f"Added message to queue: {message_content}")
 
     await bot.process_commands(message)
