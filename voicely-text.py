@@ -178,7 +178,7 @@ async def on_message(message: discord.Message):
     if voice_channel:
         # Add the filtered message content to the queue
         await bot.queue[message.guild.id]["queue"].put((message, message_content, voice_channel))
-        print(f"Added message to queue: {message_content}")
+        print(f"{message.guild.name}: Added message to queue: {message_content}")
 
     await bot.process_commands(message)
 
