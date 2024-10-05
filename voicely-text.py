@@ -512,9 +512,9 @@ class AccentsView(discord.ui.View):
     async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
         await self.select_accent(interaction, select)
 
-    """ @discord.ui.select(placeholder="Select a top-level domain (8)", options=options[7])
+    @discord.ui.select(placeholder="Select a top-level domain (8)", options=options[7])
     async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select) """
+        await self.select_accent(interaction, select)
 
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain from which the accent will be read.")
@@ -538,6 +538,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
         tld_string = requests.get("https://www.google.com/supported_domains")
         
         if tld_string.status_code == 200:
+            print('got here')
             embed = discord.Embed(title="Set your preferred accent", description='Choose from the list of top-level domains below, and I will read your messages as though I am from a region that uses that domain.')
             await ctx.send(embed=embed, view=AccentsView(), ephemeral=True)
         else:
