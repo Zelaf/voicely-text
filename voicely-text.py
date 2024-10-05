@@ -8,6 +8,7 @@ from gtts import lang
 import os
 import math
 import requests
+import atexit
 
 # Define intents
 intents = discord.Intents.default()
@@ -21,6 +22,7 @@ intents.members = True
 class Bot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents)
+        self.run_loop = None
         self.queue = {}
         self.tts_queue = asyncio.Queue()
         self.queue_task = None
@@ -608,30 +610,42 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 
 # region shutdown
 # shutdown function for graceful exit
+@atexit.register
 async def shutdown():
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
-    if bot.queue_task is not None:
-        bot.queue_task.cancel()
-        try:
-            await bot.queue_task
-        except asyncio.CancelledError:
-            print("Queue task has been cancelled")
-
+    for queue_group in bot.queue:
+        if queue_group["task"] is not None:
+            queue_group["task"].cancel()
+            try:
+                await queue_group["task"]
+            except asyncio.CancelledError:
+                print("Queue task has been cancelled")
+    # if bot.queue_task is not None:
+    #     bot.queue_task.cancel()
+    #     try:
+    #         await bot.queue_task
+    #     except asyncio.CancelledError:
+    #         print("Queue task has been cancelled")
     await bot.close()
+    if bot.run_loop is not None:
+        bot.run_loop.close()
+    else:
+        print("There is no run_loop to close!")
+    print("Voicely Text has exited.")
 # endregion
 
 def run_bot():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    bot.run_loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(bot.run_loop)
 
     try:
-        loop.run_until_complete(bot.start(TOKEN))
+        bot.run_loop.run_until_complete(bot.start(TOKEN))
     except KeyboardInterrupt:
         print("Bot is shutting down...")
-        loop.run_until_complete(shutdown())
+        bot.run_loop.run_until_complete(shutdown())
     finally:
-        loop.close()
+        bot.run_loop.close()
         print("Bot has exited.")
 
 if __name__ == "__main__":
