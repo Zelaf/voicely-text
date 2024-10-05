@@ -634,12 +634,10 @@ def run_bot():
 
     try:
         loop.run_until_complete(bot.start(TOKEN))
-    except:
-        print("run_bot has an exception.")
-    """ except KeyboardInterrupt:
+    except KeyboardInterrupt:
         print("Bot is shutting down...")
         loop.run_until_complete(shutdown())
-    finally:
+    """ finally:
         loop.close()
         print("Bot has exited.") """
 
