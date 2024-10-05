@@ -412,15 +412,15 @@ class LanguagesView(discord.ui.View):
 
     @discord.ui.select(placeholder="Select a language (1)", options=options[0])
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-        self.select_language(interaction, select)
+        await self.select_language(interaction, select)
     
     @discord.ui.select(placeholder="Select a language (2)", options=options[1])
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-        self.select_language(interaction, select)
+        await self.select_language(interaction, select)
     
     @discord.ui.select(placeholder="Select a language (3)", options=options[2])
     async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-        self.select_language(interaction, select)
+        await self.select_language(interaction, select)
 
 
 @bot.hybrid_command()
@@ -486,7 +486,7 @@ class AccentsView(discord.ui.View):
 
     @discord.ui.select(placeholder="Select an accent (1)", options=options[0])
     async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-        self.select_accent(interaction, select)
+        await self.select_accent(interaction, select)
 
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
