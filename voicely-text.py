@@ -613,7 +613,7 @@ async def shutdown():
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
     for queue_group in bot.queue:
-        if queue_group["task"] is not None:
+        if "task" in queue_group:
             queue_group["task"].cancel()
             try:
                 await queue_group["task"]
