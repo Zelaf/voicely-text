@@ -456,26 +456,22 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 
 # region Command for accents
 class AccentsView(discord.ui.View):
-    def __init__(self, tld_string: str):
-        string = tld_string.strip('.google.')
-        self.tld_list = string.split(' .google.')
+    tld_string = requests.get("https://www.google.com/supported_domains")
+    string = tld_string.strip('.google.')
+    tld_list = string.split(' .google.')
 
-    def generate_options(self):
-        tld_list = self.tld_list
+    options = []
+    
+    select_count = math.ceil(len(tld_list) / 25)
 
-        options = []
-        
-        select_count = math.ceil(len(tld_list) / 25)
+    for x in range(select_count):
+        options.append([])
 
-        for x in range(select_count):
-            options.append([])
+        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
 
-            new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
-
-            for y in range(len(new_list)):
-                options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"As in www.google.{new_list[y]}"))
-        
-        return options
+        for y in range(len(new_list)):
+            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"As in www.google.{new_list[y]}"))
+    
         
     async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
         user_id = interaction.user.id
@@ -487,7 +483,7 @@ class AccentsView(discord.ui.View):
         return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
 
-    @discord.ui.select(placeholder="Select an accent (1)", options=generate_options()[0])
+    @discord.ui.select(placeholder="Select an accent (1)", options=options[0])
     async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_accent(interaction, select)
 
@@ -514,7 +510,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
         
         if tld_string.status_code == 200:
             embed = discord.Embed(title="Set your preferred accent", description='Choose from the list of top-level domains below, and I will read your messages as though I am from a region that uses that domain.')
-            await ctx.send(embed=embed, view=AccentsView(tld_string), ephemeral=True)
+            await ctx.send(embed=embed, view=AccentsView(), ephemeral=True)
         else:
             await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains is temporarily unavailable. Please specify a `tld` parameter or wait and try again later.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.")
             
