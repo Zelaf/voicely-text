@@ -95,7 +95,7 @@ async def process_queue(guild: discord.Guild):
         try:
             requests.get(f"https://translate.google.{accent}")
         except requests.ConnectionError:
-            await message.reply(f"I cannot read your message because https://translate.google.{accent} is currently down. Please run `/setaccent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
+            await message.reply(f"I cannot read your message because `https://translate.google.`**`{tld}`** is currently down. Please run `/setaccent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
             continue
 
         else:
@@ -495,7 +495,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
     try:
         requests.get(f"https://translate.google.{tld}")
     except requests.ConnectionError:
-        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\nhttps://translate.google.{tld} is not a valid url or is otherwise temporarily unavailable.\n\nEither try another value or try again later.")
+        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is not a valid url or is otherwise temporarily unavailable.\n\nEither try another value or try again later.")
 
     else:
         user_id = ctx.author.id
