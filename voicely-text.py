@@ -508,7 +508,7 @@ class AccentsView1(discord.ui.View):
 
         @discord.ui.button(label="Next page")
         async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(embed=accent_embed, view=AccentsView2, ephemeral=True)
+            await interaction.response.send_message(embed=accent_embed, view=AccentsView2(), ephemeral=True)
 
     else:
         print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
@@ -555,7 +555,7 @@ class AccentsView2(discord.ui.View):
 
         @discord.ui.button(label="Previous page")
         async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(embed=accent_embed, view=AccentsView1, ephemeral=True)
+            await interaction.response.send_message(embed=accent_embed, view=AccentsView1(), ephemeral=True)
 
     else:
         print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
