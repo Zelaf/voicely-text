@@ -608,7 +608,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 
 # region shutdown
 # shutdown function for graceful exit
-@atexit.register
+# @atexit.register
 async def shutdown():
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
@@ -626,11 +626,11 @@ async def shutdown():
     #     except asyncio.CancelledError:
     #         print("Queue task has been cancelled")
     await bot.close()
-    if bot.run_loop:
+    """ if bot.run_loop:
         bot.run_loop.close()
     else:
         print("There is no run_loop to close!")
-    print("Voicely Text has exited.")
+    print("Voicely Text has exited.") """
 # endregion
 
 def run_bot():
@@ -639,6 +639,9 @@ def run_bot():
 
     try:
         bot.run_loop.run_until_complete(bot.start(TOKEN))
+    except KeyboardInterrupt:
+        print("Bot is shutting down...")
+        bot.run_loop.run_until_complete(shutdown())
     finally:
         bot.run_loop.close()
         print("Bot has exited.")
