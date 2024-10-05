@@ -387,7 +387,7 @@ class LanguagesView(discord.ui.View):
     
     select_count = math.ceil(len(langs) / 25)
 
-    for x in select_count:
+    for x in range(select_count):
         options.append([])
 
         new_keys = keys[(x * 25):min((x * 25) + 25, len(keys))]
@@ -467,7 +467,7 @@ class AccentsView(discord.ui.View):
         
         select_count = math.ceil(len(tld_list) / 25)
 
-        for x in select_count:
+        for x in range(select_count):
             options.append([])
 
             new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
