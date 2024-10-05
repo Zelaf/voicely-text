@@ -21,6 +21,7 @@ intents.members = True
 class Bot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents)
+        self.queue = {}
         self.tts_queue = asyncio.Queue()
         self.queue_task = None
         self.default_settings = {
@@ -47,23 +48,31 @@ with open('../token.txt', 'r') as file:
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-    bot.queue_task = bot.loop.create_task(process_queue())
-    bot.loop.create_task(check_empty_channel())  # Start the empty channel check
+
+    for guild in bot.guilds:
+        bot.queue[guild.id] = {
+            "queue": asyncio.Queue(),
+            "task": bot.loop.create_task(process_queue(guild))
+        }
+        bot.loop.create_task(check_empty_channel(guild))
+
+    """ bot.queue_task = bot.loop.create_task(process_queue())
+    bot.loop.create_task(check_empty_channel())  # Start the empty channel check """
 
     # Print out all registered commands
     print("Registered commands:")
     for command in bot.tree.get_commands():
         print(f"- /{command.name}")
 
-async def process_queue():
+async def process_queue(guild: discord.Guild):
     while True:
         print("Waiting for the next message in the queue...")
-        message, text, voice_channel, user_id = await bot.tts_queue.get()
+        message, text, voice_channel, user_id = await bot.queue[guild.id]["queue"].get()
         print(f"Processing message: {text}")
 
         # Convert the text to speech using gTTS
         
-        guild = message.guild
+        # guild = message.guild
         guild_id = guild.id
 
         if user_id in bot.members_settings and "language" in bot.members_settings[user_id]:
@@ -164,7 +173,7 @@ async def on_message(message: discord.Message):
 
     if voice_channel:
         # Add the filtered message content to the queue
-        await bot.tts_queue.put((message, message_content, voice_channel, message.author.id))
+        await bot.queue[message.guild.id]["queue"].put((message, message_content, voice_channel, message.author.id))
         print(f"Added message to queue: {message_content}")
 
     await bot.process_commands(message)
@@ -173,17 +182,23 @@ async def on_message(message: discord.Message):
 
 # region Leave voice channel when empty
 # Check if the bot is alone in the voice channel and disconnect if empty
-async def check_empty_channel():
+async def check_empty_channel(guild: discord.Guild):
     """Periodically check if the bot is alone in the voice channel and disconnect."""
     while True:
-        for guild_id, timeout in list(bot.active_timeouts.items()):
+        """ for guild_id, timeout in list(bot.active_timeouts.items()):
             guild = bot.get_guild(guild_id)
             if guild and guild.voice_client:
                 voice_channel = guild.voice_client.channel
                 if len(voice_channel.members) == 1:  # Only the bot is in the channel
                     await guild.voice_client.disconnect()
                     print(f"Disconnected from {guild.name} as it was empty.")
-                    del bot.active_timeouts[guild_id]
+                    del bot.active_timeouts[guild_id] """
+        if guild.voice_client:
+            voice_channel = guild.voice_client.channel
+            if len(voice_channel.members) == 1:
+                await guild.voice_client.disconnect()
+                print(f"Disconnected from {guild.name} as it was empty.")
+                del bot.active_timeouts[guild.id]
         await asyncio.sleep(60)  # Check every 60 seconds
 
 # endregion
