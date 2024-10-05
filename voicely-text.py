@@ -5,7 +5,6 @@ import asyncio
 import re
 from gtts import gTTS
 from gtts import lang
-from gtts.tts import gTTSError
 import os
 import math
 import requests
