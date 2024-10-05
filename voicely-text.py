@@ -495,7 +495,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower):
     try:
         requests.get(f"https://translate.google.{tld}")
     except requests.ConnectionError:
-        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is not a valid url or is otherwise temporarily unavailable.\n\nEither try another value or try again later.\n\n[Here](https://en.wikipedia.org/wiki/Country_code_top-level_domain#Latin_Character_ccTLDs) is a list of top-level domains you can use.", ephemeral=True, suppress_embeds=True)
+        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise **temporarily unavailable**.\n\nEither try another value or try again later.\n\nHere is a [Wikipedia page](https://en.wikipedia.org/wiki/Country_code_top-level_domain#Latin_Character_ccTLDs) with a list of top-level domains you can use.", ephemeral=True, suppress_embeds=True)
 
     else:
         user_id = ctx.author.id
