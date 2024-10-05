@@ -485,7 +485,7 @@ class AccentsView(discord.ui.View):
 
             return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
-
+        print('got here')
         @discord.ui.select(placeholder="Select a top-level domain (1)", options=options[0])
         async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
             await self.select_accent(interaction, select)
