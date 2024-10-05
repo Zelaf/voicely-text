@@ -626,7 +626,7 @@ async def shutdown():
     #     except asyncio.CancelledError:
     #         print("Queue task has been cancelled")
     await bot.close()
-    if bot.run_loop is not None:
+    if bot.run_loop:
         bot.run_loop.close()
     else:
         print("There is no run_loop to close!")
@@ -639,9 +639,6 @@ def run_bot():
 
     try:
         bot.run_loop.run_until_complete(bot.start(TOKEN))
-    except KeyboardInterrupt:
-        print("Bot is shutting down...")
-        bot.run_loop.run_until_complete(shutdown())
     finally:
         bot.run_loop.close()
         print("Bot has exited.")
