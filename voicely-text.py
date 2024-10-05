@@ -99,7 +99,7 @@ async def process_queue(guild: discord.Guild):
         
         else:
             tts = gTTS(text=text, lang=language, tld=accent)
-            tts.save("tts.mp3")
+            tts.save(f"voice_files/{guild_id}-tts.mp3")
             
             
             voice_client = guild.voice_client
@@ -121,20 +121,20 @@ async def process_queue(guild: discord.Guild):
 
                     # Clean up the audio file
                     try:
-                        os.remove("tts.mp3")
+                        os.remove(f"voice_files/{guild_id}-tts.mp3")
                         print(f"{guild.name}: Cleaned up the TTS file")
-                    except OSError:
-                        print(f"{guild.name}: Error cleaning up the TTS file.")
+                    except OSError as voice_error:
+                        print(f"{guild.name}: Error cleaning up the TTS file:\n\t{voice_error}")
 
                 # Play the audio file in the voice channel
                 print(f"{guild.name}: Playing the TTS message in {message.channel.name}...")
-                voice_client.play(discord.FFmpegPCMAudio("tts.mp3", executable='bot-env/ffmpeg/bin/ffmpeg'), after=after_playing)
+                voice_client.play(discord.FFmpegPCMAudio(f"voice_files/{guild_id}-tts.mp3", executable='bot-env/ffmpeg/bin/ffmpeg'), after=after_playing)
                 # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
 
                 # Wait until the current message is finished playing
                 while voice_client.is_playing():
                     await asyncio.sleep(1)
-                print(f"{guild.name}:Audio finished playing")
+                print(f"{guild.name}: Audio finished playing")
 
 
                 if guild_id in bot.active_timeouts:
@@ -145,7 +145,7 @@ async def process_queue(guild: discord.Guild):
                 bot.active_timeouts[guild_id]
 
             else:
-                print(f"{guild.name}:Voice client is not connected; task done")
+                print(f"{guild.name}: Voice client is not connected; task done")
                 bot.tts_queue.task_done()
 
 # region When a message is sent
