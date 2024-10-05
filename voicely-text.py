@@ -411,11 +411,11 @@ class LanguagesView(discord.ui.View):
             component.disabled = True """
         return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
 
-    @discord.ui.select(placeholder="Select a language (1)", options=generate_options(0))
+    @discord.ui.select(placeholder="Select a language (1)", options=generate_options(self, 0))
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_language(interaction, select)
     
-    @discord.ui.select(placeholder="Select a language (2)", options=generate_options(1))
+    @discord.ui.select(placeholder="Select a language (2)", options=generate_options(self, 1))
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_language(interaction, select)
     
