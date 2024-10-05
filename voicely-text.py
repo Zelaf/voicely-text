@@ -476,9 +476,6 @@ class AccentsView(discord.ui.View):
                 options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"As in www.google.{new_list[y]}"))
         
         return options
-
-    options = generate_options
-
         
     async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
         user_id = interaction.user.id
@@ -490,7 +487,7 @@ class AccentsView(discord.ui.View):
         return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
 
-    @discord.ui.select(placeholder="Select an accent (1)", options=options[0])
+    @discord.ui.select(placeholder="Select an accent (1)", options=generate_options()[0])
     async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_accent(interaction, select)
 
