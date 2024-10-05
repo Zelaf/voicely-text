@@ -477,8 +477,6 @@ def get_tlds():
         
         select_count = math.ceil(len(tld_list) / 25)
 
-        print(select_count)
-
         for x in range(select_count):
             options.append([])
 
@@ -491,49 +489,53 @@ def get_tlds():
         print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
         return []
 
-tld_list = get_tlds()
+# tld_list = get_tlds()
+tld_list = []
 
 class AccentsView1(discord.ui.View):
-    @discord.ui.select(placeholder="Select a top-level domain (1)", options=tld_list[0])
-    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+    if len(tld_list) > 3:
+        @discord.ui.select(placeholder="Select a top-level domain (1)", options=tld_list[0])
+        async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (2)", options=tld_list[1])
-    async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (2)", options=tld_list[1])
+        async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (3)", options=tld_list[2])
-    async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (3)", options=tld_list[2])
+        async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (4)", options=tld_list[3])
-    async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (4)", options=tld_list[3])
+        async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.button(label="Next page")
-    async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(embed=accent_embed, view=AccentsView2(), ephemeral=True)
+        if len(tld_list) > 4:
+            @discord.ui.button(label="Next page")
+            async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+                await interaction.response.send_message(embed=accent_embed, view=AccentsView2(), ephemeral=True)
 
-class AccentsView2(discord.ui.View):        
-    @discord.ui.select(placeholder="Select a top-level domain (5)", options=tld_list[4])
-    async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+class AccentsView2(discord.ui.View):
+    if len(tld_list) > 7:
+        @discord.ui.select(placeholder="Select a top-level domain (5)", options=tld_list[4])
+        async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (6)", options=tld_list[5])
-    async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (6)", options=tld_list[5])
+        async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (7)", options=tld_list[6])
-    async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (7)", options=tld_list[6])
+        async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (8)", options=tld_list[7])
-    async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await select_accent(self, interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (8)", options=tld_list[7])
+        async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
 
-    @discord.ui.button(label="Previous page")
-    async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(embed=accent_embed, view=AccentsView1(), ephemeral=True)
+        @discord.ui.button(label="Previous page")
+        async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+            await interaction.response.send_message(embed=accent_embed, view=AccentsView1(), ephemeral=True)
 
 
 @bot.hybrid_command()
