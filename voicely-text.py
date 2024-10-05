@@ -24,8 +24,6 @@ class Bot(commands.Bot):
         super().__init__(command_prefix="!", intents=intents)
         self.run_loop = None
         self.queue = {}
-        self.tts_queue = asyncio.Queue()
-        self.queue_task = None
         self.default_settings = {
             "language": "en",
             "accent": "com",
