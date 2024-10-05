@@ -612,7 +612,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 async def shutdown():
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
-    for queue_group in bot.queue:
+    for guild, queue_group in bot.queue:
         queue_group["task"].cancel()
         try:
             await queue_group["task"]
