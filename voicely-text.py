@@ -166,7 +166,7 @@ async def on_message(message: discord.Message):
     message_content = re.sub(r'\d{8,}', "", message_content)
     
     if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
-        print("Message contains no text, skipping.")
+        print(f"{message.guild.name}: Message contains no text, skipping.")
         return
     
     message_content = f"{message.author.display_name} says, " + message_content
@@ -193,7 +193,7 @@ async def check_empty_channel(guild: discord.Guild):
             voice_channel = guild.voice_client.channel
             if len(voice_channel.members) == 1:
                 await guild.voice_client.disconnect()
-                print(f"Disconnected from {guild.name} as it was empty.")
+                print(f"{guild.name}: Disconnected from voice channel as it was empty.")
                 del bot.active_timeouts[guild.id]
         await asyncio.sleep(60)  # Check every 60 seconds
 
