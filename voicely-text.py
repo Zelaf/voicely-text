@@ -456,65 +456,71 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 # region Command for accents
 class AccentsView(discord.ui.View):
     response = requests.get("https://www.google.com/supported_domains")
-    string = response.text.strip('.google.')
-    tld_list = string.split('\n.google.')
 
-    options = []
-    
-    select_count = math.ceil(len(tld_list) / 25)
+    if response.status_code == 200:
+        string = response.text.strip('.google.')
+        tld_list = string.split('\n.google.')
 
-    print(select_count)
-
-    for x in range(select_count):
-        options.append([])
-
-        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
-
-        for y in range(len(new_list)):
-            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
-    
+        options = []
         
-    async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
-        user_id = interaction.user.id
-        if user_id in bot.members_settings:
-            bot.members_settings[user_id]["accent"] = select.values[0]
-        else:
-            bot.members_settings[user_id] = {"accent": select.values[0]}
+        select_count = math.ceil(len(tld_list) / 25)
 
-        return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
+        print(select_count)
+
+        for x in range(select_count):
+            options.append([])
+
+            new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
+
+            for y in range(len(new_list)):
+                options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
+        
+            
+        async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
+            user_id = interaction.user.id
+            if user_id in bot.members_settings:
+                bot.members_settings[user_id]["accent"] = select.values[0]
+            else:
+                bot.members_settings[user_id] = {"accent": select.values[0]}
+
+            return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
 
-    @discord.ui.select(placeholder="Select a top-level domain (1)", options=options[0])
-    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (1)", options=options[0])
+        async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (2)", options=options[1])
-    async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (2)", options=options[1])
+        async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (3)", options=options[2])
-    async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (3)", options=options[2])
+        async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (4)", options=options[3])
-    async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (4)", options=options[3])
+        async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (5)", options=options[4])
-    async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (5)", options=options[4])
+        async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (6)", options=options[5])
-    async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (6)", options=options[5])
+        async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (7)", options=options[6])
-    async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (7)", options=options[6])
+        async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
 
-    @discord.ui.select(placeholder="Select a top-level domain (8)", options=options[7])
-    async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_accent(interaction, select)
+        @discord.ui.select(placeholder="Select a top-level domain (8)", options=options[7])
+        async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await self.select_accent(interaction, select)
+
+    # else:
+    #     await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains is temporarily unavailable. Please specify a `tld` parameter or wait and try again later.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.")
+        # perhaps try again?
 
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain from which the accent will be read.")
@@ -535,14 +541,8 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
                 bot.members_settings[user_id] = {"accent": tld}
             await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
     else:
-        tld_string = requests.get("https://www.google.com/supported_domains")
-        
-        if tld_string.status_code == 200:
-            print('got here')
-            embed = discord.Embed(title="Set your preferred accent", description='Choose from the list of top-level domains below, and I will read your messages as though I am from a region that uses that domain.')
-            await ctx.send(embed=embed, view=AccentsView(), ephemeral=True)
-        else:
-            await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains is temporarily unavailable. Please specify a `tld` parameter or wait and try again later.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.")
+        embed = discord.Embed(title="Set your preferred accent", description='Choose from the list of top-level domains below, and I will read your messages as though I am from a region that uses that domain.')
+        await ctx.send(embed=embed, view=AccentsView(), ephemeral=True)
             
 
 
