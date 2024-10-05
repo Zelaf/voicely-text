@@ -189,14 +189,6 @@ async def on_message(message: discord.Message):
 async def check_empty_channel(guild: discord.Guild):
     """Periodically check if the bot is alone in the voice channel and disconnect."""
     while True:
-        """ for guild_id, timeout in list(bot.active_timeouts.items()):
-            guild = bot.get_guild(guild_id)
-            if guild and guild.voice_client:
-                voice_channel = guild.voice_client.channel
-                if len(voice_channel.members) == 1:  # Only the bot is in the channel
-                    await guild.voice_client.disconnect()
-                    print(f"Disconnected from {guild.name} as it was empty.")
-                    del bot.active_timeouts[guild_id] """
         if guild.voice_client:
             voice_channel = guild.voice_client.channel
             if len(voice_channel.members) == 1:
