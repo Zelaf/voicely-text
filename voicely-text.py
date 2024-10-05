@@ -156,7 +156,7 @@ async def on_message(message: discord.Message):
         print("Message contains no text, skipping.")
         return
     
-    message_content = f"{message.author.display_name} says " + message_content
+    message_content = f"{message.author.display_name} says, " + message_content
 
     # Check if there is a voice channel with the same name as the text channel
     text_channel_name = message.channel.name
