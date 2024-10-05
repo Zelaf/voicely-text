@@ -8,7 +8,8 @@ from gtts import lang
 import os
 import math
 import requests
-import signal
+# import signal
+import atexit
 
 # Define intents
 intents = discord.Intents.default()
@@ -608,6 +609,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 
 # region shutdown
 # shutdown function for graceful exit
+
 async def shutdown(loop: asyncio.AbstractEventLoop):
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
@@ -629,14 +631,15 @@ async def shutdown(loop: asyncio.AbstractEventLoop):
 def run_bot():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    signal.signal(signal.SIGINT, shutdown)
-    signal.signal(signal.SIGTERM, shutdown)
+    atexit.register(shutdown, loop)
+    # signal.signal(signal.SIGINT, shutdown(loop))
+    # signal.signal(signal.SIGTERM, shutdown(loop))
 
     try:
         loop.run_until_complete(bot.start(TOKEN))
     except KeyboardInterrupt:
         print("Bot is shutting down...")
-        loop.run_until_complete(shutdown())
+        loop.run_until_complete(shutdown(loop))
     """ finally:
         loop.close()
         print("Bot has exited.") """
