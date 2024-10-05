@@ -477,7 +477,7 @@ class AccentsView(discord.ui.View):
         
         return options
 
-    options = generate_options()
+    options = generate_options
 
         
     async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
