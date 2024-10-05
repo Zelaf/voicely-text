@@ -8,7 +8,7 @@ from gtts import lang
 import os
 import math
 import requests
-import atexit
+import signal
 
 # Define intents
 intents = discord.Intents.default()
@@ -608,8 +608,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 
 # region shutdown
 # shutdown function for graceful exit
-# @atexit.register
-async def shutdown():
+async def shutdown(loop: asyncio.AbstractEventLoop):
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
     for queue_group in bot.queue.values():
@@ -619,32 +618,30 @@ async def shutdown():
                 await queue_group["task"]
             except asyncio.CancelledError:
                 print("Queue task has been cancelled")
-    # if bot.queue_task is not None:
-    #     bot.queue_task.cancel()
-    #     try:
-    #         await bot.queue_task
-    #     except asyncio.CancelledError:
-    #         print("Queue task has been cancelled")
     await bot.close()
-    """ if bot.run_loop:
-        bot.run_loop.close()
+    if loop:
+        loop.close()
     else:
         print("There is no run_loop to close!")
-    print("Voicely Text has exited.") """
+    print("Voicely Text has exited.")
 # endregion
 
-def run_bot():
-    bot.run_loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(bot.run_loop)
+async def run_bot():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    signal.signal(signal.SIGINT, await shutdown)
+    signal.signal(signal.SIGTERM, await shutdown)
 
     try:
-        bot.run_loop.run_until_complete(bot.start(TOKEN))
-    except KeyboardInterrupt:
+        loop.run_until_complete(bot.start(TOKEN))
+    except:
+        print("run_bot has an exception.")
+    """ except KeyboardInterrupt:
         print("Bot is shutting down...")
-        bot.run_loop.run_until_complete(shutdown())
+        loop.run_until_complete(shutdown())
     finally:
-        bot.run_loop.close()
-        print("Bot has exited.")
+        loop.close()
+        print("Bot has exited.") """
 
 if __name__ == "__main__":
     run_bot()
