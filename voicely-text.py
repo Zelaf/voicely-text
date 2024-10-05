@@ -518,7 +518,8 @@ class AccentsView(discord.ui.View):
         async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
             await self.select_accent(interaction, select)
 
-    # else:
+    else:
+        print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
     #     await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains is temporarily unavailable. Please specify a `tld` parameter or wait and try again later.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.")
         # perhaps try again?
 
