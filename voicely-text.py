@@ -155,6 +155,8 @@ async def on_message(message: discord.Message):
     if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
         print("Message contains no text, skipping.")
         return
+    
+    message_content = f"{message.author.display_name} says " + message_content
 
     # Check if there is a voice channel with the same name as the text channel
     text_channel_name = message.channel.name
