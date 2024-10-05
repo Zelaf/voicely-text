@@ -99,7 +99,7 @@ async def process_queue(guild: discord.Guild):
         
         else:
             tts = gTTS(text=text, lang=language, tld=accent)
-            tts.save(f"voice_files/{guild_id}-tts.mp3")
+            tts.write_to_fp(f"voice_files/{guild_id}-tts.mp3")
             
             
             voice_client = guild.voice_client
