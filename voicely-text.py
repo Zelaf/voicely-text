@@ -380,80 +380,48 @@ async def serversautoread() """
         await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True) """
 
 class LanguagesView(discord.ui.View):
-    options = []
+    def __init__(self):
+        self.langs = lang.tts_langs()
+        self.keys = list(self.langs.keys())
     
-    langs = lang.tts_langs()
-    keys = list(langs.keys())
-    # iterated = 0
+    def generate_options(self, index):
+        options = []
 
-    select_count = math.ceil(len(langs) / 25)
-    # print(f"select_count = {select_count}")
-    
-    for x in range(select_count):
-        options.append([])
-        # print(f"x = {x}")
-
-        new_keys = keys[(x * 25):min((x * 25) + 25, len(keys))]
+        new_keys = self.keys[(index * 25):min((index * 25) + 25, len(self.keys))]
 
         for y in range(len(new_keys)):
             key = new_keys[y]
-            options[x].append(discord.SelectOption(label=langs[key], value=key, description=key))
+            options.append(discord.SelectOption(label=self.langs[key], value=key, description=key))
+        
+        return options
 
-        # options.append(options)
-        # iterated += 1
+    # select_count = math.ceil(len(langs) / 25)
+    
+    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+        langs = lang.tts_langs()
+        user_id = interaction.user.id
+        if user_id in bot.members_settings:
+            bot.members_settings[user_id]["language"] = select.values[0]
+        else:
+            bot.members_settings[user_id] = {"language": select.values[0]}
+        
+        select.disabled = True
 
-        """ @discord.ui.select(placeholder=f"Select a language ({x})", options=options[x], custom_id=f"language_dropdown_{x}")
-        async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
-            langs = lang.tts_langs()
-            user_id = interaction.user.id
-            if user_id in bot.members_settings:
-                bot.members_settings[user_id]["language"] = select.values[0]
-            else:
-                bot.members_settings[user_id] = {"language": select.values[0]}
-            return await interaction.response.send_message(f"Your language has been set to {langs[select.values[0]]}.", ephemeral=True) """
+        """ for component in interaction.message.components:
+            component.disabled = True """
+        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
 
-    @discord.ui.select(placeholder="Select a language (1)", options=options[0])
+    @discord.ui.select(placeholder="Select a language (1)", options=generate_options(0))
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-        langs = lang.tts_langs()
-        user_id = interaction.user.id
-        if user_id in bot.members_settings:
-            bot.members_settings[user_id]["language"] = select.values[0]
-        else:
-            bot.members_settings[user_id] = {"language": select.values[0]}
-        
-        select.disabled = True
-
-        """ for component in interaction.message.components:
-            component.disabled = True """
-        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+        self.select_language(interaction, select)
     
-    @discord.ui.select(placeholder="Select a language (2)", options=options[1])
+    @discord.ui.select(placeholder="Select a language (2)", options=generate_options(1))
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-        langs = lang.tts_langs()
-        user_id = interaction.user.id
-        if user_id in bot.members_settings:
-            bot.members_settings[user_id]["language"] = select.values[0]
-        else:
-            bot.members_settings[user_id] = {"language": select.values[0]}
-        
-        select.disabled = True
-        """ for component in interaction.message.components:
-            component.disabled = True """
-        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+        self.select_language(interaction, select)
     
-    @discord.ui.select(placeholder="Select a language (3)", options=options[2])
+    @discord.ui.select(placeholder="Select a language (3)", options=generate_options(2))
     async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-        langs = lang.tts_langs()
-        user_id = interaction.user.id
-        if user_id in bot.members_settings:
-            bot.members_settings[user_id]["language"] = select.values[0]
-        else:
-            bot.members_settings[user_id] = {"language": select.values[0]}
-        
-        select.disabled = True
-        """ for component in interaction.message.components:
-            component.disabled = True """
-        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+        self.select_language(interaction, select)
 
 
 @bot.hybrid_command()
@@ -487,23 +455,72 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 # endregion
 
 # region Command for accents
+class AccentsView(discord.ui.View):
+    def __init__(self, tld_string: str):
+        string = tld_string.strip('.google.')
+        self.tld_list = string.split(' .google.')
+        select_count = math.ceil(len(self.tld_list) / 25)
+        print(select_count)
+
+    
+    def generate_options(self, index):
+        tld_list = self.tld_list
+
+        # select_count = math.ceil(len(tld_list) / 25)
+
+        options = []
+
+        new_list = tld_list[(index * 25):min((index * 25) + 25, len(tld_list))]
+
+        for y in range(len(new_list)):
+            options.append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"As in www.google.{new_list[y]}"))
+        
+        return options
+
+        
+    async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
+        user_id = interaction.user.id
+        if user_id in bot.members_settings:
+            bot.members_settings[user_id]["accent"] = select.values[0]
+        else:
+            bot.members_settings[user_id] = {"accent": select.values[0]}
+
+        return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
+
+
+    @discord.ui.select(placeholder="Select an accent (1)", options=generate_options(0))
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        self.select_accent(interaction, select)
+
 @bot.hybrid_command()
 @app_commands.describe(tld="A localized top-level domain the accent will be read with (eg. us, co.uk, com.au, etc).")
-async def setaccent(ctx: commands.Context, tld: to_lower):
+async def setaccent(ctx: commands.Context, tld: to_lower = None):
     """Set the accent you want me to read your messages in."""
 
-    try:
-        requests.get(f"https://translate.google.{tld}")
-    except requests.ConnectionError:
-        await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nEither try another value or try again later. Here is a [**list of top-level domains**](https://en.wikipedia.org/wiki/Country_code_top-level_domain#Latin_Character_ccTLDs) you can use.", ephemeral=True, suppress_embeds=True)
+    if tld:
+        try:
+            requests.get(f"https://translate.google.{tld}")
+        except requests.ConnectionError:
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nEither try another value or try again later. Here is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, suppress_embeds=True)
 
-    else:
-        user_id = ctx.author.id
-        if user_id in bot.members_settings:
-            bot.members_settings[user_id]["accent"] = tld
         else:
-            bot.members_settings[user_id] = {"accent": tld}
-        await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
+            user_id = ctx.author.id
+            if user_id in bot.members_settings:
+                bot.members_settings[user_id]["accent"] = tld
+            else:
+                bot.members_settings[user_id] = {"accent": tld}
+            await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
+    else:
+        tld_string = requests.get("https://www.google.com/supported_domains")
+        
+        if tld_string.status_code == 200:
+            embed = discord.Embed(title="Set your preferred accent", description='Choose from the list of top-level domains below, and I will read your messages as though I am from a region that uses that domain.')
+            await ctx.send(embed=embed, view=AccentsView(tld_string), ephemeral=True)
+        else:
+            await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains is temporarily unavailable. Please specify a `tld` parameter or wait and try again later.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.")
+            
+
+
 
 
 # endregion
