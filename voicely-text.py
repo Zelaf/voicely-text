@@ -626,11 +626,11 @@ async def shutdown(loop: asyncio.AbstractEventLoop):
     print("Voicely Text has exited.")
 # endregion
 
-async def run_bot():
+def run_bot():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    signal.signal(signal.SIGINT, await shutdown)
-    signal.signal(signal.SIGTERM, await shutdown)
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)
 
     try:
         loop.run_until_complete(bot.start(TOKEN))
