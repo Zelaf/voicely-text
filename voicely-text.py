@@ -384,7 +384,7 @@ class LanguagesView(discord.ui.View):
         self.langs = lang.tts_langs()
         self.keys = list(self.langs.keys())
     
-    def generate_options(self, index):
+    def generate_options(self):
         options = []
         
         select_count = math.ceil(len(self.langs) / 25)
@@ -392,7 +392,7 @@ class LanguagesView(discord.ui.View):
         for x in select_count:
             options.append([])
 
-            new_keys = self.keys[(index * 25):min((index * 25) + 25, len(self.keys))]
+            new_keys = self.keys[(x * 25):min((x * 25) + 25, len(self.keys))]
 
             for y in range(len(new_keys)):
                 key = new_keys[y]
@@ -465,7 +465,7 @@ class AccentsView(discord.ui.View):
         self.tld_list = string.split(' .google.')
 
     
-    def generate_options(self, index):
+    def generate_options(self):
         tld_list = self.tld_list
 
         options = []
@@ -475,7 +475,7 @@ class AccentsView(discord.ui.View):
         for x in select_count:
             options.append([])
 
-            new_list = tld_list[(index * 25):min((index * 25) + 25, len(tld_list))]
+            new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
 
             for y in range(len(new_list)):
                 options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"As in www.google.{new_list[y]}"))
