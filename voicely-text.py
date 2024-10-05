@@ -415,15 +415,15 @@ class LanguagesView(discord.ui.View):
             component.disabled = True """
         return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
 
-    @discord.ui.select(placeholder="Select a language (1)", options=generate_options[0])
+    @discord.ui.select(placeholder="Select a language (1)", options=generate_options()[0])
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_language(interaction, select)
     
-    @discord.ui.select(placeholder="Select a language (2)", options=generate_options[1])
+    @discord.ui.select(placeholder="Select a language (2)", options=generate_options()[1])
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_language(interaction, select)
     
-    @discord.ui.select(placeholder="Select a language (3)", options=generate_options[2])
+    @discord.ui.select(placeholder="Select a language (3)", options=generate_options()[2])
     async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_language(interaction, select)
 
@@ -493,7 +493,7 @@ class AccentsView(discord.ui.View):
         return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
 
-    @discord.ui.select(placeholder="Select an accent (1)", options=generate_options[0])
+    @discord.ui.select(placeholder="Select an accent (1)", options=generate_options()[0])
     async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         self.select_accent(interaction, select)
 
