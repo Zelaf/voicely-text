@@ -612,13 +612,12 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
 async def shutdown():
     """Handles graceful shutdown of the bot and its tasks."""
     print("Shutting down the bot...")
-    for queue_group in bot.queue:
-        if "task" in queue_group:
-            queue_group["task"].cancel()
-            try:
-                await queue_group["task"]
-            except asyncio.CancelledError:
-                print("Queue task has been cancelled")
+    for queue_group, task in bot.queue.items():
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            print("Queue task has been cancelled")
     # if bot.queue_task is not None:
     #     bot.queue_task.cancel()
     #     try:
