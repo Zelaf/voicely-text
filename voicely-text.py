@@ -492,6 +492,7 @@ def get_tlds():
         return []
 
 # tld_list = get_tlds()
+tld_list = []
 
 class AccentsView1(discord.ui.View):
     @discord.ui.select(placeholder="Select a top-level domain (1)", options=tld_list[0])
