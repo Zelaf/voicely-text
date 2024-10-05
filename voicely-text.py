@@ -94,7 +94,7 @@ async def process_queue(guild: discord.Guild):
         try:
             requests.get(f"https://translate.google.{accent}")
         except requests.ConnectionError:
-            await message.reply(f"I cannot read your message because `https://translate.google.`**`{tld}`** is currently down. Please run `/setaccent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
+            await message.reply(f"I cannot read your message because `https://translate.google.`**`{accent}`** is currently down. Please run `/setaccent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
             continue
 
         else:
@@ -455,6 +455,8 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 
 # region Command for accents
 
+accent_embed = discord.Embed(title="Set your preferred accent", description='Choose from the list of top-level domains below, and I will read your messages as though I am from a region that uses that domain.')
+
 async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
     user_id = interaction.user.id
     if user_id in bot.members_settings:
@@ -504,9 +506,9 @@ class AccentsView1(discord.ui.View):
         async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(interaction, select)
 
-        @discord.ui.select(placeholder="Select a top-level domain (5)", options=options[4])
-        async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(interaction, select)
+        @discord.ui.button(label="Next page")
+        async def next_page(self: discord.ui.View, interaction: discord.Interaction, button: discord.ui.Button):
+            await interaction.response.send_message(embed=accent_embed, view=AccentsView2, ephemeral=True)
 
     else:
         print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
@@ -535,6 +537,10 @@ class AccentsView2(discord.ui.View):
                 options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
         
         
+        @discord.ui.select(placeholder="Select a top-level domain (5)", options=options[4])
+        async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(interaction, select)
+
         @discord.ui.select(placeholder="Select a top-level domain (6)", options=options[5])
         async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(interaction, select)
@@ -546,6 +552,10 @@ class AccentsView2(discord.ui.View):
         @discord.ui.select(placeholder="Select a top-level domain (8)", options=options[7])
         async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(interaction, select)
+
+        @discord.ui.button(label="Previous page")
+        async def next_page(self: discord.ui.View, interaction: discord.Interaction, button: discord.ui.Button):
+            await interaction.response.send_message(embed=accent_embed, view=AccentsView1, ephemeral=True)
 
     else:
         print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
@@ -571,8 +581,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
                 bot.members_settings[user_id] = {"accent": tld}
             await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
     else:
-        embed = discord.Embed(title="Set your preferred accent", description='Choose from the list of top-level domains below, and I will read your messages as though I am from a region that uses that domain.')
-        await ctx.send(embed=embed, view=AccentsView1(), ephemeral=True)
+        await ctx.send(embed=accent_embed, view=AccentsView1(), ephemeral=True)
         await ctx.send("test", view=AccentsView2, ephemeral=True)
             
 
