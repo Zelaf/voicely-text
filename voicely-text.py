@@ -621,10 +621,6 @@ async def shutdown(loop: asyncio.AbstractEventLoop):
             except asyncio.CancelledError:
                 print("Queue task has been cancelled")
     await bot.close()
-    if loop:
-        loop.close()
-    else:
-        print("There is no run_loop to close!")
     print("Voicely Text has exited.")
 # endregion
 
@@ -640,9 +636,9 @@ def run_bot():
     except KeyboardInterrupt:
         print("Bot is shutting down...")
         loop.run_until_complete(shutdown(loop))
-    """ finally:
+    finally:
         loop.close()
-        print("Bot has exited.") """
+        print("Bot has exited.")
 
 if __name__ == "__main__":
     run_bot()
