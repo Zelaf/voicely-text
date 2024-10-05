@@ -491,8 +491,7 @@ def get_tlds():
         print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
         return []
 
-# tld_list = get_tlds()
-tld_list = []
+tld_list = get_tlds()
 
 class AccentsView1(discord.ui.View):
     @discord.ui.select(placeholder="Select a top-level domain (1)", options=tld_list[0])
