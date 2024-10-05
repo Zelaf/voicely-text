@@ -484,7 +484,35 @@ class AccentsView(discord.ui.View):
         return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
 
-    @discord.ui.select(placeholder="Select an accent (1)", options=options[0])
+    @discord.ui.select(placeholder="Select a top-level domain (1)", options=options[0])
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
+
+    @discord.ui.select(placeholder="Select a top-level domain (2)", options=options[1])
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
+
+    @discord.ui.select(placeholder="Select a top-level domain (3)", options=options[2])
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
+
+    @discord.ui.select(placeholder="Select a top-level domain (4)", options=options[3])
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
+
+    @discord.ui.select(placeholder="Select a top-level domain (5)", options=options[4])
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
+
+    @discord.ui.select(placeholder="Select a top-level domain (6)", options=options[5])
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
+
+    @discord.ui.select(placeholder="Select a top-level domain (7)", options=options[6])
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
+
+    @discord.ui.select(placeholder="Select a top-level domain (8)", options=options[7])
     async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         await self.select_accent(interaction, select)
 
