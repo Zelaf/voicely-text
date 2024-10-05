@@ -459,7 +459,7 @@ class AccentsView(discord.ui.View):
     response = requests.get("https://www.google.com/supported_domains")
     print(response.text)
     string = response.text.strip('.google.')
-    tld_list = string.split(' .google.')
+    tld_list = string.split('\n.google.')
 
     options = []
     
