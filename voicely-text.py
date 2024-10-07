@@ -267,20 +267,21 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
         langs = lang.tts_langs()
         
         if language not in langs:
-            language = None
             language_error = f"`{language}` is not a valid IETF language tag! Supported tags include:"
             keys = list(langs.keys())
             for key in keys:
                 language_error += f"\n- `{key}` - *{langs[key]}*"
-            
             errors.append(language_error)
+            
+            language = None
         
     if tld:
         response = requests.get("https://www.google.com/supported_domains")
         
         if response.status_code != 200:
-            tld = None
             errors.append(f"I retrieve your desired accent because `https://translate.google.`**`{accent}`** is currently down or does not exist. Please specify another top-level domain or try again later.\n\nOtherwise, leave `tld` blank to use your default accent.")
+
+            tld = None
             
     if len(errors) != 0:
         final_error = "\n\n".join(errors)
