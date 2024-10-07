@@ -18,6 +18,7 @@ intents.guilds = True
 intents.voice_states = True
 intents.messages = True
 intents.members = True
+intents.voice_states = True
 
 # Set up the bot
 class Bot(commands.Bot):
@@ -36,6 +37,7 @@ class Bot(commands.Bot):
         self.voice_channel_timeouts = {}
         self.active_timeouts = {}
         self.last_speakers = {}
+        self.members_to_read = [] # DO NOT store this in a json file.
 
     async def setup_hook(self):
         print(f"Setup complete for {self.user}")
@@ -190,9 +192,41 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
 
 @bot.event
 async def on_message(message: discord.Message):
-    await process_message(message, message.content)
+    if message.author.id in bot.members_to_read and message.author.voice.channel is message.channel:
+        await process_message(message, message.content)
     
     await bot.process_commands(message)
+
+
+@bot.event
+async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+    """
+    Event triggered when a user's voice state changes.
+    Checks if a user has joined a voice channel and sends a DM to users who opted in for notifications.
+    """
+    # Check if the user joined a voice channel (wasn't in one before, but now is)
+    if before.channel is not after.channel:
+        user_id = member.id
+        if after.channel is not None:
+            guild_id = after.channel.guild.id
+            if user_id in bot.members_settings and "autoread" in bot.members_settings[user_id]:
+                add = bot.members_settings[member.id]["autoread"]
+            elif guild_id in bot.servers_settings and "autoread" in bot.servers_settings[guild_id]:
+                add = bot.servers_settings[guild_id]["autoread"]
+            else:
+                add = bot.default_settings["autoread"]
+
+            if add:
+                if user_id not in bot.members_to_read:
+                    bot.members_to_read.append(user_id)
+            else:
+                if user_id in bot.members_to_read:
+                    bot.members_to_read.remove(user_id)
+        elif after.channel is None:
+            if user_id in bot.members_to_read:
+                bot.members_to_read.remove(user_id)
+        
+
 
 # endregion
 
