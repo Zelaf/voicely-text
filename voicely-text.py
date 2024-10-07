@@ -9,6 +9,7 @@ import os
 import math
 import requests
 import datetime
+import json
 
 # Define intents
 intents = discord.Intents.default()
@@ -31,8 +32,8 @@ class Bot(commands.Bot):
             "autoread": False,
             "timeout": 300
         }
-        self.members_settings = {}
-        self.servers_settings = {}
+        # self.members_settings = {}
+        # self.servers_settings = {}
         self.voice_channel_timeouts = {}
         self.active_timeouts = {}
         self.last_speakers = {}
@@ -46,7 +47,53 @@ bot = Bot()
 # Read the bot token from external file
 with open('../token.txt', 'r') as file:
     TOKEN = file.read().strip()
-    # print(TOKEN)
+
+# region save and load settings
+# region members settings
+# Load notify data from file (or return an empty dictionary if the file doesn't exist)
+def load_members_settings():
+    try:
+        with open('data/members_settings.json', 'r') as f:
+            # Load JSON data into a dictionary
+            return json.load(f)
+    except FileNotFoundError:
+        # If the file doesn't exist, return an empty dictionary
+        return {}
+
+# Save the current notify data to a JSON file
+def save_members_settings():
+    with open('data/members_settings.json', 'w') as f:
+        # Write the dictionary to the JSON file
+        json.dump(members_settings, f)
+
+# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
+# Load the data from the JSON file when the bot starts
+members_settings = load_members_settings()
+# endregion
+
+# region server settings
+# Load notify data from file (or return an empty dictionary if the file doesn't exist)
+def load_servers_settings():
+    try:
+        with open('data/servers_settings.json', 'r') as f:
+            # Load JSON data into a dictionary
+            return json.load(f)
+    except FileNotFoundError:
+        # If the file doesn't exist, return an empty dictionary
+        return {}
+
+# Save the current notify data to a JSON file
+def save_servers_settings():
+    with open('data/servers_settings.json', 'w') as f:
+        # Write the dictionary to the JSON file
+        json.dump(servers_settings, f)
+
+# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
+# Load the data from the JSON file when the bot starts
+servers_settings = load_servers_settings()
+# endregion
+
+# endregion
 
 @bot.event
 async def on_ready():
@@ -88,19 +135,19 @@ async def process_queue(guild: discord.Guild):
         # region set language and accent
         if language_override:
             language = language_override
-        elif user_id in bot.members_settings and "language" in bot.members_settings[user_id]:
-            language = bot.members_settings[user_id]["language"]
-        elif guild_id in bot.servers_settings and "language" in bot.servers_settings[guild_id]:
-            language = bot.servers_settings[guild_id]["language"]
+        elif user_id in members_settings and "language" in members_settings[user_id]:
+            language = members_settings[user_id]["language"]
+        elif guild_id in servers_settings and "language" in servers_settings[guild_id]:
+            language = servers_settings[guild_id]["language"]
         else:
             language = bot.default_settings["language"]
 
         if tld_override:
             accent = tld_override
-        elif user_id in bot.members_settings and "accent" in bot.members_settings[user_id]:
-            accent = bot.members_settings[user_id]["accent"]
-        elif guild_id in bot.servers_settings and "accent" in bot.servers_settings[guild_id]:
-            accent = bot.servers_settings[guild_id]["accent"]
+        elif user_id in members_settings and "accent" in members_settings[user_id]:
+            accent = members_settings[user_id]["accent"]
+        elif guild_id in servers_settings and "accent" in servers_settings[guild_id]:
+            accent = servers_settings[guild_id]["accent"]
         else:
             accent = bot.default_settings["accent"]
         
@@ -235,10 +282,10 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
         user_id = member.id
         if after.channel is not None:
             guild_id = after.channel.guild.id
-            if user_id in bot.members_settings and "autoread" in bot.members_settings[user_id]:
-                add = bot.members_settings[member.id]["autoread"]
-            elif guild_id in bot.servers_settings and "autoread" in bot.servers_settings[guild_id]:
-                add = bot.servers_settings[guild_id]["autoread"]
+            if user_id in members_settings and "autoread" in members_settings[user_id]:
+                add = members_settings[member.id]["autoread"]
+            elif guild_id in servers_settings and "autoread" in servers_settings[guild_id]:
+                add = servers_settings[guild_id]["autoread"]
             else:
                 add = bot.default_settings["autoread"]
 
@@ -510,7 +557,7 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
 #         await ctx.send("You must provide at least one value!", ephemeral=True)
 #     else:
 #         final_message = "\n\n".join(success_message)
-#         bot.members_settings[ctx.author.id] = {}
+#         members_settings[ctx.author.id] = {}
 #         print(f"{ctx.author.name}'s settings were set to: {settings}")
 #         await ctx.send(final_message, ephemeral=True)
 
@@ -538,11 +585,11 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             enabled_bool = False
             confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message."
         case "reset":
-            if ctx.author.id in bot.members_settings and "autoread" in bot.members_settings[ctx.author.id]:
-                del bot.members_settings[ctx.author.id]["autoread"]
+            if ctx.author.id in members_settings and "autoread" in members_settings[ctx.author.id]:
+                del members_settings[ctx.author.id]["autoread"]
             
-            if ctx.guild.id in bot.servers_settings and "autoread" in bot.servers_settings[ctx.guild.id]:
-                default = bot.servers_settings[ctx.guild.id]["autoread"]
+            if ctx.guild.id in servers_settings and "autoread" in servers_settings[ctx.guild.id]:
+                default = servers_settings[ctx.guild.id]["autoread"]
             else:
                 default = bot.default_settings["autoread"]
             await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", ephemeral=True)
@@ -551,10 +598,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             await ctx.send(f"`enabled` must be set to either `True` or `False`.", ephemeral=True)
             return
 
-    if ctx.author.id in bot.members_settings:
-        bot.members_settings[ctx.author.id]["autoread"] = enabled_bool
+    if ctx.author.id in members_settings:
+        members_settings[ctx.author.id]["autoread"] = enabled_bool
     else:
-        bot.members_settings[ctx.author.id] = {"autoread": enabled_bool}
+        members_settings[ctx.author.id] = {"autoread": enabled_bool}
     await ctx.send(confirm_message, ephemeral=True)
 
 # endregion
@@ -591,10 +638,10 @@ class LanguagesView(discord.ui.View):
     async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         user_id = interaction.user.id
-        if user_id in bot.members_settings:
-            bot.members_settings[user_id]["language"] = select.values[0]
+        if user_id in members_settings:
+            members_settings[user_id]["language"] = select.values[0]
         else:
-            bot.members_settings[user_id] = {"language": select.values[0]}
+            members_settings[user_id] = {"language": select.values[0]}
         
         select.disabled = True
 
@@ -624,10 +671,10 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
         langs = lang.tts_langs()
 
         if tag in langs:
-            if ctx.author.id in bot.members_settings:
-                bot.members_settings[ctx.author.id]["language"] = tag
+            if ctx.author.id in members_settings:
+                members_settings[ctx.author.id]["language"] = tag
             else:
-                bot.members_settings[ctx.author.id] = {"language": tag}
+                members_settings[ctx.author.id] = {"language": tag}
             
             await ctx.send(f"Your language has been set to **{langs[tag]}**.", ephemeral=True)
         else:
@@ -652,10 +699,10 @@ accent_embed = discord.Embed(title="Set your preferred accent", description='Cho
 
 async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
     user_id = interaction.user.id
-    if user_id in bot.members_settings:
-        bot.members_settings[user_id]["accent"] = select.values[0]
+    if user_id in members_settings:
+        members_settings[user_id]["accent"] = select.values[0]
     else:
-        bot.members_settings[user_id] = {"accent": select.values[0]}
+        members_settings[user_id] = {"accent": select.values[0]}
 
     return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
@@ -735,10 +782,10 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
 
         else:
             user_id = ctx.author.id
-            if user_id in bot.members_settings:
-                bot.members_settings[user_id]["accent"] = tld
+            if user_id in members_settings:
+                members_settings[user_id]["accent"] = tld
             else:
-                bot.members_settings[user_id] = {"accent": tld}
+                members_settings[user_id] = {"accent": tld}
             await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed, view=AccentsView1(), ephemeral=True)
