@@ -328,14 +328,41 @@ async def accents(ctx: commands.Context):
 async def start(ctx: commands.Context):
     """Make me start reading your text."""
 
-    return
+    if ctx.author.voice.channel is None:
+        await ctx.send('You must be in a voice channel to use this command.', ephemeral=True)
+        return
+    elif ctx.author.voice.channel is not ctx.channel:
+        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', ephemeral=True)
+        return
+    
+    user_id = ctx.author.id
+
+    if user_id not in bot.members_to_read:
+        bot.members_to_read.append(user_id)
+        await ctx.send('I will now read all your messages in this channel until you run `/stop` or leave the voice channel.', ephemeral=True)
+    else:
+        await ctx.send('I am already reading your messages.', ephemeral=True)
+
 
     
 @bot.hybrid_command()
 async def stop(ctx: commands.Context):
     """Make me stop reading your text."""
 
-    return
+    if ctx.author.voice.channel is None:
+        await ctx.send('You are not in a voice channel, so I am not reading your messages.', ephemeral=True)
+        return
+    elif ctx.author.voice.channel is not ctx.channel:
+        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', ephemeral=True)
+        return
+    
+    user_id = ctx.author.id
+
+    if user_id in bot.members_to_read:
+        bot.members_to_read.remove(user_id)
+        await ctx.send('I am no longer reading your messages. Type `/start` to have me read your messages again, or type `/tts` to have me read a single message with optional language and accent overrides.', ephemeral=True)
+    else:
+        await ctx.send('I already not reading your messages.', ephemeral=True)
 
     
 
