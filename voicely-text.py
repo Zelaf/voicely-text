@@ -34,7 +34,7 @@ class Bot(commands.Bot):
         }
         # self.members_settings = {}
         # self.servers_settings = {}
-        self.voice_channel_timeouts = {}
+        # self.voice_channel_timeouts = {}
         self.active_timeouts = {}
         self.last_speakers = {}
         self.members_to_read = [] # DO NOT store this in a json file.
@@ -324,9 +324,10 @@ async def leave_after_timeout(guild: discord.Guild):
 
     print(f'Timeout set for {guild.name}.')
     try:
-        timeout = bot.default_settings["timeout"]
-        if guild.id in bot.voice_channel_timeouts:
-            timeout = bot.voice_channel_timeouts[guild.id]
+        if guild.id in servers_settings and "timeout" in servers_settings[guild.id]:
+            timeout = servers_settings[guild.id]["timeout"]
+        else:
+            timeout = bot.default_settings["timeout"]
         await asyncio.sleep(timeout)
         
         await guild.voice_client.disconnect()
@@ -851,8 +852,8 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings['timeout']} seconds)*."
 
     if seconds == "reset" or seconds == bot.default_settings["timeout"]:
-        if ctx.guild.id in bot.voice_channel_timeouts:
-            del bot.voice_channel_timeouts[ctx.guild.id]
+        if ctx.guild.id in servers_settings and "timeout" in servers_settings[ctx.guild.id]:
+            del servers_settings[ctx.guild.id]["timeout"]
         save_servers_settings()
         await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", ephemeral=True)
     elif isinstance(seconds, int):
@@ -865,7 +866,10 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
         else:
             unit = "second"
 
-        bot.voice_channel_timeouts[ctx.guild.id] = seconds
+        if ctx.guild.id in servers_settings and "timeout" in servers_settings[ctx.guild.id]:
+            servers_settings[ctx.guild.id]["timeout"] = seconds
+        else:
+            servers_settings[ctx.guild.id] = {"timeout": seconds}
         save_servers_settings()
         await ctx.send(f"Timeout set to **{seconds} {unit}**.", ephemeral=True)
     else:
