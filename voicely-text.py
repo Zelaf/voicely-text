@@ -237,6 +237,8 @@ def to_lower(argument):
 
 language_desc = "The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in."
 tld_desc = "A localized top-level domain (eg. '.us' or '.co.uk') from which the accent will be read."
+    
+
 
 # region start and stop
 @bot.hybrid_command()
@@ -258,6 +260,39 @@ async def stop(ctx: commands.Context):
 @app_commands.describe(text="The text you want me to speak.", language=language_desc, tld=tld_desc)
 async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lower = None):
     """Read a single message with optional language and accent overrides."""
+    
+    errors = []
+
+    if language:
+        langs = lang.tts_langs()
+        
+        if language not in langs:
+            language = None
+            language_error = f"`{language}` is not a valid IETF language tag! Supported tags include:"
+            keys = list(langs.keys())
+            for key in keys:
+                language_error += f"\n- `{key}` - *{langs[key]}*"
+            
+            errors.append(language_error)
+        
+    if tld:
+        response = requests.get("https://www.google.com/supported_domains")
+        
+        if response.status_code != 200:
+            tld = None
+            errors.append(f"I retrieve your desired accent because `https://translate.google.`**`{accent}`** is currently down or does not exist. Please specify another top-level domain or try again later.\n\nOtherwise, leave `tld` blank to use your default accent.")
+            
+    if len(errors) != 0:
+        final_error = "\n\n".join(errors)
+
+        if len(errors) == 1:
+            plural = ""
+        else:
+            plural = "s"
+
+        final_error = f"<@{ctx.author.id}> I cannot read your message at https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}/{ctx.message.id} because of the following error{plural}:\n\n" + final_error
+        
+        ctx.send(final_error, ephemeral=True)
     
     await process_message(ctx, text, language, tld)
 
