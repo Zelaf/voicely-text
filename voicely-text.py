@@ -35,6 +35,7 @@ class Bot(commands.Bot):
         self.servers_settings = {}
         self.voice_channel_timeouts = {}
         self.active_timeouts = {}
+        self.last_speakers = {}
 
     async def setup_hook(self):
         print(f"Setup complete for {self.user}")
@@ -68,7 +69,7 @@ async def on_ready():
 async def process_queue(guild: discord.Guild):
     while True:
         print(f"{guild.name}: Waiting for the next message in the queue for...")
-        message, text, voice_channel = await bot.queue[guild.id]["queue"].get()
+        message, text, voice_channel, language_override, tld_override = await bot.queue[guild.id]["queue"].get()
         user_id = message.author.id
         print(f"{guild.name}: Processing message: {text}")
 
@@ -76,14 +77,18 @@ async def process_queue(guild: discord.Guild):
         
         # guild = message.guild
         guild_id = guild.id
-
-        if user_id in bot.members_settings and "language" in bot.members_settings[user_id]:
+        
+        if language_override:
+            language = language_override
+        elif user_id in bot.members_settings and "language" in bot.members_settings[user_id]:
             language = bot.members_settings[user_id]["language"]
         elif guild_id in bot.servers_settings and "language" in bot.servers_settings[guild_id]:
             language = bot.servers_settings[guild_id]["language"]
         else:
             language = bot.default_settings["language"]
 
+        if tld_override:
+            accent = tld_override
         if user_id in bot.members_settings and "accent" in bot.members_settings[user_id]:
             accent = bot.members_settings[user_id]["accent"]
         elif guild_id in bot.servers_settings and "accent" in bot.servers_settings[guild_id]:
@@ -148,14 +153,14 @@ async def process_queue(guild: discord.Guild):
                 bot.tts_queue.task_done()
 
 # region When a message is sent
-@bot.event
-async def on_message(message: discord.Message):
-    if message.author == bot.user or not message.guild:
+
+async def process_message(ctx: commands.Context | discord.Message, text: str, language: str = None, tld: str = None):
+    if ctx.author == bot.user or not ctx.guild:
         return
 
     # Remove emote IDs, leaving only emote names (e.g., :emote_name:) 
     # This replaces <emote_name:123456789> with :emote_name:
-    message_content = re.sub(r'<:(\w+):\d+>', r':\1:', message.content)
+    message_content = re.sub(r'<:(\w+):\d+>', r':\1:', text)
 
     # Remove links, replacing it with an empty string
     message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message_content)
@@ -165,21 +170,29 @@ async def on_message(message: discord.Message):
     message_content = re.sub(r'\d{8,}', "", message_content)
     
     if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
-        print(f"{message.guild.name}: Message contains no text, skipping.")
+        print(f"{ctx.guild.name}: Message contains no text, skipping.")
         return
     
-    message_content = f"{message.author.display_name} says, " + message_content
+    message_content = f"{ctx.author.display_name} says, " + message_content
 
-    # Check if there is a voice channel with the same name as the text channel
-    text_channel_name = message.channel.name
-    voice_channel = discord.utils.get(message.guild.voice_channels, name=text_channel_name)
+    text_channel_name = ctx.channel.name
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
+
+    if isinstance(ctx, discord.Message):
+        message = ctx
+    else:
+        message = ctx.message
 
     if voice_channel:
         # Add the filtered message content to the queue
-        await bot.queue[message.guild.id]["queue"].put((message, message_content, voice_channel))
-        print(f"{message.guild.name}: Added message to queue: {message_content}")
+        await bot.queue[ctx.guild.id]["queue"].put((message, message_content, voice_channel, None, None))
+        print(f"{ctx.guild.name}: Added message to queue: {message_content}")
 
     await bot.process_commands(message)
+
+@bot.event
+async def on_message(message: discord.Message):
+    process_message(message, message.content)
 
 # endregion
 
@@ -222,6 +235,32 @@ def to_lower(argument):
         return None
     return argument.lower()
 
+language_desc = "The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in."
+tld_desc = "A localized top-level domain (eg. '.us' or '.co.uk') from which the accent will be read."
+
+# region start and stop
+@bot.hybrid_command()
+async def start(ctx: commands.Context):
+    """Make me start reading your text."""
+
+    
+@bot.hybrid_command()
+async def stop(ctx: commands.Context):
+    """Make me stop reading your text."""
+
+    
+
+@bot.hybrid_command()
+@app_commands.describe(text="The text you want me to speak.", language=language_desc, tld=tld_desc)
+async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lower = None):
+    """Read a single message with optional language and accent overrides."""
+    
+    process_message(ctx, text, language, tld)
+
+
+    
+# endregion
+
 # region settings
 
 # region members
@@ -243,7 +282,7 @@ def to_lower(argument):
 
 
 # @bot.hybrid_command()
-# @app_commands.describe(language="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.", accent="A localized top-level domain (as in www.google.<accent>) the accent will be read with.", autoread="Whether your messages are automatically read when you join a voice channel.")
+# @app_commands.describe(language=language_desc, accent=tld_desc, autoread="Whether your messages are automatically read when you join a voice channel.")
 # async def settings(ctx: commands.Context, language: to_lower = None, accent: to_lower = None, autoread: to_lower = None):
 #     """Set up your personal settings for Voicely Text."""
 
@@ -359,17 +398,6 @@ async def serversautoread() """
 # region Languages and accents
 
 # region Languages
-""" class Languages(discord.ui.Select):
-    def __init__(self):
-        options = []
-        langs = lang.tts_langs()
-        for thisLang in langs:
-            options.append(discord.SelectOption(label=thisLang, value=thisLang, description=langs[thisLang]))
-        
-        super().__init__(placeholder="Select a language", max_values=1, min_values=1, options=options)
-    
-    async def callback(self, interaction: discord.Interaction):
-        await interaction.response.send_message(content=f"Your choice is {self.values[0]}! ", ephemeral=True) """
 
 class LanguagesView(discord.ui.View):
     langs = lang.tts_langs()
@@ -417,7 +445,7 @@ class LanguagesView(discord.ui.View):
 
 
 @bot.hybrid_command()
-@app_commands.describe(tag="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.")
+@app_commands.describe(tag=language_desc)
 async def setlanguage(ctx: commands.Context, tag: str = None):
     """Set the language you want me to read your messages in."""
 
@@ -536,7 +564,7 @@ class AccentsView2(discord.ui.View):
 
 
 @bot.hybrid_command()
-@app_commands.describe(tld="A localized top-level domain from which the accent will be read.")
+@app_commands.describe(tld=tld_desc)
 async def setaccent(ctx: commands.Context, tld: to_lower = None):
     """Set the accent you want me to read your messages in."""
 
