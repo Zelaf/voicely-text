@@ -272,7 +272,7 @@ tld_list = get_tld_list()
     
 
 @bot.hybrid_command()
-async def languages(ctx: commands.Context):
+async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
     text = f"`Supported top-level domains include:"
