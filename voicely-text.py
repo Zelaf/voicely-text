@@ -160,7 +160,7 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
     if ctx.author == bot.user or not ctx.guild:
         return
 
-    for command in bot.tree.get_commands():
+    for command in bot.commands:
         if text.startswith(f"{bot.command_prefix}{command}"):
             print("returned true")
             print(f"{ctx.guild.name}: Message is a command, skipping.")
