@@ -247,7 +247,7 @@ async def languages(ctx: commands.Context):
     langs = lang.tts_langs()
     keys = list(langs.keys())
 
-    text = f"`Supported IETF language tags include:"
+    text = f"Supported IETF language tags include:"
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
@@ -275,7 +275,7 @@ tld_list = get_tld_list()
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
-    text = f"`Supported top-level domains include:"
+    text = f"Supported top-level domains include:"
     for item in tld_list:
         text += f"\n- `{item}`"
 
