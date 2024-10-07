@@ -276,11 +276,10 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
             language = None
         
     if tld:
-        response = requests.get("https://www.google.com/supported_domains")
-        
-        if response.status_code != 200:
+        try:
+            requests.get(f"https://translate.google.{accent}")
+        except requests.ConnectionError:
             errors.append(f"I retrieve your desired accent because `https://translate.google.`**`{accent}`** is currently down or does not exist. Please specify another top-level domain or try again later.\n\nOtherwise, leave `tld` blank to use your default accent.")
-
             tld = None
             
     if len(errors) != 0:
