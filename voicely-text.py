@@ -852,7 +852,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
 
     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings['timeout']} seconds)*."
 
-    if seconds == "reset" or seconds == bot.default_settings["timeout"]:
+    if seconds == "reset":
         if ctx.guild.id in servers_settings and "timeout" in servers_settings[ctx.guild.id]:
             del servers_settings[ctx.guild.id]["timeout"]
         save_servers_settings()
