@@ -488,7 +488,7 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
         if not isinstance(ctx, discord.Interaction):
             # await bot.edit(username=ctx.author.display_name, avatar=ctx.author.display_avatar)
             # await ctx.channel.send(text,)
-            await ctx.send(f"**{ctx.author.display_name}**: {text}")
+            await ctx.send(f"**{ctx.author.display_name}:** {text}")
 
 
     
