@@ -222,13 +222,6 @@ def to_lower(argument):
         return None
     return argument.lower()
 
-# def same_or_none(argument):
-#     if not argument or argument == "":
-#         return None
-#     return argument
-
-# @bot.hybrid_group(name="User settings")
-
 # region settings
 
 # region members
@@ -472,6 +465,7 @@ def get_tlds():
     if response.status_code == 200:
         string = response.text.strip('.google.')
         tld_list = string.split('\n.google.')
+        tld_list.sort()
 
         options = []
         
