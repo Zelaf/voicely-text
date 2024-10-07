@@ -275,10 +275,11 @@ tld_list = get_tld_list()
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
-    print("got here")
     text = f"Supported top-level domains include:\n\n`"
 
     text += "`, `".join(tld_list)
+    
+    print("got here")
     text += "`"
 
     print(len(text))
