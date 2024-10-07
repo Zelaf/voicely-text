@@ -57,6 +57,7 @@ def load_members_settings():
             # Load JSON data into a dictionary
             return json.load(f)
     except FileNotFoundError:
+        print('Cannot open data/members_settings.json: File not found.')
         # If the file doesn't exist, return an empty dictionary
         return {}
 
@@ -79,6 +80,7 @@ def load_servers_settings():
             # Load JSON data into a dictionary
             return json.load(f)
     except FileNotFoundError:
+        print('Cannot open data/servers_settings.json: File not found.')
         # If the file doesn't exist, return an empty dictionary
         return {}
 
@@ -133,21 +135,24 @@ async def process_queue(guild: discord.Guild):
         print(f"{guild.name}: Processing message: {text}")
         
         # region set language and accent
+        user_id_str = str(user_id)
+        guild_id_str = str(guild_id)
+
         if language_override:
             language = language_override
-        elif user_id in members_settings and "language" in members_settings[user_id]:
-            language = members_settings[user_id]["language"]
-        elif guild_id in servers_settings and "language" in servers_settings[guild_id]:
-            language = servers_settings[guild_id]["language"]
+        elif user_id_str in members_settings and "language" in members_settings[user_id_str]:
+            language = members_settings[user_id_str]["language"]
+        elif guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
+            language = servers_settings[guild_id_str]["language"]
         else:
             language = bot.default_settings["language"]
 
         if tld_override:
             accent = tld_override
-        elif user_id in members_settings and "accent" in members_settings[user_id]:
-            accent = members_settings[user_id]["accent"]
-        elif guild_id in servers_settings and "accent" in servers_settings[guild_id]:
-            accent = servers_settings[guild_id]["accent"]
+        elif user_id_str in members_settings and "accent" in members_settings[user_id_str]:
+            accent = members_settings[user_id_str]["accent"]
+        elif guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
+            accent = servers_settings[guild_id_str]["accent"]
         else:
             accent = bot.default_settings["accent"]
         
@@ -280,12 +285,14 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
     # Check if the user joined a voice channel (wasn't in one before, but now is)
     if before.channel is not after.channel:
         user_id = member.id
+        user_id_str = str(user_id)
         if after.channel is not None:
-            guild_id = after.channel.guild.id
-            if user_id in members_settings and "autoread" in members_settings[user_id]:
+            # guild_id = after.channel.guild.id
+            guild_id_str = str(after.channel.guild.id)
+            if user_id_str in members_settings and "autoread" in members_settings[user_id_str]:
                 add = members_settings[member.id]["autoread"]
-            elif guild_id in servers_settings and "autoread" in servers_settings[guild_id]:
-                add = servers_settings[guild_id]["autoread"]
+            elif guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
+                add = servers_settings[guild_id_str]["autoread"]
             else:
                 add = bot.default_settings["autoread"]
 
@@ -322,9 +329,11 @@ async def check_empty_channel(guild: discord.Guild):
 async def leave_after_timeout(guild: discord.Guild):
     """Disconnect from the voice channel after the timeout has passed."""
 
+    guild_id_str = str(guild.id)
+
     try:
-        if guild.id in servers_settings and "timeout" in servers_settings[guild.id]:
-            timeout = servers_settings[guild.id]["timeout"]
+        if guild_id_str in servers_settings and "timeout" in servers_settings[guild_id_str]:
+            timeout = servers_settings[guild_id_str]["timeout"]
         else:
             timeout = bot.default_settings["timeout"]
         
@@ -579,6 +588,9 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
 async def autoread(ctx: commands.Context, enabled: to_lower):
     """Set whether your messages are automatically read when you join a voice channel."""
 
+    user_id_str = str(ctx.author.id)
+    guild_id_str = str(ctx.guild.id)
+
     match enabled:
         case "true":
             enabled_bool = True
@@ -587,11 +599,11 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             enabled_bool = False
             confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message."
         case "reset":
-            if ctx.author.id in members_settings and "autoread" in members_settings[ctx.author.id]:
-                del members_settings[ctx.author.id]["autoread"]
+            if user_id_str in members_settings and "autoread" in members_settings[user_id_str]:
+                del members_settings[user_id_str]["autoread"]
             
-            if ctx.guild.id in servers_settings and "autoread" in servers_settings[ctx.guild.id]:
-                default = servers_settings[ctx.guild.id]["autoread"]
+            if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
+                default = servers_settings[guild_id_str]["autoread"]
             else:
                 default = bot.default_settings["autoread"]
             await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", ephemeral=True)
@@ -600,10 +612,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             await ctx.send(f"`enabled` must be set to either `True` or `False`.", ephemeral=True)
             return
 
-    if ctx.author.id in members_settings:
-        members_settings[ctx.author.id]["autoread"] = enabled_bool
+    if user_id_str in members_settings:
+        members_settings[user_id_str]["autoread"] = enabled_bool
     else:
-        members_settings[ctx.author.id] = {"autoread": enabled_bool}
+        members_settings[user_id_str] = {"autoread": enabled_bool}
     
     save_members_settings()
     await ctx.send(confirm_message, ephemeral=True)
@@ -641,11 +653,12 @@ class LanguagesView(discord.ui.View):
     
     async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
-        user_id = interaction.user.id
-        if user_id in members_settings:
-            members_settings[user_id]["language"] = select.values[0]
+        # user_id = interaction.user.id
+        user_id_str = str(interaction.user.id)
+        if user_id_str in members_settings:
+            members_settings[user_id_str]["language"] = select.values[0]
         else:
-            members_settings[user_id] = {"language": select.values[0]}
+            members_settings[user_id_str] = {"language": select.values[0]}
         
         save_members_settings()
         
@@ -671,11 +684,14 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
 
     if tag:
         if tag == 'reset':
-            if ctx.author.id in members_settings and "language" in members_settings[ctx.author.id]:
-                del members_settings[ctx.author.id]["language"]
+            user_id_str = str(ctx.author.id)
+            if user_id_str in members_settings and "language" in members_settings[user_id_str]:
+                del members_settings[user_id_str]["language"]
             
-            if ctx.guild.id in servers_settings and "language" in servers_settings[ctx.guild.id]:
-                default = servers_settings[ctx.guild.id]["language"]
+            guild_id_str = str(ctx.guild.id)
+            
+            if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
+                default = servers_settings[guild_id_str]["language"]
             else:
                 default = bot.default_settings["language"]
             
@@ -688,10 +704,11 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
         langs = lang.tts_langs()
 
         if tag in langs:
-            if ctx.author.id in members_settings:
-                members_settings[ctx.author.id]["language"] = tag
+            user_id_str = ctx.author.id
+            if user_id_str in members_settings:
+                members_settings[user_id_str]["language"] = tag
             else:
-                members_settings[ctx.author.id] = {"language": tag}
+                members_settings[user_id_str] = {"language": tag}
 
             save_members_settings()
             
@@ -717,11 +734,12 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
 accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
 
 async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
-    user_id = interaction.user.id
-    if user_id in members_settings:
-        members_settings[user_id]["accent"] = select.values[0]
+    # user_id = interaction.user.id
+    user_id_str = str(interaction.user.id)
+    if user_id_str in members_settings:
+        members_settings[user_id_str]["accent"] = select.values[0]
     else:
-        members_settings[user_id] = {"accent": select.values[0]}
+        members_settings[user_id_str] = {"accent": select.values[0]}
 
     save_members_settings()
 
@@ -797,11 +815,13 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
 
     if tld:
         if tld == 'reset':
-            if ctx.author.id in members_settings and "accent" in members_settings[ctx.author.id]:
-                del members_settings[ctx.author.id]["accent"]
+            user_id_str = str(ctx.author.id)
+            if user_id_str in members_settings and "accent" in members_settings[user_id_str]:
+                del members_settings[user_id_str]["accent"]
             
-            if ctx.guild.id in servers_settings and "accent" in servers_settings[ctx.guild.id]:
-                default = servers_settings[ctx.guild.id]["accent"]
+            guild_id_str = str(ctx.guild.id)
+            if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
+                default = servers_settings[guild_id_str]["accent"]
             else:
                 default = bot.default_settings["accent"]
             
@@ -816,11 +836,12 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
             await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nType `/accents` for a list of supported top-level domains, or try again later.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, suppress_embeds=True)
 
         else:
-            user_id = ctx.author.id
-            if user_id in members_settings:
-                members_settings[user_id]["accent"] = tld
+            # user_id = ctx.author.id
+            user_id_str = str(ctx.author.id)
+            if user_id_str in members_settings:
+                members_settings[user_id_str]["accent"] = tld
             else:
-                members_settings[user_id] = {"accent": tld}
+                members_settings[user_id_str] = {"accent": tld}
             
             save_members_settings()
             await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
@@ -852,9 +873,11 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
 
     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings['timeout']} seconds)*."
 
+    guild_id_str = str(ctx.guild.id)
+
     if seconds == "reset":
-        if ctx.guild.id in servers_settings and "timeout" in servers_settings[ctx.guild.id]:
-            del servers_settings[ctx.guild.id]["timeout"]
+        if guild_id_str in servers_settings and "timeout" in servers_settings[guild_id_str]:
+            del servers_settings[guild_id_str]["timeout"]
         save_servers_settings()
         await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", ephemeral=True)
     elif isinstance(seconds, int):
@@ -867,10 +890,10 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
         else:
             unit = "second"
 
-        if ctx.guild.id in servers_settings and "timeout" in servers_settings[ctx.guild.id]:
-            servers_settings[ctx.guild.id]["timeout"] = seconds
+        if guild_id_str in servers_settings and "timeout" in servers_settings[guild_id_str]:
+            servers_settings[guild_id_str]["timeout"] = seconds
         else:
-            servers_settings[ctx.guild.id] = {"timeout": seconds}
+            servers_settings[guild_id_str] = {"timeout": seconds}
         save_servers_settings()
         await ctx.send(f"Timeout set to **{seconds} {unit}**.", ephemeral=True)
     else:
