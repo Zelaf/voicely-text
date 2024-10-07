@@ -276,12 +276,11 @@ async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
     text = f"Supported top-level domains include:\n\n`"
+    
 
-    converted_list = "`, `".join(tld_list)
+    text += await "`, `".join(tld_list)
     
     print("got here")
-
-    text += converted_list
     text += "`"
 
     print(len(text))
