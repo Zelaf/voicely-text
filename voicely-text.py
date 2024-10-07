@@ -8,8 +8,6 @@ from gtts import lang
 import os
 import math
 import requests
-# import signal
-import atexit
 import datetime
 
 # Define intents
