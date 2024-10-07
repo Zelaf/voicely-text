@@ -188,11 +188,11 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
         await bot.queue[ctx.guild.id]["queue"].put((message, message_content, voice_channel, None, None))
         print(f"{ctx.guild.name}: Added message to queue: {message_content}")
 
-    await bot.process_commands(message)
-
 @bot.event
 async def on_message(message: discord.Message):
     await process_message(message, message.content)
+    
+    await bot.process_commands(message)
 
 # endregion
 
