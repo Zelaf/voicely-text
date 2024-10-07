@@ -488,19 +488,19 @@ tld_list = get_tlds()
 
 class AccentsView1(discord.ui.View):
     if len(tld_list) > 3:
-        @discord.ui.select(placeholder="Select a top-level domain (1)", options=tld_list[0])
+        @discord.ui.select(placeholder="Select a top-level domain (`ad`-`cm`)", options=tld_list[0])
         async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
-        @discord.ui.select(placeholder="Select a top-level domain (2)", options=tld_list[1])
+        @discord.ui.select(placeholder="Select a top-level domain (`cn`-`co.zw`)", options=tld_list[1])
         async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
-        @discord.ui.select(placeholder="Select a top-level domain (3)", options=tld_list[2])
+        @discord.ui.select(placeholder="Select a top-level domain (`com`-`com.kh`)", options=tld_list[2])
         async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
-        @discord.ui.select(placeholder="Select a top-level domain (4)", options=tld_list[3])
+        @discord.ui.select(placeholder="Select a top-level domain (`com.kw`-`com.sv`)", options=tld_list[3])
         async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
@@ -511,19 +511,19 @@ class AccentsView1(discord.ui.View):
 
 class AccentsView2(discord.ui.View):
     if len(tld_list) > 7:
-        @discord.ui.select(placeholder="Select a top-level domain (5)", options=tld_list[4])
+        @discord.ui.select(placeholder="Select a top-level domain (`com.tj`-`gr`)", options=tld_list[4])
         async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
-        @discord.ui.select(placeholder="Select a top-level domain (6)", options=tld_list[5])
+        @discord.ui.select(placeholder="Select a top-level domain (`gy`-`mk`)", options=tld_list[5])
         async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
-        @discord.ui.select(placeholder="Select a top-level domain (7)", options=tld_list[6])
+        @discord.ui.select(placeholder="Select a top-level domain (`ml`-`sn`)", options=tld_list[6])
         async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
-        @discord.ui.select(placeholder="Select a top-level domain (8)", options=tld_list[7])
+        @discord.ui.select(placeholder="Select a top-level domain (`so`-`ws`)", options=tld_list[7])
         async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
             await select_accent(self, interaction, select)
 
