@@ -322,12 +322,13 @@ async def check_empty_channel(guild: discord.Guild):
 async def leave_after_timeout(guild: discord.Guild):
     """Disconnect from the voice channel after the timeout has passed."""
 
-    print(f'Timeout set for {guild.name}.')
     try:
         if guild.id in servers_settings and "timeout" in servers_settings[guild.id]:
             timeout = servers_settings[guild.id]["timeout"]
         else:
             timeout = bot.default_settings["timeout"]
+        
+        print(f'Timeout set for {guild.name}.')
         await asyncio.sleep(timeout)
         
         await guild.voice_client.disconnect()
