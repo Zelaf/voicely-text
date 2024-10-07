@@ -160,6 +160,10 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
     if ctx.author == bot.user or not ctx.guild:
         return
 
+    for command in bot.tree.get_commands():
+        if text.startswith(f"{bot.command_prefix}{command}")
+        print(f"{ctx.guild.name}: Message is a command, skipping.")
+        return
     # Remove emote IDs, leaving only emote names (e.g., :emote_name:) 
     # This replaces <emote_name:123456789> with :emote_name:
     message_content = re.sub(r'<:(\w+):\d+>', r':\1:', text)
