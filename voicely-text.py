@@ -277,9 +277,9 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
         
     if tld:
         try:
-            requests.get(f"https://translate.google.{accent}")
+            requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            errors.append(f"I retrieve your desired accent because `https://translate.google.`**`{accent}`** is currently down or does not exist. Please specify another top-level domain or try again later.\n\nOtherwise, leave `tld` blank to use your default accent.")
+            errors.append(f"I retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another top-level domain or try again later.\n\nOtherwise, leave `tld` blank to use your default accent.")
             tld = None
             
     if len(errors) != 0:
