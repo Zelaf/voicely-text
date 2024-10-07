@@ -251,7 +251,7 @@ async def languages(ctx: commands.Context):
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
-    ctx.send(text, ephemeral=True)
+    await ctx.send(text, ephemeral=True)
 
 def get_tld_list():
     response = requests.get("https://www.google.com/supported_domains")
@@ -279,7 +279,7 @@ async def accents(ctx: commands.Context):
     for item in tld_list:
         text += f"\n- `{item}`"
 
-    ctx.send(text, ephemeral=True)
+    await ctx.send(text, ephemeral=True)
 
 # endregion
 
