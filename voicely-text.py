@@ -162,6 +162,7 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
 
     for command in bot.tree.get_commands():
         if text.startswith(f"{bot.command_prefix}{command}"):
+            print("returned true")
             print(f"{ctx.guild.name}: Message is a command, skipping.")
             return
     # Remove emote IDs, leaving only emote names (e.g., :emote_name:) 
