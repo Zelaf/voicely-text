@@ -403,7 +403,7 @@ class LanguagesView(discord.ui.View):
             component.disabled = True """
         return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
 
-    @discord.ui.select(placeholder="Language tags **af** through id", options=options[0])
+    @discord.ui.select(placeholder="Language tags af through id", options=options[0])
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         await self.select_language(interaction, select)
     
