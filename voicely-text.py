@@ -74,6 +74,15 @@ async def process_queue(guild: discord.Guild):
         print(f"{guild.name}: Waiting for the next message in the queue for...")
         message, text, user, voice_channel, language_override, tld_override = await bot.queue[guild.id]["queue"].get()
 
+        # region reset timeout
+        if guild_id in bot.active_timeouts:
+            bot.active_timeouts[guild_id].cancel()
+
+        bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
+
+        bot.active_timeouts[guild_id]
+        # endregion
+
         user_id = user.id
         print(f"{guild.name}: Processing message: {text}")
 
@@ -167,15 +176,6 @@ async def process_queue(guild: discord.Guild):
                 while voice_client.is_playing():
                     await asyncio.sleep(1)
                 print(f"{guild.name}: Audio finished playing")
-
-
-                if guild_id in bot.active_timeouts:
-                    bot.active_timeouts[guild_id].cancel()
-
-                bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
-
-                bot.active_timeouts[guild_id]
-
             else:
                 print(f"{guild.name}: Voice client is not connected; task done")
                 bot.tts_queue.task_done()
