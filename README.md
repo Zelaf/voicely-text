@@ -3,10 +3,18 @@ Voicely Text is another text-to-speech bot for Discord, but instead of linking t
 
 [Invite me](https://discord.com/oauth2/authorize?client_id=1290741552158609419)
 # Features
-- Reads text messages from a voice channel's associated chat channel.
-	- No need to be in a voice channel for the bot to read the text: it will read it in the associated voice channel.
-- The ability to trigger TTS without using a command beforehand.
-	- `/start` and `/stop` speaking text with slash commands.
-	- Members can enable text to speech for all their messages when they join a voice channel by default.
-- A `/tts` slash command to read just a single message without needing to use the `/start` command.
-- Individual members can set their preferred language.
+## Enabling text-to-speech
+If you are in a voice channel, and you want the bot to **read your messages**, type `/start` in the associated voice chat channel. All of the messages you send in that channel will be read by Voicely Text until you either run `/stop` or leave the voice channel.
+## Autoread
+If you would like the bot to **automatically read your messages** whenever you join a voice channel without needing to run the `/start` command, type the command `/autoread` and set `enabled` to `true`, and whenever you join a voice channel, it will automatically read your messages from the associated voice chat channel.
+## Set your language and accent
+You can also set the **language** and the **accent** that the bot will read your messages in by typing `/setlanguage` and `/setaccent`. Typing either of these commands *without parameters* will display a collection of dropdowns for you to choose from.
+- It turns out, if you type in English, and your language is set to Spanish, it will read the English text in a Spanish accent.
+- If you're from the UK, you can make the bot read your messages in a British accent by setting the `tld` to `co.uk` when running `/setaccent`.
+## Text-to-speech override
+If you don't want the bot to read *all* of your messages, but just want it to **read a single message**, or if you already have your messages being read but want to **override the language or accent** for a single message, use the `/tts` command, and specify the text you want to be read under `text`.
+- If you don't provide a `language` or `tld` (for the accent), your default language and accent will be used.
+# Early development
+This bot is still in early development, and I still need to fix up some things and add server-side settings, but the bot is completely useable in this state! Feel free to invite it to any of your servers, and just remember that things may change in the future!
+
+If any of you have an issue with the bot, please create an [issue](https://github.com/Erallie/voicely-text/issues), and I will address it to the best of my ability!
