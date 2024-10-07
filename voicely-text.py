@@ -369,7 +369,7 @@ async def languages(ctx: commands.Context):
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
-    await ctx.send(text, ephemeral=True)
+    await ctx.send(text, reference=ctx.message, ephemeral=True)
 
 def get_tld_list():
     response = requests.get("https://www.google.com/supported_domains")
@@ -403,7 +403,7 @@ async def accents(ctx: commands.Context):
 
     print(len(text))
 
-    await ctx.send(text, ephemeral=True)
+    await ctx.send(text, reference=ctx.message, ephemeral=True)
 
 # endregion
 
@@ -413,19 +413,19 @@ async def start(ctx: commands.Context):
     """Make me start reading your text."""
 
     if ctx.author.voice.channel is None:
-        await ctx.send('You must be in a voice channel to use this command.', ephemeral=True)
+        await ctx.send('You must be in a voice channel to use this command.', reference=ctx.message, ephemeral=True)
         return
     elif ctx.author.voice.channel is not ctx.channel:
-        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', ephemeral=True)
+        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', reference=ctx.message, ephemeral=True)
         return
     
     user_id = ctx.author.id
 
     if user_id not in bot.members_to_read:
         bot.members_to_read.append(user_id)
-        await ctx.send('I will now read all your messages in this channel until you run `/stop` or leave the voice channel.', ephemeral=True)
+        await ctx.send('I will now read all your messages in this channel until you run `/stop` or leave the voice channel.', reference=ctx.message, ephemeral=True)
     else:
-        await ctx.send('I am already reading your messages.', ephemeral=True)
+        await ctx.send('I am already reading your messages.', reference=ctx.message, ephemeral=True)
 
 
     
@@ -434,19 +434,19 @@ async def stop(ctx: commands.Context):
     """Make me stop reading your text."""
 
     if ctx.author.voice.channel is None:
-        await ctx.send('You are not in a voice channel, so I am not reading your messages.', ephemeral=True)
+        await ctx.send('You are not in a voice channel, so I am not reading your messages.', reference=ctx.message, ephemeral=True)
         return
     elif ctx.author.voice.channel is not ctx.channel:
-        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', ephemeral=True)
+        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', reference=ctx.message, ephemeral=True)
         return
     
     user_id = ctx.author.id
 
     if user_id in bot.members_to_read:
         bot.members_to_read.remove(user_id)
-        await ctx.send('I am no longer reading your messages. Type `/start` to have me read your messages again, or type `/tts` to have me read a single message with optional language and accent overrides.', ephemeral=True)
+        await ctx.send('I am no longer reading your messages. Type `/start` to have me read your messages again, or type `/tts` to have me read a single message with optional language and accent overrides.', reference=ctx.message, ephemeral=True)
     else:
-        await ctx.send('I already not reading your messages.', ephemeral=True)
+        await ctx.send('I already not reading your messages.', reference=ctx.message, ephemeral=True)
 
     
 
@@ -480,9 +480,9 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
         else:
             plural = "s"
 
-        final_error = f"<@{ctx.author.id}> I cannot read your message at https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}/{ctx.message.id} because of the following error{plural}:\n\n" + final_error
+        final_error = f"I cannot read your message because of the following error{plural}:\n\n" + final_error
 
-        await ctx.send(final_error, ephemeral=True)
+        await ctx.send(final_error, reference=ctx.message, ephemeral=True)
     else:
         await process_message(ctx, text, language, tld)
 
@@ -607,10 +607,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             else:
                 default = bot.default_settings["autoread"]
             save_members_settings()
-            await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", ephemeral=True)
+            await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
             return
         case _:
-            await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", ephemeral=True)
+            await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", reference=ctx.message, ephemeral=True)
             return
 
     if user_id_str in members_settings:
@@ -619,7 +619,7 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
         members_settings[user_id_str] = {"autoread": enabled_bool}
     
     save_members_settings()
-    await ctx.send(confirm_message, ephemeral=True)
+    await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
 
 # endregion
 
@@ -698,7 +698,7 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
             
             save_members_settings()
 
-            await ctx.send(f"Your language has been **reset** to the server default: `{default}`", ephemeral=True, suppress_embeds=True)
+            await ctx.send(f"Your language has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
             return
         
 
@@ -713,7 +713,7 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
 
             save_members_settings()
             
-            await ctx.send(f"Your language has been set to **{langs[tag]}**.", ephemeral=True)
+            await ctx.send(f"Your language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
         else:
             language_error = f"`{tag}` is not a valid IETF language tag! Supported tags include:"
             keys = list(langs.keys())
@@ -722,11 +722,11 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
 
             language_error += "\nRerun `/setlanguage` without arguments to generate dropdowns to choose from."
             
-            await ctx.send(language_error, ephemeral=True)
+            await ctx.send(language_error, reference=ctx.message, ephemeral=True)
     else:
         embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
 
-        await ctx.send(embed=embed, view=LanguagesView(), ephemeral=True)
+        await ctx.send(embed=embed, view=LanguagesView(), reference=ctx.message, ephemeral=True)
 
 # endregion
 
@@ -828,13 +828,13 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
             
             save_members_settings()
             
-            await ctx.send(f"Your accent's **top-level domain** has been reset to the server default: `{default}`", ephemeral=True, suppress_embeds=True)
+            await ctx.send(f"Your accent's **top-level domain** has been reset to the server default: `{default}`", reference=ctx.message, ephemeral=True)
             return
         
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nType `/accents` for a list of supported top-level domains, or try again later.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, suppress_embeds=True)
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nType `/accents` for a list of supported top-level domains, or try again later.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
 
         else:
             # user_id = ctx.author.id
@@ -845,11 +845,11 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
                 members_settings[user_id_str] = {"accent": tld}
             
             save_members_settings()
-            await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
+            await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
-        await ctx.send(embed=accent_embed, view=AccentsView1(), ephemeral=True)
+        await ctx.send(embed=accent_embed, view=AccentsView1(), reference=ctx.message, ephemeral=True)
     else:
-        await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.")
+        await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
 
 
@@ -880,10 +880,10 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
         if guild_id_str in servers_settings and "timeout" in servers_settings[guild_id_str]:
             del servers_settings[guild_id_str]["timeout"]
         save_servers_settings()
-        await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", ephemeral=True)
+        await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", reference=ctx.message, ephemeral=True)
     elif isinstance(seconds, int):
         if seconds <= 0:
-            await ctx.send(error_message, ephemeral=True)
+            await ctx.send(error_message, reference=ctx.message, ephemeral=True)
             return
         
         if seconds > 1:
@@ -896,9 +896,9 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
         else:
             servers_settings[guild_id_str] = {"timeout": seconds}
         save_servers_settings()
-        await ctx.send(f"Timeout set to **{seconds} {unit}**.", ephemeral=True)
+        await ctx.send(f"Timeout set to **{seconds} {unit}**.", reference=ctx.message, ephemeral=True)
     else:
-        await ctx.send(error_message, ephemeral=True)
+        await ctx.send(error_message, reference=ctx.message, ephemeral=True)
 
 
     
@@ -913,9 +913,9 @@ async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
-        await ctx.send("Disconnected from the voice channel.")
+        await ctx.send("Disconnected from the voice channel.", reference=ctx.message)
     else:
-        await ctx.send("I'm not in a voice channel.")
+        await ctx.send("I'm not in a voice channel.", reference=ctx.message, ephemeral=True)
 
 # endregion
 
@@ -933,7 +933,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
         command_list = ""
         for command in synced_commands:
             command_list += f"\n- `/{command.name}`"
-        await ctx.send(f"Commands synced to the guild: {guild.name}{command_list}\nPlease note it may take up to an hour to propagate globally.", ephemeral=True)
+        await ctx.send(f"Commands synced to the guild: {guild.name}{command_list}\nPlease note it may take up to an hour to propagate globally.", reference=ctx.message, ephemeral=True)
     else:
         try:
             synced_commands = await bot.tree.sync()
@@ -949,7 +949,7 @@ async def sync(ctx: commands.Context, guild: discord.Guild = None):
         command_list = ""
         for command in synced_commands:
             command_list += f"\n- `/{command.name}`"
-        await ctx.send(f"Commands synced globally:{command_list}\nPlease note it may take up to an hour to propagate globally.", ephemeral=True)
+        await ctx.send(f"Commands synced globally:{command_list}\nPlease note it may take up to an hour to propagate globally.", reference=ctx.message, ephemeral=True)
 
 # endregion
 
