@@ -602,6 +602,8 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
         members_settings[ctx.author.id]["autoread"] = enabled_bool
     else:
         members_settings[ctx.author.id] = {"autoread": enabled_bool}
+    
+    save_members_settings()
     await ctx.send(confirm_message, ephemeral=True)
 
 # endregion
@@ -643,10 +645,8 @@ class LanguagesView(discord.ui.View):
         else:
             members_settings[user_id] = {"language": select.values[0]}
         
-        select.disabled = True
-
-        """ for component in interaction.message.components:
-            component.disabled = True """
+        save_members_settings()
+        
         return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
 
     @discord.ui.select(placeholder="Language tags af through id", options=options[0])
@@ -677,6 +677,8 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
             else:
                 default = bot.default_settings["language"]
             
+            save_members_settings()
+
             await ctx.send(f"Your language has been **reset** to the server default: `{default}`", ephemeral=True, suppress_embeds=True)
             return
         
@@ -688,6 +690,8 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
                 members_settings[ctx.author.id]["language"] = tag
             else:
                 members_settings[ctx.author.id] = {"language": tag}
+
+            save_members_settings()
             
             await ctx.send(f"Your language has been set to **{langs[tag]}**.", ephemeral=True)
         else:
@@ -716,6 +720,8 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
         members_settings[user_id]["accent"] = select.values[0]
     else:
         members_settings[user_id] = {"accent": select.values[0]}
+
+    save_members_settings()
 
     return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
@@ -797,6 +803,8 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
             else:
                 default = bot.default_settings["accent"]
             
+            save_members_settings()
+            
             await ctx.send(f"Your accent's **top-level domain** has been reset to the server default: `{default}`", ephemeral=True, suppress_embeds=True)
             return
         
@@ -811,6 +819,8 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
                 members_settings[user_id]["accent"] = tld
             else:
                 members_settings[user_id] = {"accent": tld}
+            
+            save_members_settings()
             await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed, view=AccentsView1(), ephemeral=True)
@@ -843,6 +853,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
     if seconds == "reset" or seconds == bot.default_settings["timeout"]:
         if ctx.guild.id in bot.voice_channel_timeouts:
             del bot.voice_channel_timeouts[ctx.guild.id]
+        save_servers_settings()
         await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", ephemeral=True)
     elif isinstance(seconds, int):
         if seconds <= 0:
@@ -855,6 +866,7 @@ async def settimeout(ctx: commands.Context, seconds: return_seconds):
             unit = "second"
 
         bot.voice_channel_timeouts[ctx.guild.id] = seconds
+        save_servers_settings()
         await ctx.send(f"Timeout set to **{seconds} {unit}**.", ephemeral=True)
     else:
         await ctx.send(error_message, ephemeral=True)
