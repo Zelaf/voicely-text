@@ -280,6 +280,8 @@ async def accents(ctx: commands.Context):
     text += "`, `".join(tld_list)
     text += "`"
 
+    print(len(text))
+
     await ctx.send(text, ephemeral=True)
 
 # endregion
