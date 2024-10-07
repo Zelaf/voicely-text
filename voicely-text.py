@@ -10,6 +10,7 @@ import math
 import requests
 # import signal
 import atexit
+import datetime
 
 # Define intents
 intents = discord.Intents.default()
@@ -71,15 +72,15 @@ async def on_ready():
 async def process_queue(guild: discord.Guild):
     while True:
         print(f"{guild.name}: Waiting for the next message in the queue for...")
-        message, text, voice_channel, language_override, tld_override = await bot.queue[guild.id]["queue"].get()
-        user_id = message.author.id
+        message, text, user, voice_channel, language_override, tld_override = await bot.queue[guild.id]["queue"].get()
+
+        user_id = user.id
         print(f"{guild.name}: Processing message: {text}")
 
-        # Convert the text to speech using gTTS
-        
         # guild = message.guild
         guild_id = guild.id
         
+        # region set language and accent
         if language_override:
             language = language_override
         elif user_id in bot.members_settings and "language" in bot.members_settings[user_id]:
@@ -97,6 +98,8 @@ async def process_queue(guild: discord.Guild):
             accent = bot.servers_settings[guild_id]["accent"]
         else:
             accent = bot.default_settings["accent"]
+        
+        # endregion
 
         try:
             requests.get(f"https://translate.google.{accent}")
@@ -105,6 +108,18 @@ async def process_queue(guild: discord.Guild):
             continue
 
         else:
+
+            # region Prepend display name
+            if guild_id in bot.last_speakers and user_id is bot.last_speakers[guild_id]["user_id"]:
+                last_time: datetime.datetime = bot.last_speakers[guild_id]["time"]
+                time_diff = datetime.datetime.today() - last_time
+                if time_diff.total_seconds() > 30:
+                    text = user.display_name + ' says, ' + text
+            else:
+                text = user.display_name + ' says, ' + text
+            # endregion
+
+            # Convert the text to speech using gTTS
             tts = gTTS(text=text, lang=language, tld=accent)
             tts.save(f"voice_files/{guild_id}-tts.mp3")
             
@@ -121,6 +136,17 @@ async def process_queue(guild: discord.Guild):
                 def after_playing(error):
                     if error:
                         print(f"{guild.name}: Error occurred during playback: {error}")
+
+                    # region add last_speakers
+                    if guild_id in bot.last_speakers:
+                        bot.last_speakers[guild_id]["user_id"] = user_id
+                        bot.last_speakers[guild_id]["time"] = datetime.datetime.today()
+                    else:
+                        bot.last_speakers[guild_id] = {
+                            "user_id": user_id,
+                            "time": datetime.datetime.today()
+                        }
+                    # endregion
 
                     # Indicate that the current task is done
                     bot.loop.call_soon_threadsafe(bot.tts_queue.task_done)
@@ -179,7 +205,7 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
         print(f"{ctx.guild.name}: Message contains no text, skipping.")
         return
     
-    message_content = f"{ctx.author.display_name} says, " + message_content
+    # message_content = f"{ctx.author.display_name} says, " + message_content
 
     text_channel_name = ctx.channel.name
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
@@ -191,8 +217,8 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
 
     if voice_channel:
         # Add the filtered message content to the queue
-        await bot.queue[ctx.guild.id]["queue"].put((message, message_content, voice_channel, language, tld))
-        print(f"{ctx.guild.name}: Added message to queue: {message_content}")
+        await bot.queue[ctx.guild.id]["queue"].put((message, message_content, ctx.author, voice_channel, language, tld))
+        print(f"{ctx.guild.name}: Added message to queue for {ctx.author.display_name}: {message_content}")
 
 @bot.event
 async def on_message(message: discord.Message):
