@@ -192,7 +192,7 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
 
 @bot.event
 async def on_message(message: discord.Message):
-    process_message(message, message.content)
+    await process_message(message, message.content)
 
 # endregion
 
@@ -255,7 +255,7 @@ async def stop(ctx: commands.Context):
 async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lower = None):
     """Read a single message with optional language and accent overrides."""
     
-    process_message(ctx, text, language, tld)
+    await process_message(ctx, text, language, tld)
 
 
     
