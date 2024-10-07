@@ -465,6 +465,8 @@ def get_tlds():
     if response.status_code == 200:
         string = response.text.strip('.google.')
         tld_list = string.split('\n.google.')
+        if "us" not in tld_list:
+            tld_list.append("us")
         tld_list.sort()
 
         options = []
