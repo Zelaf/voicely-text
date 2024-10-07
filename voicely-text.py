@@ -180,7 +180,7 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
 
     if isinstance(ctx, discord.Message):
         message = ctx
-    else:
+    elif isinstance(ctx, commands.Context):
         message = ctx.message
 
     if voice_channel:
@@ -243,10 +243,14 @@ tld_desc = "A localized top-level domain (eg. '.us' or '.co.uk') from which the 
 async def start(ctx: commands.Context):
     """Make me start reading your text."""
 
+    return
+
     
 @bot.hybrid_command()
 async def stop(ctx: commands.Context):
     """Make me stop reading your text."""
+
+    return
 
     
 
