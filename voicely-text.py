@@ -342,8 +342,8 @@ def to_lower(argument):
         return None
     return argument.lower()
 
-language_desc = "The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in."
-tld_desc = "A localized top-level domain (eg. '.us' or '.co.uk') from which the accent will be read."
+language_desc = "The IETF language tag of the language you will write in. Type 'reset' to set to the server default."
+tld_desc = "A localized top-level domain from which the accent will be read. Type 'reset' to set to default."
     
 # region information
 
@@ -573,7 +573,7 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
 
 # region members
 @bot.hybrid_command()
-@app_commands.describe(enabled="'True' or 'False'")
+@app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
 async def autoread(ctx: commands.Context, enabled: to_lower):
     """Set whether your messages are automatically read when you join a voice channel."""
 
@@ -668,6 +668,19 @@ async def setlanguage(ctx: commands.Context, tag: str = None):
     """Set the language you want me to read your messages in."""
 
     if tag:
+        if tag == 'reset':
+            if ctx.author.id in members_settings and "language" in members_settings[ctx.author.id]:
+                del members_settings[ctx.author.id]["language"]
+            
+            if ctx.guild.id in servers_settings and "language" in servers_settings[ctx.guild.id]:
+                default = servers_settings[ctx.guild.id]["language"]
+            else:
+                default = bot.default_settings["language"]
+            
+            await ctx.send(f"Your language has been **reset** to the server default: `{default}`", ephemeral=True, suppress_embeds=True)
+            return
+        
+
         langs = lang.tts_langs()
 
         if tag in langs:
@@ -775,6 +788,18 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
     """Set the accent you want me to read your messages in."""
 
     if tld:
+        if tld == 'reset':
+            if ctx.author.id in members_settings and "accent" in members_settings[ctx.author.id]:
+                del members_settings[ctx.author.id]["accent"]
+            
+            if ctx.guild.id in servers_settings and "accent" in servers_settings[ctx.guild.id]:
+                default = servers_settings[ctx.guild.id]["accent"]
+            else:
+                default = bot.default_settings["accent"]
+            
+            await ctx.send(f"Your accent's **top-level domain** has been reset to the server default: `{default}`", ephemeral=True, suppress_embeds=True)
+            return
+        
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
