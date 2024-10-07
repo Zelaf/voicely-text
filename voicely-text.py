@@ -448,7 +448,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
 
 # region Command for accents
 
-accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted alphabetically.')
+accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
 
 async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
     user_id = interaction.user.id
