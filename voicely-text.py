@@ -271,6 +271,8 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
             keys = list(langs.keys())
             for key in keys:
                 language_error += f"\n- `{key}` - *{langs[key]}*"
+
+            language_error += "\nLeave `language` blank to use your default language."
             errors.append(language_error)
             
             language = None
@@ -279,7 +281,7 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            errors.append(f"I retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another top-level domain or try again later.\n\nOtherwise, leave `tld` blank to use your default accent.")
+            errors.append(f"I cannot retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another **top-level domain** or try again later. Here is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use. Otherwise, leave `tld` blank to use your default accent.")
             tld = None
             
     if len(errors) != 0:
