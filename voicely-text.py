@@ -71,6 +71,7 @@ async def process_queue(guild: discord.Guild):
     while True:
         print(f"{guild.name}: Waiting for the next message in the queue for...")
         message, text, user, voice_channel, language_override, tld_override = await bot.queue[guild.id]["queue"].get()
+        guild_id = guild.id
 
         # region reset timeout
         if guild_id in bot.active_timeouts:
@@ -83,9 +84,6 @@ async def process_queue(guild: discord.Guild):
 
         user_id = user.id
         print(f"{guild.name}: Processing message: {text}")
-
-        # guild = message.guild
-        guild_id = guild.id
         
         # region set language and accent
         if language_override:
