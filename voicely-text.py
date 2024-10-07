@@ -403,35 +403,36 @@ class LanguagesView(discord.ui.View):
             component.disabled = True """
         return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
 
-    @discord.ui.select(placeholder="Select a language (1)", options=options[0])
+    @discord.ui.select(placeholder="Language tags **af** through id", options=options[0])
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
         await self.select_language(interaction, select)
     
-    @discord.ui.select(placeholder="Select a language (2)", options=options[1])
+    @discord.ui.select(placeholder="Language tags is through si", options=options[1])
     async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
         await self.select_language(interaction, select)
     
-    @discord.ui.select(placeholder="Select a language (3)", options=options[2])
+    @discord.ui.select(placeholder="Language tags sk through zh", options=options[2])
     async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
         await self.select_language(interaction, select)
 
 
 @bot.hybrid_command()
-async def setlanguage(ctx: commands.Context, languagetag: str = None):
+@app_commands.describe(tag="The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in.")
+async def setlanguage(ctx: commands.Context, tag: str = None):
     """Set the language you want me to read your messages in."""
 
-    if languagetag:
+    if tag:
         langs = lang.tts_langs()
 
-        if languagetag in langs:
+        if tag in langs:
             if ctx.author.id in bot.members_settings:
-                bot.members_settings[ctx.author.id]["language"] = languagetag
+                bot.members_settings[ctx.author.id]["language"] = tag
             else:
-                bot.members_settings[ctx.author.id] = {"language": languagetag}
+                bot.members_settings[ctx.author.id] = {"language": tag}
             
-            await ctx.send(f"Your language has been set to **{langs[languagetag]}**.", ephemeral=True)
+            await ctx.send(f"Your language has been set to **{langs[tag]}**.", ephemeral=True)
         else:
-            language_error = f"`{languagetag}` is not a valid IETF language tag! Supported tags include:"
+            language_error = f"`{tag}` is not a valid IETF language tag! Supported tags include:"
             keys = list(langs.keys())
             for key in keys:
                 language_error += f"\n- `{key}` - *{langs[key]}*"
@@ -440,7 +441,7 @@ async def setlanguage(ctx: commands.Context, languagetag: str = None):
             
             await ctx.send(language_error, ephemeral=True)
     else:
-        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.')
+        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
 
         await ctx.send(embed=embed, view=LanguagesView(), ephemeral=True)
 
