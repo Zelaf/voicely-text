@@ -291,10 +291,10 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
             plural = "s"
 
         final_error = f"<@{ctx.author.id}> I cannot read your message at https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}/{ctx.message.id} because of the following error{plural}:\n\n" + final_error
-        
-        ctx.send(final_error, ephemeral=True)
-    
-    await process_message(ctx, text, language, tld)
+
+        await ctx.send(final_error, ephemeral=True)
+    else:
+        await process_message(ctx, text, language, tld)
 
 
     
