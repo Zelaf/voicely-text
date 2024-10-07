@@ -238,7 +238,50 @@ def to_lower(argument):
 language_desc = "The IETF language tag (eg. 'en' or 'zh-TW') of the language you will write messages in."
 tld_desc = "A localized top-level domain (eg. '.us' or '.co.uk') from which the accent will be read."
     
+# region information
 
+@bot.hybrid_command()
+async def languages(ctx: commands.Context):
+    """List all the IETF languages tags available to use."""
+
+    langs = lang.tts_langs()
+    keys = list(langs.keys())
+
+    text = f"`Supported IETF language tags include:"
+    for key in keys:
+        text += f"\n- `{key}` - *{langs[key]}*"
+
+    ctx.send(text, ephemeral=True)
+
+def get_tld_list():
+    response = requests.get("https://www.google.com/supported_domains")
+
+    if response.status_code == 200:
+        string = response.text.strip('.google.')
+        tld_list = string.split('\n.google.')
+        if "us" not in tld_list:
+            tld_list.append("us")
+        tld_list.sort()
+
+        return tld_list
+    else:
+        print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
+        return []
+
+tld_list = get_tld_list()
+    
+
+@bot.hybrid_command()
+async def languages(ctx: commands.Context):
+    """List all the top-level domains available to use for accents."""
+
+    text = f"`Supported top-level domains include:"
+    for item in tld_list:
+        text += f"\n- `{item}`"
+
+    ctx.send(text, ephemeral=True)
+
+# endregion
 
 # region start and stop
 @bot.hybrid_command()
@@ -530,30 +573,18 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
     return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
 
 def get_tlds():
-    response = requests.get("https://www.google.com/supported_domains")
+    options = []
+    
+    select_count = math.ceil(len(tld_list) / 25)
 
-    if response.status_code == 200:
-        string = response.text.strip('.google.')
-        tld_list = string.split('\n.google.')
-        if "us" not in tld_list:
-            tld_list.append("us")
-        tld_list.sort()
+    for x in range(select_count):
+        options.append([])
 
-        options = []
-        
-        select_count = math.ceil(len(tld_list) / 25)
+        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
 
-        for x in range(select_count):
-            options.append([])
-
-            new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
-
-            for y in range(len(new_list)):
-                options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
-        return options
-    else:
-        print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
-        return []
+        for y in range(len(new_list)):
+            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
+    return options
 
 tld_list = get_tlds()
 # tld_list = []
