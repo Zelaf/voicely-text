@@ -185,7 +185,7 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
 
     if voice_channel:
         # Add the filtered message content to the queue
-        await bot.queue[ctx.guild.id]["queue"].put((message, message_content, voice_channel, None, None))
+        await bot.queue[ctx.guild.id]["queue"].put((message, message_content, voice_channel, language, tld))
         print(f"{ctx.guild.name}: Added message to queue: {message_content}")
 
 @bot.event
