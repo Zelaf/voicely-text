@@ -89,7 +89,7 @@ async def process_queue(guild: discord.Guild):
 
         if tld_override:
             accent = tld_override
-        if user_id in bot.members_settings and "accent" in bot.members_settings[user_id]:
+        elif user_id in bot.members_settings and "accent" in bot.members_settings[user_id]:
             accent = bot.members_settings[user_id]["accent"]
         elif guild_id in bot.servers_settings and "accent" in bot.servers_settings[guild_id]:
             accent = bot.servers_settings[guild_id]["accent"]
