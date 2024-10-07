@@ -310,13 +310,7 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
         langs = lang.tts_langs()
         
         if language not in langs:
-            language_error = f"`{language}` is not a valid IETF language tag! Supported tags include:"
-            keys = list(langs.keys())
-            for key in keys:
-                language_error += f"\n- `{key}` - *{langs[key]}*"
-
-            language_error += "\nLeave `language` blank to use your default language."
-            errors.append(language_error)
+            errors.append(f"`{language}` is not a valid IETF language tag! Type `/languages` for a list of supported language tags.")
             
             language = None
         
@@ -324,7 +318,7 @@ async def tts(ctx: commands.Context, text: str, language: str = None, tld: to_lo
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            errors.append(f"I cannot retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another **top-level domain** or try again later. Here is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use. Otherwise, leave `tld` blank to use your default accent.")
+            errors.append(f"I cannot retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another **top-level domain** or try again later. Type `/accents` for a list of supported top-level domains. Otherwise, leave `tld` blank to use your default accent.")
             tld = None
             
     if len(errors) != 0:
@@ -644,7 +638,7 @@ async def setaccent(ctx: commands.Context, tld: to_lower = None):
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nEither try another value or try again later. Here is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, suppress_embeds=True)
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nType `/accents` for a list of supported top-level domains, or try again later.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, suppress_embeds=True)
 
         else:
             user_id = ctx.author.id
