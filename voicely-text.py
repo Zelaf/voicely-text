@@ -290,7 +290,7 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
             # guild_id = after.channel.guild.id
             guild_id_str = str(after.channel.guild.id)
             if user_id_str in members_settings and "autoread" in members_settings[user_id_str]:
-                add = members_settings[member.id]["autoread"]
+                add = members_settings[user_id_str]["autoread"]
             elif guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
                 add = servers_settings[guild_id_str]["autoread"]
             else:
@@ -606,10 +606,11 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
                 default = servers_settings[guild_id_str]["autoread"]
             else:
                 default = bot.default_settings["autoread"]
+            save_members_settings()
             await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", ephemeral=True)
             return
         case _:
-            await ctx.send(f"`enabled` must be set to either `True` or `False`.", ephemeral=True)
+            await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", ephemeral=True)
             return
 
     if user_id_str in members_settings:
