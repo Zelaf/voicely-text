@@ -895,7 +895,7 @@ async def leave(ctx: commands.Context):
 
 # region Sync
 @admin.command()
-@commands.has_guild_permissions(administrator=True)
+@commands.is_owner()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
