@@ -882,7 +882,7 @@ async def server(ctx: commands.Context):
     if ctx.invoked_subcommand is None:
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
-# region Set timeout
+# region Timeout
 @server.command()
 @commands.has_guild_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
