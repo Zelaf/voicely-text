@@ -130,6 +130,8 @@ async def on_guild_join(guild: discord.Guild):
     
     bot.loop.create_task(check_empty_channel(guild))
 
+    print(f"Bot added to guild: {guild.name}")
+
 async def on_guild_remove(guild: discord.Guild):
     if guild.id in bot.queue:
         if bot.queue[guild.id]["task"] is not None:
@@ -138,8 +140,11 @@ async def on_guild_remove(guild: discord.Guild):
                 await bot.queue[guild.id]["task"]
             except asyncio.CancelledError:
                 print(f"{guild.name}: Queue task has been cancelled")
-                
+
         del bot.queue[guild.id]
+
+        print(f"Bot removed from guild: {guild.name}")
+
 
 
 async def process_queue(guild: discord.Guild):
