@@ -894,6 +894,7 @@ async def timeout(ctx: commands.Context, seconds: return_seconds):
 # region Languages
 
 @server.command()
+@commands.has_permissions(administrator=True)
 @app_commands.describe(tag=language_desc)
 async def language(ctx: commands.Context, tag: str = None):
     """Set the default language for the server. This can be overridden on a per-user basis."""
