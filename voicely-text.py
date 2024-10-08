@@ -449,7 +449,6 @@ class LanguagesView(discord.ui.View):
 
 # endregion
 
-
 # region Accents setup
 
 accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
@@ -465,6 +464,24 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
     save_members_settings()
 
     return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
+
+
+def get_tld_list():
+    response = requests.get("https://www.google.com/supported_domains")
+
+    if response.status_code == 200:
+        string = response.text.strip('.google.')
+        tld_list = string.split('\n.google.')
+        if "us" not in tld_list:
+            tld_list.append("us")
+        tld_list.sort()
+
+        return tld_list
+    else:
+        print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
+        return []
+
+tld_list = get_tld_list()
 
 def get_tlds():
     options = []
@@ -550,23 +567,6 @@ async def languages(ctx: commands.Context):
         text += f"\n- `{key}` - *{langs[key]}*"
 
     await ctx.send(text, reference=ctx.message, ephemeral=True)
-
-def get_tld_list():
-    response = requests.get("https://www.google.com/supported_domains")
-
-    if response.status_code == 200:
-        string = response.text.strip('.google.')
-        tld_list = string.split('\n.google.')
-        if "us" not in tld_list:
-            tld_list.append("us")
-        tld_list.sort()
-
-        return tld_list
-    else:
-        print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
-        return []
-
-tld_list = get_tld_list()
     
 
 @list.command()
