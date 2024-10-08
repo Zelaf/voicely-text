@@ -45,7 +45,7 @@ class Bot(commands.Bot):
 bot = Bot()
 
 # Read the bot token from external file
-with open('../token.txt', 'r') as file:
+with open('../token', 'r') as file:
     TOKEN = file.read().strip()
 
 # region save and load settings
