@@ -10,7 +10,7 @@ import math
 import requests
 import datetime
 import json
-import signal
+# import signal
 
 # Define intents
 intents = discord.Intents.default()
@@ -1011,11 +1011,11 @@ def run_bot():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    def run_shutdown():
-        loop.run_until_complete(shutdown())
+    # def run_shutdown():
+    #     loop.run_until_complete(shutdown())
     # atexit.register(shutdown, loop)
-    signal.signal(signal.SIGINT, run_shutdown)
-    signal.signal(signal.SIGTERM, run_shutdown)
+    # signal.signal(signal.SIGINT, run_shutdown)
+    # signal.signal(signal.SIGTERM, run_shutdown)
 
     try:
         loop.run_until_complete(bot.start(TOKEN))
