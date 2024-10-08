@@ -398,7 +398,9 @@ def return_seconds(argument):
 # endregion
 
 language_desc = "The IETF language tag of the language you will write in. Type 'reset' to set to the server default."
+language_list_desc = "Type `/languages` to list the supported language tags"
 tld_desc = "A localized top-level domain from which the accent will be read. Type 'reset' to set to default."
+tld_list_desc = "Type `/accents` for a list of supported top-level domains"
     
 # region information
 
@@ -763,12 +765,7 @@ async def language(ctx: commands.Context, tag: str = None):
             
             await ctx.send(f"Your language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
         else:
-            language_error = f"`{tag}` is not a valid IETF language tag! Supported tags include:"
-            keys = list(langs.keys())
-            for key in keys:
-                language_error += f"\n- `{key}` - *{langs[key]}*"
-
-            language_error += "\nRerun `/setlanguage` without arguments to generate dropdowns to choose from."
+            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/setlanguage` without arguments to generate dropdowns to choose from."
             
             await ctx.send(language_error, reference=ctx.message, ephemeral=True)
     else:
@@ -805,7 +802,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\nType `/accents` for a list of supported top-level domains, or try again later.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\n{tld_list_desc}, or try again later.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
 
         else:
             # user_id = ctx.author.id
