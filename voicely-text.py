@@ -403,8 +403,14 @@ tld_desc = "A localized top-level domain from which the accent will be read. Typ
 tld_list_desc = "Type `/accents` for a list of supported top-level domains"
     
 # region information
+# Create a hybrid group
+@bot.hybrid_group()
+async def list(ctx: commands.Context):
+    """List different options."""
+    if ctx.invoked_subcommand is None:
+        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
-@bot.hybrid_command()
+@list.hybrid_command()
 async def languages(ctx: commands.Context):
     """List all the IETF language tags available to use."""
 
@@ -435,7 +441,7 @@ def get_tld_list():
 tld_list = get_tld_list()
     
 
-@bot.hybrid_command()
+@list.hybrid_command()
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
