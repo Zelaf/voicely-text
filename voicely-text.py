@@ -458,7 +458,7 @@ async def accents(ctx: commands.Context):
 async def tts(ctx: commands.Context):
     """Toggle or trigger text-to-speech"""
     if ctx.invoked_subcommand is None:
-        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
+        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
 # region start
 @tts.command()
@@ -682,7 +682,7 @@ class AccentsView2(discord.ui.View):
 async def settings(ctx: commands.Context):
     """Settings that apply to the user, regardless of the server."""
     if ctx.invoked_subcommand is None:
-        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
+        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
 # region autoread
 @settings.command()
@@ -828,7 +828,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
 async def server(ctx: commands.Context):
     """Settings that apply to the entire server. Can be overridden by user settings."""
     if ctx.invoked_subcommand is None:
-        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
+        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
 # region Set timeout
 @server.command()
@@ -876,7 +876,7 @@ async def timeout(ctx: commands.Context, seconds: return_seconds):
 async def admin(ctx: commands.Context):
     """Admin commands"""
     if ctx.invoked_subcommand is None:
-        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
+        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
 # region Leave
 @admin.command()
