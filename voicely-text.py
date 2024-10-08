@@ -461,7 +461,7 @@ async def tts(ctx: commands.Context):
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
 
 # region start
-@bot.hybrid_command()
+@tts.hybrid_command()
 async def start(ctx: commands.Context):
     """Make me start reading your text."""
 
@@ -484,7 +484,7 @@ async def start(ctx: commands.Context):
 
 #region stop
     
-@bot.hybrid_command()
+@tts.hybrid_command()
 async def stop(ctx: commands.Context):
     """Make me stop reading your text."""
 
@@ -507,7 +507,7 @@ async def stop(ctx: commands.Context):
 
 # region speak
 
-@bot.hybrid_command()
+@tts.hybrid_command()
 @app_commands.describe(text="The text you want me to speak.", language=language_desc, tld=tld_desc)
 async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_lower = None):
     """Speak a single message with optional language and accent overrides."""
@@ -687,7 +687,7 @@ async def settings(ctx: commands.Context):
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
 
 # region autoread
-@bot.hybrid_command()
+@settings.hybrid_command()
 @app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
 async def autoread(ctx: commands.Context, enabled: to_lower):
     """Set whether your messages are automatically read when you join a voice channel."""
@@ -728,7 +728,7 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 # endregion
 
 # region Languages
-@bot.hybrid_command()
+@settings.hybrid_command()
 @app_commands.describe(tag=language_desc)
 async def language(ctx: commands.Context, tag: str = None):
     """Set the language you want me to read your messages in."""
@@ -777,7 +777,7 @@ async def language(ctx: commands.Context, tag: str = None):
 
 # region Accents
 
-@bot.hybrid_command()
+@settings.hybrid_command()
 @app_commands.describe(tld=tld_desc)
 async def accent(ctx: commands.Context, tld: to_lower = None):
     """Set the accent you want me to read your messages in."""
@@ -833,7 +833,7 @@ async def server(ctx: commands.Context):
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
 
 # region Set timeout
-@bot.hybrid_command()
+@server.hybrid_command()
 @commands.has_guild_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
 async def timeout(ctx: commands.Context, seconds: return_seconds):
@@ -881,7 +881,7 @@ async def admin(ctx: commands.Context):
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.")
 
 # region Leave
-@bot.hybrid_command()
+@admin.hybrid_command()
 @commands.has_permissions(administrator=True)
 async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
@@ -894,7 +894,7 @@ async def leave(ctx: commands.Context):
 # endregion
 
 # region Sync
-@bot.hybrid_command()
+@admin.hybrid_command()
 @commands.has_guild_permissions(administrator=True)
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
