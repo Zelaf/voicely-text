@@ -542,9 +542,7 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
         await ctx.send(final_error, reference=ctx.message, ephemeral=True)
     else:
         await process_message(ctx, text, language, tld)
-        if isinstance(ctx, discord.Interaction):
-            # await bot.edit(username=ctx.author.display_name, avatar=ctx.author.display_avatar)
-            # await ctx.channel.send(text,)
+        if ctx.interaction is not None:
             await ctx.send(f"**{ctx.author.display_name}:** {text}")
 
 # endregion
