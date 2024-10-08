@@ -562,7 +562,7 @@ class AccentsView1(discord.ui.View):
         if len(tld_list) > 4:
             @discord.ui.button(label="Next page")
             async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-                await interaction.response.send_message(embed=accent_embed(self.type), view=AccentsView2(self.type), ephemeral=True)
+                await interaction.response.send_message(embed=accent_embed(self.type, interaction.guild), view=AccentsView2(self.type), ephemeral=True)
 
 class AccentsView2(discord.ui.View):
     def __init__(self, typeof):
@@ -588,7 +588,7 @@ class AccentsView2(discord.ui.View):
 
         @discord.ui.button(label="Previous page")
         async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(embed=accent_embed(self.type), view=AccentsView1(self.type), ephemeral=True)
+            await interaction.response.send_message(embed=accent_embed(self.type, interaction.guild), view=AccentsView1(self.type), ephemeral=True)
 # endregion
 
 
@@ -973,7 +973,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
     """Set the default accent for the server. This can be overridden on a per-user basis."""
 
     guild = ctx.guild
-    
+
     if tld:
         guild_id_str = str(guild.id)
         if tld == 'reset':
