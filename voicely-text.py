@@ -394,7 +394,7 @@ tld_desc = "A localized top-level domain from which the accent will be read. Typ
 
 @bot.hybrid_command()
 async def languages(ctx: commands.Context):
-    """List all the IETF languages tags available to use."""
+    """List all the IETF language tags available to use."""
 
     langs = lang.tts_langs()
     keys = list(langs.keys())
