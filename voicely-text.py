@@ -877,7 +877,6 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
 
 # Create a hybrid group for 'settings' commands
 @set.group()
-@commands.has_guild_permissions(administrator=True)
 async def server(ctx: commands.Context):
     """Settings that apply to the entire server. Can be overridden by user settings."""
     if ctx.invoked_subcommand is None:
@@ -885,6 +884,7 @@ async def server(ctx: commands.Context):
 
 # region Timeout
 @server.command()
+@commands.has_guild_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
 async def timeout(ctx: commands.Context, seconds: return_seconds):
     """Set the number of seconds of inactivity after which the bot will leave the voice channel."""
@@ -922,6 +922,7 @@ async def timeout(ctx: commands.Context, seconds: return_seconds):
 # region Languages
 
 @server.command()
+@commands.has_guild_permissions(administrator=True)
 @app_commands.describe(tag=language_desc)
 async def language(ctx: commands.Context, tag = None):
     """Set the default language for the server. This can be overridden on a per-user basis."""
@@ -967,6 +968,7 @@ async def language(ctx: commands.Context, tag = None):
 # region Accents
 
 @server.command()
+@commands.has_guild_permissions(administrator=True)
 @app_commands.describe(tld=tld_desc)
 async def accent(ctx: commands.Context, tld: to_lower = None):
     """Set the default accent for the server. This can be overridden on a per-user basis."""
@@ -1012,7 +1014,6 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
 
 # Create a hybrid group for 'settings' commands
 @bot.hybrid_group()
-@commands.has_guild_permissions(administrator=True)
 async def admin(ctx: commands.Context):
     """Admin commands"""
     if ctx.invoked_subcommand is None:
@@ -1020,6 +1021,7 @@ async def admin(ctx: commands.Context):
 
 # region Leave
 @admin.command()
+@commands.has_guild_permissions(administrator=True)
 async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
     if ctx.voice_client:
