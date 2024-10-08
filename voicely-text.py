@@ -194,7 +194,7 @@ async def process_queue(guild: discord.Guild):
         try:
             requests.get(f"https://translate.google.{accent}")
         except requests.ConnectionError:
-            await message.reply(f"I cannot read your message because `https://translate.google.`**`{accent}`** is currently down. Please run `/set accent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
+            await message.reply(f"I cannot read your message because `https://translate.google.`**`{accent}`** is currently down. Please run `/set accent` and specify another top-level domain or try again later.\n\nOtherwise, type `/tts stop`, and I will stop reading your messages.")
             continue
 
         else:
@@ -401,10 +401,10 @@ def return_seconds(argument):
 
 # endregion
 
-language_desc = "The IETF language tag of the language you will write in. Type 'reset' to set to the server default."
-language_list_desc = "Type `/languages` to list the supported language tags"
+language_desc = "The IETF language tag of the language you will write in. Type 'reset' to set to default."
+language_list_desc = "Type `/list languages` to list the supported language tags"
 tld_desc = "A localized top-level domain from which the accent will be read. Type 'reset' to set to default."
-tld_list_desc = "Type `/accents` for a list of supported top-level domains"
+tld_list_desc = "Type `/list accents` for a list of supported top-level domains"
     
 
 # region Languages setup
@@ -657,7 +657,7 @@ async def start(ctx: commands.Context):
 
     if user_id not in bot.members_to_read:
         bot.members_to_read.append(user_id)
-        await ctx.send('I will now read all your messages in this channel until you run `/stop` or leave the voice channel.', reference=ctx.message, ephemeral=True)
+        await ctx.send('I will now read all your messages in this channel until you run `/tts stop` or leave the voice channel.', reference=ctx.message, ephemeral=True)
     else:
         await ctx.send('I am already reading your messages.', reference=ctx.message, ephemeral=True)
 
@@ -680,7 +680,7 @@ async def stop(ctx: commands.Context):
 
     if user_id in bot.members_to_read:
         bot.members_to_read.remove(user_id)
-        await ctx.send('I am no longer reading your messages. Type `/start` to have me read your messages again, or type `/tts` to have me read a single message with optional language and accent overrides.', reference=ctx.message, ephemeral=True)
+        await ctx.send('I am no longer reading your messages. Type `/tts start` to have me read your messages again, or type `/tts speak [your message]` to have me read a single message with optional language and accent overrides.', reference=ctx.message, ephemeral=True)
     else:
         await ctx.send('I already not reading your messages.', reference=ctx.message, ephemeral=True)
 
@@ -699,7 +699,7 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
         langs = lang.tts_langs()
         
         if language not in langs:
-            errors.append(f"`{language}` is not a valid IETF language tag! Type `/languages` for a list of supported language tags.")
+            errors.append(f"`{language}` is not a valid IETF language tag! Type `/list languages` for a list of supported language tags.")
             
             language = None
         
@@ -707,7 +707,7 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            errors.append(f"I cannot retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another **top-level domain** or try again later. Type `/accents` for a list of supported top-level domains. Otherwise, leave `tld` blank to use your default accent.")
+            errors.append(f"I cannot retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another **top-level domain** or try again later. Type `/list accents` for a list of supported top-level domains. Otherwise, leave `tld` blank to use your default accent.")
             tld = None
             
     if len(errors) != 0:
@@ -751,10 +751,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
     match enabled:
         case "true":
             enabled_bool = True
-            confirm_message = f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\n\nThis will be disabled when you leave the voice channel."
+            confirm_message = f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/tts start`.\n\nThis will be disabled when you leave the voice channel."
         case "false":
             enabled_bool = False
-            confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message."
+            confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/tts start` for me to start reading your messages.\n\nAlternatively, you can type `/tts speak [your message]` for me to read a single message."
         case "reset":
             if user_id_str in members_settings and "autoread" in members_settings[user_id_str]:
                 del members_settings[user_id_str]["autoread"]
