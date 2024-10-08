@@ -825,7 +825,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
 
 # Create a hybrid group for 'settings' commands
 @set.group()
-async def global(ctx: commands.Context):
+async def server(ctx: commands.Context):
     """Settings that apply to the entire server. Can be overridden by user settings."""
     if ctx.invoked_subcommand is None:
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
