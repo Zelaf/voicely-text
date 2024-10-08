@@ -193,7 +193,7 @@ async def process_queue(guild: discord.Guild):
         try:
             requests.get(f"https://translate.google.{accent}")
         except requests.ConnectionError:
-            await message.reply(f"I cannot read your message because `https://translate.google.`**`{accent}`** is currently down. Please run `/setaccent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
+            await message.reply(f"I cannot read your message because `https://translate.google.`**`{accent}`** is currently down. Please run `/set accent` and specify another top-level domain or try again later.\n\nOtherwise, type `/stop`, and I will stop reading your messages.")
             continue
 
         else:
@@ -471,18 +471,31 @@ class LanguagesView(discord.ui.View):
 
 accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
 
-async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
-    # user_id = interaction.user.id
-    user_id_str = str(interaction.user.id)
-    if user_id_str in members_settings:
-        members_settings[user_id_str]["accent"] = select.values[0]
+async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select, typeof):
+    if typeof == "user":
+        user_id_str = str(interaction.user.id)
+        if user_id_str in members_settings:
+            members_settings[user_id_str]["accent"] = select.values[0]
+        else:
+            members_settings[user_id_str] = {"accent": select.values[0]}
+
+        save_members_settings()
+
+        return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
+    elif typeof == "server":
+        guild = interaction.guild
+        guild_id_str = str(guild.id)
+        if guild_id_str in servers_settings:
+            servers_settings[guild_id_str]["accent"] = select.values[0]
+        else:
+            servers_settings[guild_id_str] = {"accent": select.values[0]}
+        
+        save_servers_settings()
+        
+        return await interaction.response.send_message(f"The **top-level domain** for {guild.name}'s accent has been set to `{select.values[0]}`.", ephemeral=True)
     else:
-        members_settings[user_id_str] = {"accent": select.values[0]}
-
-    save_members_settings()
-
-    return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
-
+        print(f"{interaction.guild.name}: Failed to set server accent:\n\t{typeof} is not a valid type!")
+        return await interaction.response.send_message(f"There was an error setting the server accent. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{typeof} is not a valid type!\n```")
 
 def get_tld_list():
     response = requests.get("https://www.google.com/supported_domains")
@@ -519,49 +532,57 @@ tld_list = get_tlds()
 # tld_list = []
 
 class AccentsView1(discord.ui.View):
+    def __init__(self, typeof):
+        super().__init__()
+        self.type = typeof
+        
     if len(tld_list) > 3:
         @discord.ui.select(placeholder="Domains .ad through .cm", options=tld_list[0])
         async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .cn through .co.zw", options=tld_list[1])
         async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .com through .com.kh", options=tld_list[2])
         async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .com.kw through .com.sv", options=tld_list[3])
         async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         if len(tld_list) > 4:
             @discord.ui.button(label="Next page")
             async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-                await interaction.response.send_message(embed=accent_embed, view=AccentsView2(), ephemeral=True)
+                await interaction.response.send_message(embed=accent_embed, view=AccentsView2(self.type), ephemeral=True)
 
 class AccentsView2(discord.ui.View):
+    def __init__(self, typeof):
+        super().__init__()
+        self.type = typeof
+    
     if len(tld_list) > 7:
         @discord.ui.select(placeholder="Domains .com.tj through .gr", options=tld_list[4])
         async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .gy through .mk", options=tld_list[5])
         async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .ml through .sn", options=tld_list[6])
         async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .so through .ws", options=tld_list[7])
         async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
+            await select_accent(self, interaction, select, self.type)
 
         @discord.ui.button(label="Previous page")
         async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(embed=accent_embed, view=AccentsView1(), ephemeral=True)
+            await interaction.response.send_message(embed=accent_embed, view=AccentsView1(self.type), ephemeral=True)
 # endregion
 
 
@@ -825,7 +846,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\n{tld_list_desc}, or try again later.\n\nAlternatively, rerun `/setaccent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\n{tld_list_desc}, or try again later.\n\nAlternatively, rerun `/set accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
 
         else:
             # user_id = ctx.author.id
@@ -838,7 +859,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             save_members_settings()
             await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
-        await ctx.send(embed=accent_embed, view=AccentsView1(), reference=ctx.message, ephemeral=True)
+        await ctx.send(embed=accent_embed, view=AccentsView1("user"), reference=ctx.message, ephemeral=True)
     else:
         await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
@@ -897,7 +918,7 @@ async def timeout(ctx: commands.Context, seconds: return_seconds):
 @server.command()
 @commands.has_permissions(administrator=True)
 @app_commands.describe(tag=language_desc)
-async def language(ctx: commands.Context, tag: str = None):
+async def language(ctx: commands.Context, tag = None):
     """Set the default language for the server. This can be overridden on a per-user basis."""
     
     guild = ctx.guild
@@ -912,7 +933,7 @@ async def language(ctx: commands.Context, tag: str = None):
             
             save_servers_settings()
 
-            await ctx.send(f"{guild.name}'s server language has been **reset** to the bot default: `{default}`", reference=ctx.message, ephemeral=True)
+            await ctx.send(f"{guild.name}'s server language has been **reset** to default: `{default}`", reference=ctx.message, ephemeral=True)
             return
         
 
@@ -936,6 +957,47 @@ async def language(ctx: commands.Context, tag: str = None):
 
         await ctx.send(embed=embed, view=LanguagesView("server"), reference=ctx.message, ephemeral=True)
 
+# endregion
+
+# region Accents
+
+@server.command()
+@app_commands.describe(tld=tld_desc)
+async def accent(ctx: commands.Context, tld: to_lower = None):
+    """Set the default accent for the server. This can be overridden on a per-user basis."""
+
+    if tld:
+        guild = ctx.guild
+        guild_id_str = str(guild.id)
+        if tld == 'reset':
+            if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
+                del servers_settings[guild_id_str]["accent"]
+            
+            default = bot.default_settings["accent"]
+            
+            save_servers_settings()
+            
+            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been reset to default: `{default}`", reference=ctx.message, ephemeral=True)
+            return
+        
+        try:
+            requests.get(f"https://translate.google.{tld}")
+        except requests.ConnectionError:
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\n{tld_list_desc}, or try again later.\n\nAlternatively, rerun `/set server accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+
+        else:
+            if guild_id_str in servers_settings:
+                servers_settings[guild_id_str]["accent"] = tld
+            else:
+                servers_settings[guild_id_str] = {"accent": tld}
+            
+            save_servers_settings()
+            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been set to `{tld}`.", reference=ctx.message, ephemeral=True)
+    elif len(tld_list) != 0:
+        await ctx.send(embed=accent_embed, view=AccentsView1("server"), reference=ctx.message, ephemeral=True)
+    else:
+        await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
+            
 # endregion
 
 # endregion
