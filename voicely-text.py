@@ -405,6 +405,9 @@ tld_list_desc = "Type `/accents` for a list of supported top-level domains"
 
 # region Languages setup
 class LanguagesView(discord.ui.View):
+    def __init__(self, type: str):
+        self.type = type
+
     langs = lang.tts_langs()
     keys = list(langs.keys())
     
@@ -425,15 +428,29 @@ class LanguagesView(discord.ui.View):
     async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         # user_id = interaction.user.id
-        user_id_str = str(interaction.user.id)
-        if user_id_str in members_settings:
-            members_settings[user_id_str]["language"] = select.values[0]
+        if self.type == "user":
+            user_id_str = str(interaction.user.id)
+            if user_id_str in members_settings:
+                members_settings[user_id_str]["language"] = select.values[0]
+            else:
+                members_settings[user_id_str] = {"language": select.values[0]}
+            
+            save_members_settings()
+            
+            return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+        elif self.type == "server":
+            guild_id_str = str(interaction.guild.id)
+            if guild_id_str in servers_settings:
+                servers_settings[guild_id_str]["language"] = select.values[0]
+            else:
+                servers_settings[guild_id_str] = {"language": select.values[0]}
+            
+            save_servers_settings()
+            return await interaction.response.send_message(f"{interaction.guild.name}'s server language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
         else:
-            members_settings[user_id_str] = {"language": select.values[0]}
-        
-        save_members_settings()
-        
-        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+            print(f"{interaction.guild.name}: Failed to set server language:\n\t{self.type} is not a valid type!")
+            return await interaction.response.send_message(f"There was an error setting the server language. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{self.type} is not a valid type!\n```")
+
 
     @discord.ui.select(placeholder="Language tags af through id", options=options[0])
     async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
@@ -770,13 +787,13 @@ async def language(ctx: commands.Context, tag: str = None):
             
             await ctx.send(f"Your language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
         else:
-            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/setlanguage` without arguments to generate dropdowns to choose from."
+            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set language` without arguments to generate dropdowns to choose from."
             
             await ctx.send(language_error, reference=ctx.message, ephemeral=True)
     else:
         embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
 
-        await ctx.send(embed=embed, view=LanguagesView(), reference=ctx.message, ephemeral=True)
+        await ctx.send(embed=embed, view=LanguagesView("user"), reference=ctx.message, ephemeral=True)
 
 # endregion
 
@@ -871,6 +888,51 @@ async def timeout(ctx: commands.Context, seconds: return_seconds):
         await ctx.send(f"Timeout set to **{seconds} {unit}**.", reference=ctx.message, ephemeral=True)
     else:
         await ctx.send(error_message, reference=ctx.message, ephemeral=True)
+
+# endregion
+
+# region Languages
+
+@server.command()
+@app_commands.describe(tag=language_desc)
+async def language(ctx: commands.Context, tag: str = None):
+    """Set the default language for the server. This can be overridden on a per-user basis."""
+    
+    guild = ctx.guild
+
+    if tag:
+        guild_id_str = str(guild.id)
+        if tag == 'reset':
+            if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
+                del servers_settings[guild_id_str]["language"]
+            
+            default = bot.default_settings["language"]
+            
+            save_servers_settings()
+
+            await ctx.send(f"{guild.name}'s server language has been **reset** to the bot default: `{default}`", reference=ctx.message, ephemeral=True)
+            return
+        
+
+        langs = lang.tts_langs()
+
+        if tag in langs:
+            if guild_id_str in servers_settings:
+                servers_settings[guild_id_str]["language"] = tag
+            else:
+                servers_settings[guild_id_str] = {"language": tag}
+
+            save_servers_settings()
+            
+            await ctx.send(f"{guild.name}'s server language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
+        else:
+            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set server language` without arguments to generate dropdowns to choose from."
+            
+            await ctx.send(language_error, reference=ctx.message, ephemeral=True)
+    else:
+        embed = discord.Embed(title=f"Set {guild.name}'s server language", description='Choose from the dropdown below to set the server default to that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
+
+        await ctx.send(embed=embed, view=LanguagesView("server"), reference=ctx.message, ephemeral=True)
 
 # endregion
 
