@@ -402,6 +402,134 @@ language_list_desc = "Type `/languages` to list the supported language tags"
 tld_desc = "A localized top-level domain from which the accent will be read. Type 'reset' to set to default."
 tld_list_desc = "Type `/accents` for a list of supported top-level domains"
     
+
+# region Languages setup
+class LanguagesView(discord.ui.View):
+    langs = lang.tts_langs()
+    keys = list(langs.keys())
+    
+    options = []
+    
+    select_count = math.ceil(len(langs) / 25)
+
+    for x in range(select_count):
+        options.append([])
+
+        new_keys = keys[(x * 25):min((x * 25) + 25, len(keys))]
+
+        for y in range(len(new_keys)):
+            key = new_keys[y]
+            options[x].append(discord.SelectOption(label=langs[key], value=key, description=key))
+
+    
+    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+        langs = lang.tts_langs()
+        # user_id = interaction.user.id
+        user_id_str = str(interaction.user.id)
+        if user_id_str in members_settings:
+            members_settings[user_id_str]["language"] = select.values[0]
+        else:
+            members_settings[user_id_str] = {"language": select.values[0]}
+        
+        save_members_settings()
+        
+        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+
+    @discord.ui.select(placeholder="Language tags af through id", options=options[0])
+    async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_language(interaction, select)
+    
+    @discord.ui.select(placeholder="Language tags is through si", options=options[1])
+    async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_language(interaction, select)
+    
+    @discord.ui.select(placeholder="Language tags sk through zh", options=options[2])
+    async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_language(interaction, select)
+
+# endregion
+
+
+# region Accents setup
+
+accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
+
+async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
+    # user_id = interaction.user.id
+    user_id_str = str(interaction.user.id)
+    if user_id_str in members_settings:
+        members_settings[user_id_str]["accent"] = select.values[0]
+    else:
+        members_settings[user_id_str] = {"accent": select.values[0]}
+
+    save_members_settings()
+
+    return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
+
+def get_tlds():
+    options = []
+    
+    select_count = math.ceil(len(tld_list) / 25)
+
+    for x in range(select_count):
+        options.append([])
+
+        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
+
+        for y in range(len(new_list)):
+            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
+    return options
+
+tld_list = get_tlds()
+# tld_list = []
+
+class AccentsView1(discord.ui.View):
+    if len(tld_list) > 3:
+        @discord.ui.select(placeholder="Domains .ad through .cm", options=tld_list[0])
+        async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        @discord.ui.select(placeholder="Domains .cn through .co.zw", options=tld_list[1])
+        async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        @discord.ui.select(placeholder="Domains .com through .com.kh", options=tld_list[2])
+        async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        @discord.ui.select(placeholder="Domains .com.kw through .com.sv", options=tld_list[3])
+        async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        if len(tld_list) > 4:
+            @discord.ui.button(label="Next page")
+            async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+                await interaction.response.send_message(embed=accent_embed, view=AccentsView2(), ephemeral=True)
+
+class AccentsView2(discord.ui.View):
+    if len(tld_list) > 7:
+        @discord.ui.select(placeholder="Domains .com.tj through .gr", options=tld_list[4])
+        async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        @discord.ui.select(placeholder="Domains .gy through .mk", options=tld_list[5])
+        async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        @discord.ui.select(placeholder="Domains .ml through .sn", options=tld_list[6])
+        async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        @discord.ui.select(placeholder="Domains .so through .ws", options=tld_list[7])
+        async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_accent(self, interaction, select)
+
+        @discord.ui.button(label="Previous page")
+        async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+            await interaction.response.send_message(embed=accent_embed, view=AccentsView1(), ephemeral=True)
+# endregion
+
+
 # region information
 # Create a hybrid group
 @bot.hybrid_group()
@@ -605,54 +733,6 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 
 # region Languages
 
-# region Setup
-class LanguagesView(discord.ui.View):
-    langs = lang.tts_langs()
-    keys = list(langs.keys())
-    
-    options = []
-    
-    select_count = math.ceil(len(langs) / 25)
-
-    keys_len = len(keys)
-
-    for x in range(select_count):
-        options.append([])
-
-        new_keys = keys[(x * 25):min((x * 25) + 25, keys_len)]
-
-        for y in range(len(new_keys)):
-            key = new_keys[y]
-            options[x].append(discord.SelectOption(label=langs[key], value=key, description=key))
-
-    
-    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
-        langs = lang.tts_langs()
-        # user_id = interaction.user.id
-        user_id_str = str(interaction.user.id)
-        if user_id_str in members_settings:
-            members_settings[user_id_str]["language"] = select.values[0]
-        else:
-            members_settings[user_id_str] = {"language": select.values[0]}
-        
-        save_members_settings()
-        
-        return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
-
-    @discord.ui.select(placeholder="Language tags af through id", options=options[0])
-    async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_language(interaction, select)
-    
-    @discord.ui.select(placeholder="Language tags is through si", options=options[1])
-    async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_language(interaction, select)
-    
-    @discord.ui.select(placeholder="Language tags sk through zh", options=options[2])
-    async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_language(interaction, select)
-
-# endregion
-
 @set.command()
 @app_commands.describe(tag=language_desc)
 async def language(ctx: commands.Context, tag: str = None):
@@ -701,85 +781,6 @@ async def language(ctx: commands.Context, tag: str = None):
 # endregion
 
 # region Accents
-
-# region Setup
-
-accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
-
-async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
-    # user_id = interaction.user.id
-    user_id_str = str(interaction.user.id)
-    if user_id_str in members_settings:
-        members_settings[user_id_str]["accent"] = select.values[0]
-    else:
-        members_settings[user_id_str] = {"accent": select.values[0]}
-
-    save_members_settings()
-
-    return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
-
-def get_tlds():
-    options = []
-    
-    select_count = math.ceil(len(tld_list) / 25)
-
-    for x in range(select_count):
-        options.append([])
-
-        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
-
-        for y in range(len(new_list)):
-            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
-    return options
-
-tld_list = get_tlds()
-# tld_list = []
-
-class AccentsView1(discord.ui.View):
-    if len(tld_list) > 3:
-        @discord.ui.select(placeholder="Domains .ad through .cm", options=tld_list[0])
-        async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        @discord.ui.select(placeholder="Domains .cn through .co.zw", options=tld_list[1])
-        async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        @discord.ui.select(placeholder="Domains .com through .com.kh", options=tld_list[2])
-        async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        @discord.ui.select(placeholder="Domains .com.kw through .com.sv", options=tld_list[3])
-        async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        if len(tld_list) > 4:
-            @discord.ui.button(label="Next page")
-            async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-                await interaction.response.send_message(embed=accent_embed, view=AccentsView2(), ephemeral=True)
-
-class AccentsView2(discord.ui.View):
-    if len(tld_list) > 7:
-        @discord.ui.select(placeholder="Domains .com.tj through .gr", options=tld_list[4])
-        async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        @discord.ui.select(placeholder="Domains .gy through .mk", options=tld_list[5])
-        async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        @discord.ui.select(placeholder="Domains .ml through .sn", options=tld_list[6])
-        async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        @discord.ui.select(placeholder="Domains .so through .ws", options=tld_list[7])
-        async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select)
-
-        @discord.ui.button(label="Previous page")
-        async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(embed=accent_embed, view=AccentsView1(), ephemeral=True)
-# endregion
 
 @set.command()
 @app_commands.describe(tld=tld_desc)
