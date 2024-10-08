@@ -614,9 +614,11 @@ class LanguagesView(discord.ui.View):
     
     select_count = math.ceil(len(langs) / 25)
 
+    keys_len = len(keys)
+
     for x in range(select_count):
         options.append([])
-        keys_len = len(keys)
+
         new_keys = keys[(x * 25):min((x * 25) + 25, keys_len)]
 
         for y in range(len(new_keys)):
