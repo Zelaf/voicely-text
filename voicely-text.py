@@ -97,6 +97,7 @@ servers_settings = load_servers_settings()
 
 # endregion
 
+# region bot events
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
@@ -338,6 +339,8 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
                 bot.members_to_read.remove(user_id)
         
 
+
+# endregion
 
 # endregion
 
