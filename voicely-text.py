@@ -31,6 +31,7 @@ class Bot(commands.Bot):
             "accent": "com",
             "autoread": False,
             "timeout": 300
+            # "prefix": "!"
         }
         # self.members_settings = {}
         # self.servers_settings = {}
@@ -394,6 +395,9 @@ def return_seconds(argument):
         return int(argument)
     except:
         return argument.lower()
+
+# def return_stripped(argument):
+#     return str(argument).strip()
 
 # endregion
 
@@ -881,6 +885,44 @@ async def server(ctx: commands.Context):
     """Settings that apply to the entire server. Can be overridden by user settings."""
     if ctx.invoked_subcommand is None:
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
+
+# region Botprefix
+# @server.command()
+# @commands.has_guild_permissions(administrator=True)
+# @app_commands.describe(prefix="One or more characters to be used as a prefix. Type 'reset' to set to default.")
+# async def botprefix(ctx: commands.Context, prefix: return_stripped):
+#     """Set the prefix used to run bot commands."""
+
+#     guild = ctx.guild
+#     guild_id_str = str(guild.id)
+
+#     if prefix == 'reset':
+#         if guild_id_str in servers_settings and "prefix" in servers_settings[guild_id_str]:
+#             del servers_settings[guild_id_str]["prefix"]
+        
+#         default = bot.default_settings["prefix"]
+
+#         bot.command_prefix = default
+        
+#         save_servers_settings()
+
+#         await ctx.send(f"{guild.name}'s bot prefex has been **reset** to default: `{default}`", reference=ctx.message, ephemeral=True)
+#         return
+#     elif prefix is not "":
+#         if guild_id_str in servers_settings:
+#             servers_settings[guild_id_str]["prefix"] = prefix
+#         else:
+#             servers_settings[guild_id_str] = {"prefix": prefix}
+
+#         bot.command_prefix = 
+#         save_servers_settings()
+        
+#         await ctx.send(f"{guild.name}'s server language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
+#     else:
+#         language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set server language` without arguments to generate dropdowns to choose from."
+        
+#         await ctx.send(language_error, reference=ctx.message, ephemeral=True)
+# endregion
 
 # region Timeout
 @server.command()
