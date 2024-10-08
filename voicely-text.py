@@ -406,6 +406,7 @@ tld_list_desc = "Type `/accents` for a list of supported top-level domains"
 # region Languages setup
 class LanguagesView(discord.ui.View):
     def __init__(self, type: str):
+        super().__init__(type)
         self.type = type
 
     langs = lang.tts_langs()
