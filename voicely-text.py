@@ -410,7 +410,7 @@ async def list(ctx: commands.Context):
     if ctx.invoked_subcommand is None:
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
-@bot.hybrid_command()
+@list.command()
 async def languages(ctx: commands.Context):
     """List all the IETF language tags available to use."""
 
@@ -441,7 +441,7 @@ def get_tld_list():
 tld_list = get_tld_list()
     
 
-@bot.hybrid_command()
+@list.command()
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
@@ -555,57 +555,8 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
 
 # region User settings
 
-# Create a hybrid group for 'settings' commands
-@bot.hybrid_group()
-async def set(ctx: commands.Context):
-    """Settings for the bot."""
-    if ctx.invoked_subcommand is None:
-        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
-
-# region autoread
-@set.command()
-@app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
-async def autoread(ctx: commands.Context, enabled: to_lower):
-    """Set whether your messages are automatically read when you join a voice channel."""
-
-    user_id_str = str(ctx.author.id)
-    guild_id_str = str(ctx.guild.id)
-
-    match enabled:
-        case "true":
-            enabled_bool = True
-            confirm_message = f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\n\nThis will be disabled when you leave the voice channel."
-        case "false":
-            enabled_bool = False
-            confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message."
-        case "reset":
-            if user_id_str in members_settings and "autoread" in members_settings[user_id_str]:
-                del members_settings[user_id_str]["autoread"]
-            
-            if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
-                default = servers_settings[guild_id_str]["autoread"]
-            else:
-                default = bot.default_settings["autoread"]
-            save_members_settings()
-            await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
-            return
-        case _:
-            await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", reference=ctx.message, ephemeral=True)
-            return
-
-    if user_id_str in members_settings:
-        members_settings[user_id_str]["autoread"] = enabled_bool
-    else:
-        members_settings[user_id_str] = {"autoread": enabled_bool}
-    
-    save_members_settings()
-    await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
-
-# endregion
-
-# region Languages
-
 # region Setup
+# region Languages Setup
 class LanguagesView(discord.ui.View):
     langs = lang.tts_langs()
     keys = list(langs.keys())
@@ -651,56 +602,7 @@ class LanguagesView(discord.ui.View):
 
 # endregion
 
-@set.command()
-@app_commands.describe(tag=language_desc)
-async def language(ctx: commands.Context, tag: str = None):
-    """Set the language you want me to read your messages in."""
-
-    if tag:
-        if tag == 'reset':
-            user_id_str = str(ctx.author.id)
-            if user_id_str in members_settings and "language" in members_settings[user_id_str]:
-                del members_settings[user_id_str]["language"]
-            
-            guild_id_str = str(ctx.guild.id)
-            
-            if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
-                default = servers_settings[guild_id_str]["language"]
-            else:
-                default = bot.default_settings["language"]
-            
-            save_members_settings()
-
-            await ctx.send(f"Your language has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
-            return
-        
-
-        langs = lang.tts_langs()
-
-        if tag in langs:
-            user_id_str = ctx.author.id
-            if user_id_str in members_settings:
-                members_settings[user_id_str]["language"] = tag
-            else:
-                members_settings[user_id_str] = {"language": tag}
-
-            save_members_settings()
-            
-            await ctx.send(f"Your language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
-        else:
-            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/setlanguage` without arguments to generate dropdowns to choose from."
-            
-            await ctx.send(language_error, reference=ctx.message, ephemeral=True)
-    else:
-        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
-
-        await ctx.send(embed=embed, view=LanguagesView(), reference=ctx.message, ephemeral=True)
-
-# endregion
-
-# region Accents
-
-# region Setup
+# region Accents Setup
 
 accent_embed = discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
 
@@ -778,6 +680,107 @@ class AccentsView2(discord.ui.View):
         async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
             await interaction.response.send_message(embed=accent_embed, view=AccentsView1(), ephemeral=True)
 # endregion
+
+# endregion
+
+# Create a hybrid group for 'settings' commands
+@bot.hybrid_group()
+async def set(ctx: commands.Context):
+    """Settings for the bot."""
+    if ctx.invoked_subcommand is None:
+        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
+
+# region autoread
+@set.command()
+@app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
+async def autoread(ctx: commands.Context, enabled: to_lower):
+    """Set whether your messages are automatically read when you join a voice channel."""
+
+    user_id_str = str(ctx.author.id)
+    guild_id_str = str(ctx.guild.id)
+
+    match enabled:
+        case "true":
+            enabled_bool = True
+            confirm_message = f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/start`.\n\nThis will be disabled when you leave the voice channel."
+        case "false":
+            enabled_bool = False
+            confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/start` for me to start reading your messages.\n\nAlternatively, you can type `/tts [your message]` for me to read a single message."
+        case "reset":
+            if user_id_str in members_settings and "autoread" in members_settings[user_id_str]:
+                del members_settings[user_id_str]["autoread"]
+            
+            if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
+                default = servers_settings[guild_id_str]["autoread"]
+            else:
+                default = bot.default_settings["autoread"]
+            save_members_settings()
+            await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
+            return
+        case _:
+            await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", reference=ctx.message, ephemeral=True)
+            return
+
+    if user_id_str in members_settings:
+        members_settings[user_id_str]["autoread"] = enabled_bool
+    else:
+        members_settings[user_id_str] = {"autoread": enabled_bool}
+    
+    save_members_settings()
+    await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
+
+# endregion
+
+# region Languages
+
+@set.command()
+@app_commands.describe(tag=language_desc)
+async def language(ctx: commands.Context, tag: str = None):
+    """Set the language you want me to read your messages in."""
+
+    if tag:
+        if tag == 'reset':
+            user_id_str = str(ctx.author.id)
+            if user_id_str in members_settings and "language" in members_settings[user_id_str]:
+                del members_settings[user_id_str]["language"]
+            
+            guild_id_str = str(ctx.guild.id)
+            
+            if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
+                default = servers_settings[guild_id_str]["language"]
+            else:
+                default = bot.default_settings["language"]
+            
+            save_members_settings()
+
+            await ctx.send(f"Your language has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
+            return
+        
+
+        langs = lang.tts_langs()
+
+        if tag in langs:
+            user_id_str = ctx.author.id
+            if user_id_str in members_settings:
+                members_settings[user_id_str]["language"] = tag
+            else:
+                members_settings[user_id_str] = {"language": tag}
+
+            save_members_settings()
+            
+            await ctx.send(f"Your language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
+        else:
+            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/setlanguage` without arguments to generate dropdowns to choose from."
+            
+            await ctx.send(language_error, reference=ctx.message, ephemeral=True)
+    else:
+        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
+
+        await ctx.send(embed=embed, view=LanguagesView(), reference=ctx.message, ephemeral=True)
+
+# endregion
+
+# region Accents
 
 @set.command()
 @app_commands.describe(tld=tld_desc)
