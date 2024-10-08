@@ -132,6 +132,7 @@ async def on_guild_join(guild: discord.Guild):
 
     print(f"Bot added to guild: {guild.name}")
 
+@bot.event
 async def on_guild_remove(guild: discord.Guild):
     if guild.id in bot.queue:
         if bot.queue[guild.id]["task"] is not None:
