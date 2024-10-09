@@ -12,6 +12,7 @@ import datetime
 import json
 import builtins
 from bs4 import BeautifulSoup
+from enum import Enum
 # import signal
 
 # Define intents
@@ -408,6 +409,9 @@ language_list_desc = "Type `/list languages` to list the supported language tags
 tld_desc = "A localized top-level domain from which the accent will be read. Type 'reset' to set to default."
 tld_list_desc = "Type `/list accents` for a list of supported top-level domains"
     
+class ResponseType(Enum):
+    user = "user"
+    server = "server"
 
 # region Languages setup
 class LanguagesView(discord.ui.View):
@@ -475,16 +479,31 @@ class LanguagesView(discord.ui.View):
 
 # region Accents setup
 
-def accent_embed(typeof, guild: discord.Guild = None):
-    if typeof == "user":
+def accent_embed(typeof: ResponseType, guild: discord.Guild = None):
+    if typeof == ResponseType.user:
         return discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
-    elif typeof == "server" and guild is not None:
+    elif typeof == ResponseType.server and guild is not None:
         return discord.Embed(title=f"Set {guild.name}'s accent", description='Choose one **top-level domain** from the series of dropdowns below to set the server default.\n\nI will read messages in your server as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
     else:
         print("Error getting accent_embed")
 
-async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select, typeof):
-    if typeof == "user":
+def get_accent_response(tld: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
+    display_tld = f"`{tld}` - *{get_country(tld)}*"
+    if not reset:
+        if typeof == ResponseType.user:
+            return f"Your accent's **top-level domain** has been set to {display_tld}."
+        elif typeof == ResponseType.server:
+            return f"The **top-level domain** for {guild.name}'s accent has been set to {display_tld}."
+    else:
+        if typeof == ResponseType.user:
+            return f"Your accent's **top-level domain** has been reset to the server default: {display_tld}"
+        elif typeof == ResponseType.server:
+            return f"The **top-level domain** for {guild.name}'s accent has been reset to default: {display_tld}"
+
+
+
+async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select, typeof: ResponseType):
+    if typeof == ResponseType.user:
         user_id_str = str(interaction.user.id)
         if user_id_str in members_settings:
             members_settings[user_id_str]["accent"] = select.values[0]
@@ -493,8 +512,8 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
 
         save_members_settings()
 
-        return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}` - *{get_country(select.values[0])}*.", ephemeral=True)
-    elif typeof == "server":
+        return await interaction.response.send_message(get_accent_response(select.values[0], ResponseType.user, False), ephemeral=True)
+    elif typeof == ResponseType.server:
         guild = interaction.guild
         guild_id_str = str(guild.id)
         if guild_id_str in servers_settings:
@@ -504,7 +523,7 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
         
         save_servers_settings()
         
-        return await interaction.response.send_message(f"The **top-level domain** for {guild.name}'s accent has been set to `{select.values[0]}` - *{get_country(select.values[0])}*.", ephemeral=True)
+        return await interaction.response.send_message(get_accent_response(select.values[0], ResponseType.server, False, guild), ephemeral=True)
     else:
         print(f"{interaction.guild.name}: Failed to set server accent:\n\t{typeof} is not a valid type!")
         return await interaction.response.send_message(f"There was an error setting the server accent. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{typeof} is not a valid type!\n```")
@@ -578,7 +597,7 @@ tld_list = get_tlds()
 
 # region views
 class AccentsView1(discord.ui.View):
-    def __init__(self, typeof):
+    def __init__(self, typeof: ResponseType):
         super().__init__()
         self.type = typeof
         
@@ -605,7 +624,7 @@ class AccentsView1(discord.ui.View):
                 await interaction.response.send_message(embed=accent_embed(self.type, interaction.guild), view=AccentsView2(self.type), ephemeral=True)
 
 class AccentsView2(discord.ui.View):
-    def __init__(self, typeof):
+    def __init__(self, typeof: ResponseType):
         super().__init__()
         self.type = typeof
     
@@ -913,7 +932,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             
             save_members_settings()
             
-            await ctx.send(f"Your accent's **top-level domain** has been reset to the server default: `{default}` - *{get_country(default)}*", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_accent_response(default, ResponseType.user, True), reference=ctx.message, ephemeral=True)
             return
         
         try:
@@ -930,9 +949,9 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
                 members_settings[user_id_str] = {"accent": tld}
             
             save_members_settings()
-            await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}` - *{get_country(tld)}*.", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_accent_response(tld, ResponseType.user, False), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
-        await ctx.send(embed=accent_embed("user"), view=AccentsView1("user"), reference=ctx.message, ephemeral=True)
+        await ctx.send(embed=accent_embed(ResponseType.user), view=AccentsView1(ResponseType.user), reference=ctx.message, ephemeral=True)
     else:
         await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
@@ -1090,7 +1109,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             
             save_servers_settings()
             
-            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been reset to default: `{default}` - *{get_country(default)}*", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_accent_response(default, ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
             return
         
         try:
@@ -1105,9 +1124,9 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
                 servers_settings[guild_id_str] = {"accent": tld}
             
             save_servers_settings()
-            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been set to `{tld}` - *{get_country(tld)}*.", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_accent_response(default, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
-        await ctx.send(embed=accent_embed("server", guild), view=AccentsView1("server"), reference=ctx.message, ephemeral=True)
+        await ctx.send(embed=accent_embed(ResponseType.server, guild), view=AccentsView1(ResponseType.server), reference=ctx.message, ephemeral=True)
     else:
         await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
