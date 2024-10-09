@@ -248,6 +248,15 @@ async def process_queue(guild: discord.Guild):
                             "time": datetime.datetime.today()
                         }
                     # endregion
+                    
+                    if guild_id in bot.to_skip and message.channel.id in bot.to_skip[guild_id] and user_id in bot.to_skip[guild_id][message.channel.id]:
+                        bot.to_skip[guild_id][message.channel.id][user_id] -= 1
+                        if bot.to_skip[guild_id][message.channel.id][user_id] <= 0:
+                            del bot.to_skip[guild_id][message.channel.id][user_id]
+                        if len(bot.to_skip[guild_id][message.channel.id]) == 0:
+                            del bot.to_skip[guild_id][message.channel.id]
+                        if len(bot.to_skip[guild_id]) == 0:
+                            del bot.to_skip[guild_id]
 
                     # Indicate that the current task is done
                     bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
@@ -265,7 +274,20 @@ async def process_queue(guild: discord.Guild):
                 # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
 
                 # Wait until the current message is finished playing
-                while voice_client.is_playing():
+                def should_play():
+                    if not guild_id in bot.to_skip:
+                        return True
+                    if not message.channel.id in bot.to_skip[guild_id]:
+                        return True
+                    if not user_id in bot.to_skip[guild_id][message.channel.id]:
+                        return True
+                    if bot.to_skip[guild_id][message.channel.id][user_id] > 0:
+                        return False
+                    else:
+                        del bot.to_skip[guild_id][message.channel.id][user_id]
+                        return True
+
+                while voice_client.is_playing() and should_play():
                     await asyncio.sleep(1)
                 print(f"{guild.name}: Audio finished playing")
             else:
