@@ -625,10 +625,13 @@ async def languages(ctx: commands.Context):
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
-    text = f"Supported **top-level domains** include:"
+    text = f"Supported **top-level domains** include:\n\n"
 
-    for tld in tld_list_raw:
-        text += f"\n- [`{tld.strip()}`](https://translate.google.{tld.strip()})"
+    for x in range(len(tld_list_raw)):
+        if x < len(tld_list_raw) - 1:
+            text += f"`{tld_list_raw[x].strip()}`, "
+        else:
+            text += f"and `{tld_list_raw[x]}`"
 
     print(len(text))
     await ctx.send(text, reference=ctx.message, ephemeral=True)
