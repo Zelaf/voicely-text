@@ -898,7 +898,6 @@ async def skip(ctx: commands.Context, count: return_int = 1):
     channel_id = ctx.channel.id
     user_id = ctx.author.id
     if count == "cancel":
-        print('got here')
         if guild_id in bot.to_skip and channel_id in bot.to_skip[guild_id] and user_id in bot.to_skip[guild_id][channel_id]:
             del bot.to_skip[guild_id][channel_id][user_id]
             if len(bot.to_skip[guild_id][channel_id]) == 0:
