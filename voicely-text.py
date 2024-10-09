@@ -616,7 +616,7 @@ async def languages(ctx: commands.Context):
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
-    print(len(text))
+    # print(len(text))
 
     await ctx.send(text, reference=ctx.message, ephemeral=True)
     
@@ -630,7 +630,7 @@ async def accents(ctx: commands.Context):
     for tld in tld_list_raw:
         text += f"\n- [`{tld.strip()}`](https://translate.google.{tld.strip()})"
 
-
+    print(len(text))
     await ctx.send(text, reference=ctx.message, ephemeral=True)
 # endregion
 
