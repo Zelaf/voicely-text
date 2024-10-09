@@ -753,7 +753,7 @@ async def start(ctx: commands.Context):
         await ctx.send('You must be in a voice channel to use this command.', reference=ctx.message, ephemeral=True)
         return
     elif ctx.author.voice.channel is not ctx.channel:
-        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', reference=ctx.message, ephemeral=True)
+        await ctx.send('You can only use this command in the text chat of the voice channel you are currently in.', reference=ctx.message, ephemeral=True)
         return
     
     user_id = ctx.author.id
@@ -776,7 +776,7 @@ async def stop(ctx: commands.Context):
         await ctx.send('You are not in a voice channel, so I am not reading your messages.', reference=ctx.message, ephemeral=True)
         return
     elif ctx.author.voice.channel is not ctx.channel:
-        await ctx.send('You can only use this command in the chat channel associated with the voice channel you are currently in.', reference=ctx.message, ephemeral=True)
+        await ctx.send('You can only use this command in the text chat of the voice channel you are currently in.', reference=ctx.message, ephemeral=True)
         return
     
     user_id = ctx.author.id
