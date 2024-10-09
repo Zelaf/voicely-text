@@ -169,7 +169,6 @@ async def process_queue(guild: discord.Guild):
             bot.active_timeouts[guild_id].cancel()
 
         bot.active_timeouts[guild_id] = asyncio.create_task(leave_after_timeout(guild))
-
         bot.active_timeouts[guild_id]
         # endregion
 
