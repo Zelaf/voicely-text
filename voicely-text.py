@@ -197,7 +197,7 @@ async def process_queue(guild: discord.Guild):
         
         if not should_play():
             decrement_skips()
-            print(f"{guild.name}: {user.global_name} skipped their message.")
+            print(f"{guild.name}: {user.global_name}'s message was skipped.")
             bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
             continue
         
