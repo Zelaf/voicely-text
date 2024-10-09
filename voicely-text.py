@@ -615,6 +615,8 @@ async def languages(ctx: commands.Context):
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
+    print(len(text))
+
     await ctx.send(text, reference=ctx.message, ephemeral=True)
     
 
