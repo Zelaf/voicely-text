@@ -625,6 +625,7 @@ def get_country(tld):
     start = tld.rfind('.')
     tld = tld[start:]
     tld = "." + tld
+    print(tld)
     return str(tld_countries.get(tld)).strip()
 
 print(get_country('us'))
