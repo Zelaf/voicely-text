@@ -622,7 +622,10 @@ tld_countries = tld_get_countries()
 
 
 def get_country(tld):
-    return str(tld_countries.get("." + tld)).strip()
+    start = tld.rfind('.') + 1
+    tld = tld[start:]
+    tld = "." + tld
+    return str(tld_countries.get(tld)).strip()
 
     
 # print(get_country('us'))
@@ -663,8 +666,8 @@ async def accents(ctx: commands.Context):
 
 
     for tld in tld_list_raw:
-        new_tld = tld.strip()
-        text += f"\n- `{new_tld}` - *{get_country(new_tld)}*"
+        tld = tld.strip()
+        text += f"\n- `{tld}` - *{get_country(tld)}*"
 
     # for x in range(len(tld_list_raw)):
     #     if x < len(tld_list_raw) - 1:
