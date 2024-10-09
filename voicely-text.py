@@ -1124,7 +1124,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
                 servers_settings[guild_id_str] = {"accent": tld}
             
             save_servers_settings()
-            await ctx.send(get_accent_response(default, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
+            await ctx.send(get_accent_response(tld, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed(ResponseType.server, guild), view=AccentsView1(ResponseType.server), reference=ctx.message, ephemeral=True)
     else:
