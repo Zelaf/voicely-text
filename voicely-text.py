@@ -796,6 +796,12 @@ async def stop(ctx: commands.Context):
 async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_lower = None):
     """Speak a single message with optional language and accent overrides."""
     
+    text_channel_name = ctx.channel.name
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
+    if voice_channel is None:
+        await ctx.send("You can only use this command in a voice channel's text chat.", reference=ctx.message, ephemeral=True)
+        return
+    
     errors = []
 
     if language:
