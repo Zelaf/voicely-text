@@ -909,6 +909,7 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 
         await ctx.send(f"Your next **{count}** message{plural} will not be read.\n\nIf one of your messages are currently being read, it will be skipped.\n\nType `/tts skip cancel` to speak all your upcoming messages.", reference=ctx.message, ephemeral=True)
     elif count == "cancel":
+        print('got here')
         if guild_id in bot.to_skip and channel_id in bot.to_skip[guild_id] and user_id in bot.to_skip[guild_id][channel_id]:
             del bot.to_skip[guild_id][channel_id][user_id]
             if len(bot.to_skip[guild_id][channel_id]) == 0:
