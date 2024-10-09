@@ -13,7 +13,7 @@ import json
 import builtins
 
 import socket
-from ip2geotools.databases import ip  
+from ip2geotools.databases.commercial import DbIpWeb
 # import signal
 
 # Define intents
@@ -643,9 +643,10 @@ async def accents(ctx: commands.Context):
 
     for tld in tld_list_raw:
         domain = f"translate.google.{tld.strip()}"
-        ip_address = get_ip_from_domain(domain)
-        if ip_address:
-            region = f" - *{get_region_from_ip(ip_address)}*"
+        response = DbIpWeb.get(domain)
+        # ip_address = get_ip_from_domain(domain)
+        if response:
+            region = f" - *{response.country}*"
         else:
             region = ""
         text += f"\n- `{tld.strip()}`{region}"
