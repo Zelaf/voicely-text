@@ -630,11 +630,11 @@ async def accents(ctx: commands.Context):
 
     text = f"Supported **top-level domains** include:\n\n"
 
-    # def get_ip_from_domain(domain):
-    #     try:
-    #         return socket.gethostbyname(domain)
-    #     except socket.gaierror:
-    #         return None
+    def get_ip_from_domain(domain):
+        try:
+            return socket.gethostbyname(domain)
+        except socket.gaierror:
+            return None
 
     # def get_region_from_ip(ip_address):
     #     response = ip('database.db', ip_address)
@@ -643,8 +643,8 @@ async def accents(ctx: commands.Context):
 
     for tld in tld_list_raw:
         domain = f"translate.google.{tld.strip()}"
-        response = DbIpWeb.get(domain)
-        # ip_address = get_ip_from_domain(domain)
+        ip_address = get_ip_from_domain(domain)
+        response = DbIpWeb.get(ip_address)
         if response:
             region = f" - *{response.country}*"
         else:
