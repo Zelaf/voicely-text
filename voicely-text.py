@@ -509,6 +509,37 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
         print(f"{interaction.guild.name}: Failed to set server accent:\n\t{typeof} is not a valid type!")
         return await interaction.response.send_message(f"There was an error setting the server accent. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{typeof} is not a valid type!\n```")
 
+# region tld mappings
+def tld_get_countries():
+    url = "https://en.wikipedia.org/wiki/Country_code_top-level_domain"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    ccTLD_list = []
+    for table in soup.find_all("table", class_="wikitable"):
+        for row in table.find_all("tr")[1:]:
+            cols = row.find_all("td")
+            ccTLD_list.append((cols[0].text, cols[1].text))
+
+    ccTLD_dict = {}
+    for ccTLD, country in ccTLD_list:
+        ccTLD_dict[ccTLD] = country
+
+    return ccTLD_dict
+
+tld_countries = tld_get_countries()
+
+
+def get_country(tld):
+    start = tld.rfind('.')
+    if start != -1:
+        tld = tld[start:]
+    else:
+        tld = "." + tld
+    return str(tld_countries.get(tld)).strip()
+
+# endregion
+
 # region tld_list
 def get_tld_list():
     response = requests.get("https://www.google.com/supported_domains")
@@ -538,7 +569,7 @@ def get_tlds():
         new_list = tld_list_raw[(x * 25):min((x * 25) + 25, len(tld_list_raw))]
 
         for y in range(len(new_list)):
-            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
+            options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=get_country(new_list[y])))
     return options
 
 tld_list = get_tlds()
@@ -598,41 +629,6 @@ class AccentsView2(discord.ui.View):
         @discord.ui.button(label="Previous page")
         async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
             await interaction.response.send_message(embed=accent_embed(self.type, interaction.guild), view=AccentsView1(self.type), ephemeral=True)
-# endregion
-
-# region tld mappings
-def tld_get_countries():
-    url = "https://en.wikipedia.org/wiki/Country_code_top-level_domain"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    ccTLD_list = []
-    for table in soup.find_all("table", class_="wikitable"):
-        for row in table.find_all("tr")[1:]:
-            cols = row.find_all("td")
-            ccTLD_list.append((cols[0].text, cols[1].text))
-
-    ccTLD_dict = {}
-    for ccTLD, country in ccTLD_list:
-        ccTLD_dict[ccTLD] = country
-
-    return ccTLD_dict
-
-tld_countries = tld_get_countries()
-
-
-def get_country(tld):
-    start = tld.rfind('.')
-    if start != -1:
-        tld = tld[start:]
-    else:
-        tld = "." + tld
-    # print(tld)
-    return str(tld_countries.get(tld)).strip()
-
-# print(get_country('us'))
-# print(get_country('co.uk'))
-# print(get_country('us'))
 # endregion
 
 # endregion
