@@ -164,6 +164,22 @@ async def process_queue(guild: discord.Guild):
         message, text, user, voice_channel, language_override, tld_override = await bot.queue[guild.id]["queue"].get()
         guild_id = guild.id
 
+        def should_play():
+            if not guild_id in bot.to_skip:
+                return True
+            if not message.channel.id in bot.to_skip[guild_id]:
+                return True
+            if not user_id in bot.to_skip[guild_id][message.channel.id]:
+                return True
+            if bot.to_skip[guild_id][message.channel.id][user_id] > 0:
+                return False
+            else:
+                del bot.to_skip[guild_id][message.channel.id][user_id]
+                return True
+        
+        if not should_play():
+            return
+        
         # region reset timeout
         if guild_id in bot.active_timeouts:
             bot.active_timeouts[guild_id].cancel()
@@ -273,19 +289,6 @@ async def process_queue(guild: discord.Guild):
                 # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
 
                 # Wait until the current message is finished playing
-                def should_play():
-                    if not guild_id in bot.to_skip:
-                        return True
-                    if not message.channel.id in bot.to_skip[guild_id]:
-                        return True
-                    if not user_id in bot.to_skip[guild_id][message.channel.id]:
-                        return True
-                    if bot.to_skip[guild_id][message.channel.id][user_id] > 0:
-                        return False
-                    else:
-                        del bot.to_skip[guild_id][message.channel.id][user_id]
-                        return True
-
                 while voice_client.is_playing() and should_play():
                     await asyncio.sleep(1)
                 print(f"{guild.name}: Audio finished playing")
