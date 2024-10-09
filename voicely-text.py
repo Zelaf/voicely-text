@@ -604,7 +604,7 @@ async def list(ctx: commands.Context):
     if ctx.invoked_subcommand is None:
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
-@list.command()
+@bot.command()
 async def languages(ctx: commands.Context):
     """List all the IETF language tags available to use."""
 
