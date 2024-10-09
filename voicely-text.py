@@ -697,7 +697,7 @@ async def accents(ctx: commands.Context):
 
     # print(len(text))
 
-    embed = discord.Embed(title="Supported **top-level domains**", description=text)
+    # embed = discord.Embed(title="Supported **top-level domains**", description=text)s
     await ctx.send(embeds=embeds, reference=ctx.message, ephemeral=True)
 # endregion
 
