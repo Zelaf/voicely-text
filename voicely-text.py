@@ -620,10 +620,12 @@ async def tld_get_countries():
 
 tld_countries = tld_get_countries()
 
-print('got tld mappings')
 
 def get_country(tld):
     return tld_countries.get("." + tld)
+
+    
+print(get_country('us'))
 # endregion
 
 # endregion
