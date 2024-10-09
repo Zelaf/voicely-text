@@ -36,12 +36,9 @@ class Bot(commands.Bot):
             "timeout": 300
             # "prefix": "!"
         }
-        # self.members_settings = {}
-        # self.servers_settings = {}
-        # self.voice_channel_timeouts = {}
         self.active_timeouts = {}
         self.last_speakers = {}
-        self.members_to_read = [] # DO NOT store this in a json file.
+        self.members_to_read = []
 
     async def setup_hook(self):
         print(f"Setup complete for {self.user}")
