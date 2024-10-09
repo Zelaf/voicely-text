@@ -612,7 +612,7 @@ async def languages(ctx: commands.Context):
     langs = lang.tts_langs()
     keys = builtins.list(langs.keys())
 
-    text = f"Supported IETF language tags include:"
+    text = f"Supported **IETF language tags** include:"
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
@@ -625,10 +625,10 @@ async def languages(ctx: commands.Context):
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
-    text = f"Supported top-level domains include:"
+    text = f"Supported **top-level domains** include:"
 
     for tld in tld_list_raw:
-        text += f"\n- `{tld.strip()}`"
+        text += f"\n- [`{tld.strip()}`](https://translate.google.{tld.strip()})"
 
 
     await ctx.send(text, reference=ctx.message, ephemeral=True)
