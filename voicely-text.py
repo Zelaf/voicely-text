@@ -623,8 +623,10 @@ tld_countries = tld_get_countries()
 
 def get_country(tld):
     start = tld.rfind('.')
-    tld = tld[start:]
-    tld = "." + tld
+    if start != -1:
+        tld = tld[start:]
+    else:
+        tld = "." + tld
     print(tld)
     return str(tld_countries.get(tld)).strip()
 
