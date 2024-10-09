@@ -198,6 +198,8 @@ async def process_queue(guild: discord.Guild):
             requests.get(f"https://translate.google.{accent}")
         except requests.ConnectionError:
             await message.reply(f"I cannot read your message because `https://translate.google.`**`{accent}`** is currently down. Please run `/set accent` and specify another top-level domain or try again later.\n\nOtherwise, type `/tts stop`, and I will stop reading your messages.")
+            # Indicate that the current task is done
+            bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
             continue
 
         else:
@@ -242,7 +244,7 @@ async def process_queue(guild: discord.Guild):
                     # endregion
 
                     # Indicate that the current task is done
-                    bot.loop.call_soon_threadsafe(bot.tts_queue.task_done)
+                    bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
 
                     # Clean up the audio file
                     try:
@@ -827,6 +829,13 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
 
 # endregion
     
+# region cancel
+
+@tts.command()
+async def cancel(ctx: commands.Context):
+    """Cancel your message from being read"""
+# endregion
+
 # endregion
 
 # region User settings
