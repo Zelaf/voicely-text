@@ -1326,6 +1326,57 @@ async def leave(ctx: commands.Context):
 
 # endregion
 
+# region cancel
+
+@admin.command()
+@commands.has_guild_permissions(administrator=True)
+@app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
+async def skip(ctx: commands.Context, count: return_int = 1):
+    """Skip the next message(s) in this channel. This includes currently playing or sent messages."""
+
+    invalid_count = '`count` must be a positive whole number! Alternatively, enter `cancel` to read all upcoming messages.'
+
+    text_channel_name = ctx.channel.name
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
+    if voice_channel is None:
+        await ctx.send("You can only use this command in a voice channel's text chat.", reference=ctx.message, ephemeral=True)
+        return
+    
+    guild_id = ctx.guild.id
+    channel_id = ctx.channel.id
+    # user_id = ctx.author.id
+    if count == "cancel":
+        if guild_id in bot.to_skip and channel_id in bot.to_skip[guild_id] and "admin" in bot.to_skip[guild_id][channel_id]:
+            del bot.to_skip[guild_id][channel_id]["admin"]
+            if len(bot.to_skip[guild_id][channel_id]) == 0:
+                del bot.to_skip[guild_id][channel_id]
+            if len(bot.to_skip[guild_id]) == 0:
+                del bot.to_skip[guild_id]
+
+        await ctx.send("All upcoming messages in this channel will be read.", reference=ctx.message, ephemeral=True)
+    elif isinstance(count, int):
+        if count <= 0:
+            await ctx.send(invalid_count, reference=ctx.message, ephemeral=True)
+            return
+        
+        if guild_id not in bot.to_skip:
+            bot.to_skip[guild_id] = {channel_id: {"admin": count}}
+        elif channel_id not in bot.to_skip[guild_id]:
+            bot.to_skip[guild_id][channel_id] = {"admin": count}
+        else:
+            bot.to_skip[guild_id][channel_id]["admin"] = count
+
+        if count > 1:
+            plural = "s"
+        else:
+            plural = ""
+
+        await ctx.send(f"The next **{count} message{plural}** in this channel will not be read.\n\nIf a message is currently being read, it will be skipped.\n\nType `/admin skip cancel` to speak all upcoming messages.", reference=ctx.message, ephemeral=True)
+    else:
+        await ctx.send(invalid_count, reference=ctx.message, ephemeral=True)
+
+# endregion
+
 # region Sync
 @admin.command()
 @commands.is_owner()
