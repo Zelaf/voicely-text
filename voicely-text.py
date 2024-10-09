@@ -913,7 +913,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             
             save_members_settings()
             
-            await ctx.send(f"Your accent's **top-level domain** has been reset to the server default: `{default}`", reference=ctx.message, ephemeral=True)
+            await ctx.send(f"Your accent's **top-level domain** has been reset to the server default: `{default}` - *{get_country(default)}*", reference=ctx.message, ephemeral=True)
             return
         
         try:
@@ -930,7 +930,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
                 members_settings[user_id_str] = {"accent": tld}
             
             save_members_settings()
-            await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}`.", reference=ctx.message, ephemeral=True)
+            await ctx.send(f"Your accent's **top-level domain** has been set to `{tld}` - *{get_country(tld)}*.", reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed("user"), view=AccentsView1("user"), reference=ctx.message, ephemeral=True)
     else:
@@ -1090,7 +1090,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             
             save_servers_settings()
             
-            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been reset to default: `{default}`", reference=ctx.message, ephemeral=True)
+            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been reset to default: `{default}` - *{get_country(default)}*", reference=ctx.message, ephemeral=True)
             return
         
         try:
@@ -1105,7 +1105,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
                 servers_settings[guild_id_str] = {"accent": tld}
             
             save_servers_settings()
-            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been set to `{tld}`.", reference=ctx.message, ephemeral=True)
+            await ctx.send(f"The **top-level domain** for {guild.name}'s accent has been set to `{tld}` - *{get_country(tld)}*.", reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed("server", guild), view=AccentsView1("server"), reference=ctx.message, ephemeral=True)
     else:
