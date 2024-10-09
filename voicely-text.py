@@ -622,7 +622,7 @@ tld_countries = tld_get_countries()
 
 
 def get_country(tld):
-    return tld_countries.get("." + tld).strip()
+    return str(tld_countries.get("." + tld)).strip()
 
     
 # print(get_country('us'))
