@@ -668,7 +668,7 @@ async def accents(ctx: commands.Context):
 
     embed_text = []
 
-    this_list = [f"Supported **top-level domains** include:"]
+    this_list = [f"# Supported **top-level domains** include:"]
 
     for tld in tld_list_raw:
         tld = tld.strip()
