@@ -448,7 +448,7 @@ class LanguagesView(discord.ui.View):
 
         for y in range(len(new_keys)):
             key = new_keys[y]
-            options[x].append(discord.SelectOption(label=langs[key], value=key, description=key))
+            options[x].append(discord.SelectOption(label=key, value=key, description=langs[key]))
 
     
     async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
