@@ -270,7 +270,7 @@ async def process_queue(guild: discord.Guild):
                 print(f"{guild.name}: Audio finished playing")
             else:
                 print(f"{guild.name}: Voice client is not connected; task done")
-                bot.tts_queue.task_done()
+                bot.queue[guild_id]["queue"].task_done()
 
 # region When a message is sent
 
