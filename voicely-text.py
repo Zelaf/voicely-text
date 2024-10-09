@@ -878,7 +878,7 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
 
 # endregion
 
-# region cancel
+# region skip
 
 @tts.command()
 @app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
@@ -1314,7 +1314,7 @@ async def leave(ctx: commands.Context):
 
 # endregion
 
-# region cancel
+# region skip
 
 @admin.command()
 @commands.has_guild_permissions(administrator=True)
