@@ -878,7 +878,7 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
             await ctx.send(f"**{ctx.author.display_name}:** {text}")
 
 # endregion
-    
+
 # region cancel
 
 @tts.command()
@@ -927,9 +927,6 @@ async def skip(ctx: commands.Context, count: return_int = 1):
     else:
         await ctx.send(invalid_count, reference=ctx.message, ephemeral=True)
 
-
-
-    
 # endregion
 
 # endregion
