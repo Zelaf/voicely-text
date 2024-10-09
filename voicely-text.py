@@ -81,7 +81,6 @@ def save_members_settings():
         # Write the dictionary to the JSON file
         json.dump(members_settings, f)
 
-    members_settings = load_members_settings()
 # endregion
 
 # region server settings
@@ -106,7 +105,6 @@ def save_servers_settings():
         # Write the dictionary to the JSON file
         json.dump(servers_settings, f)
 
-    servers_settings = load_servers_settings()
 
 # endregion
 
