@@ -622,12 +622,13 @@ tld_countries = tld_get_countries()
 
 
 def get_country(tld):
-    start = tld.rfind('.') + 1
+    start = tld.rfind('.')
     tld = tld[start:]
     tld = "." + tld
     return str(tld_countries.get(tld)).strip()
 
-    
+print(get_country('us'))
+print(get_country('co.uk'))
 # print(get_country('us'))
 # endregion
 
