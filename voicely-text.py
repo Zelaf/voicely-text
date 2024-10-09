@@ -1022,7 +1022,7 @@ async def language(ctx: commands.Context, tag: str = None):
 
             save_members_settings()
             
-            await ctx.send(get_language_response(langs[tag], ResponseType.user, False), ephemeral=True)
+            await ctx.send(get_language_response(langs[tag], ResponseType.user, False), reference=ctx.message, ephemeral=True)
         else:
             language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set language` without arguments to generate dropdowns to choose from."
             
