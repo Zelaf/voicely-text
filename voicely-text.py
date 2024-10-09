@@ -414,6 +414,21 @@ class ResponseType(Enum):
     server = "server"
 
 # region Languages setup
+
+def get_language_response(language: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
+    # langs = lang.tts_langs()
+    if not reset:
+        if typeof == ResponseType.user:
+            return f"Your language has been set to **{language}**."
+        elif typeof == ResponseType.server and guild is not None:
+            return f"{guild.name}'s server language has been set to **{language}**."
+    else:
+        if typeof == ResponseType.user:
+            return f"Your language has been **reset** to the server default: `{language}`"
+        elif typeof == ResponseType.server and guild is not None:
+            return f"{guild.name}'s server language has been **reset** to default: `{language}`"
+
+
 class LanguagesView(discord.ui.View):
     def __init__(self, typeof):
         super().__init__()
@@ -448,18 +463,19 @@ class LanguagesView(discord.ui.View):
             
             save_members_settings()
             
-            return await interaction.response.send_message(f"Your language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+            return await interaction.response.send_message(get_language_response(langs[select.values[0]], ResponseType.user, False), ephemeral=True)
         elif self.type == "server":
-            guild_id_str = str(interaction.guild.id)
+            guild = interaction.guild
+            guild_id_str = str(guild.id)
             if guild_id_str in servers_settings:
                 servers_settings[guild_id_str]["language"] = select.values[0]
             else:
                 servers_settings[guild_id_str] = {"language": select.values[0]}
             
             save_servers_settings()
-            return await interaction.response.send_message(f"{interaction.guild.name}'s server language has been set to **{langs[select.values[0]]}**.", ephemeral=True)
+            return await interaction.response.send_message(get_language_response(langs[select.values[0]], ResponseType.server, False, guild), ephemeral=True)
         else:
-            print(f"{interaction.guild.name}: Failed to set server language:\n\t{self.type} is not a valid type!")
+            print(f"{interaction.guild.name}: Failed to set server language:\n\t{self.type} is not a valid ResponseType!")
             return await interaction.response.send_message(f"There was an error setting the server language. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{self.type} is not a valid type!\n```")
 
 
@@ -492,14 +508,13 @@ def get_accent_response(tld: str, typeof: ResponseType, reset: bool, guild: disc
     if not reset:
         if typeof == ResponseType.user:
             return f"Your accent's **top-level domain** has been set to {display_tld}."
-        elif typeof == ResponseType.server:
+        elif typeof == ResponseType.server and guild is not None:
             return f"The **top-level domain** for {guild.name}'s accent has been set to {display_tld}."
     else:
         if typeof == ResponseType.user:
             return f"Your accent's **top-level domain** has been reset to the server default: {display_tld}"
-        elif typeof == ResponseType.server:
+        elif typeof == ResponseType.server and guild is not None:
             return f"The **top-level domain** for {guild.name}'s accent has been reset to default: {display_tld}"
-
 
 
 async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select, typeof: ResponseType):
@@ -870,6 +885,8 @@ async def language(ctx: commands.Context, tag: str = None):
     """Set the language you want me to read your messages in."""
 
     if tag:
+        langs = lang.tts_langs()
+
         if tag == 'reset':
             user_id_str = str(ctx.author.id)
             if user_id_str in members_settings and "language" in members_settings[user_id_str]:
@@ -884,11 +901,9 @@ async def language(ctx: commands.Context, tag: str = None):
             
             save_members_settings()
 
-            await ctx.send(f"Your language has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_language_response(langs[default], ResponseType.user, True), reference=ctx.message, ephemeral=True)
             return
-        
 
-        langs = lang.tts_langs()
 
         if tag in langs:
             user_id_str = ctx.author.id
@@ -899,7 +914,7 @@ async def language(ctx: commands.Context, tag: str = None):
 
             save_members_settings()
             
-            await ctx.send(f"Your language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_language_response(langs[tag], ResponseType.user, False), ephemeral=True)
         else:
             language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set language` without arguments to generate dropdowns to choose from."
             
@@ -1055,6 +1070,7 @@ async def language(ctx: commands.Context, tag = None):
 
     if tag:
         guild_id_str = str(guild.id)
+        langs = lang.tts_langs()
         if tag == 'reset':
             if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
                 del servers_settings[guild_id_str]["language"]
@@ -1063,11 +1079,8 @@ async def language(ctx: commands.Context, tag = None):
             
             save_servers_settings()
 
-            await ctx.send(f"{guild.name}'s server language has been **reset** to default: `{default}`", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_language_response(langs[default], ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
             return
-        
-
-        langs = lang.tts_langs()
 
         if tag in langs:
             if guild_id_str in servers_settings:
@@ -1077,7 +1090,7 @@ async def language(ctx: commands.Context, tag = None):
 
             save_servers_settings()
             
-            await ctx.send(f"{guild.name}'s server language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
+            await ctx.send(get_language_response(langs[tag], ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
         else:
             language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set server language` without arguments to generate dropdowns to choose from."
             
