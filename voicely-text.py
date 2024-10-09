@@ -258,34 +258,31 @@ async def process_queue(guild: discord.Guild):
 
             voice_client: discord.VoiceClient = guild.voice_client
 
-            def cleanup():
-                # region add last_speakers
-                if guild_id in bot.last_speakers:
-                    bot.last_speakers[guild_id]["user_id"] = user_id
-                    bot.last_speakers[guild_id]["time"] = datetime.datetime.today()
-                else:
-                    bot.last_speakers[guild_id] = {
-                        "user_id": user_id,
-                        "time": datetime.datetime.today()
-                    }
-                # endregion
-
-                # Clean up the audio file
-                try:
-                    os.remove(f"voice_files/{guild_id}-tts.mp3")
-                    print(f"{guild.name}: Cleaned up the TTS file")
-                except OSError as remove_error:
-                    print(f"{guild.name}: Error cleaning up the TTS file:\n\t{remove_error}")
-                finally:    
-                    # Indicate that the current task is done
-                    bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
-
             if voice_client and voice_client.is_connected():
                 def after_playing(error):
                     if error:
                         print(f"{guild.name}: Error occurred during playback: {error}")
 
-                    cleanup()
+                    # region add last_speakers
+                    if guild_id in bot.last_speakers:
+                        bot.last_speakers[guild_id]["user_id"] = user_id
+                        bot.last_speakers[guild_id]["time"] = datetime.datetime.today()
+                    else:
+                        bot.last_speakers[guild_id] = {
+                            "user_id": user_id,
+                            "time": datetime.datetime.today()
+                        }
+                    # endregion
+
+                    # Clean up the audio file
+                    try:
+                        os.remove(f"voice_files/{guild_id}-tts.mp3")
+                        print(f"{guild.name}: Cleaned up the TTS file")
+                    except OSError as remove_error:
+                        print(f"{guild.name}: Error cleaning up the TTS file:\n\t{remove_error}")
+                    finally:    
+                        # Indicate that the current task is done
+                        bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
 
                 # Play the audio file in the voice channel
                 print(f"{guild.name}: Playing the TTS message in {message.channel.name}...")
