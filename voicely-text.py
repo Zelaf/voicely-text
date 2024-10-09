@@ -170,23 +170,33 @@ async def process_queue(guild: discord.Guild):
                 return True
             if not message.channel.id in bot.to_skip[guild_id]:
                 return True
-            if not user_id in bot.to_skip[guild_id][message.channel.id]:
-                return True
-            if bot.to_skip[guild_id][message.channel.id][user_id] > 0:
+            if user_id in bot.to_skip[guild_id][message.channel.id] and bot.to_skip[guild_id][message.channel.id][user_id] > 0:
+                return False
+            if "admin" in bot.to_skip[guild_id][message.channel.id] and bot.to_skip[guild_id][message.channel.id]["admin"] > 0:
                 return False
             else:
                 del bot.to_skip[guild_id][message.channel.id][user_id]
                 return True
-        
-        if not should_play():
-            if guild_id in bot.to_skip and message.channel.id in bot.to_skip[guild_id] and user_id in bot.to_skip[guild_id][message.channel.id]:
-                bot.to_skip[guild_id][message.channel.id][user_id] -= 1
-                if bot.to_skip[guild_id][message.channel.id][user_id] <= 0:
-                    del bot.to_skip[guild_id][message.channel.id][user_id]
+            
+        def decrement_skips():
+            if guild_id in bot.to_skip and message.channel.id in bot.to_skip[guild_id]:
+                if user_id in bot.to_skip[guild_id][message.channel.id]:
+                    bot.to_skip[guild_id][message.channel.id][user_id] -= 1
+                    if bot.to_skip[guild_id][message.channel.id][user_id] <= 0:
+                        del bot.to_skip[guild_id][message.channel.id][user_id]
+
+                if "admin" in bot.to_skip[guild_id][message.channel.id]:
+                    bot.to_skip[guild_id][message.channel.id]["admin"] -= 1
+                    if bot.to_skip[guild_id][message.channel.id]["admin"] <= 0:
+                        del bot.to_skip[guild_id][message.channel.id]["admin"]
+
                 if len(bot.to_skip[guild_id][message.channel.id]) == 0:
                     del bot.to_skip[guild_id][message.channel.id]
                 if len(bot.to_skip[guild_id]) == 0:
                     del bot.to_skip[guild_id]
+        
+        if not should_play():
+            decrement_skips()
             print(f"{guild.name}: {user.global_name} skipped their message.")
             bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
             continue
@@ -295,14 +305,7 @@ async def process_queue(guild: discord.Guild):
                     await asyncio.sleep(1)
                     # should_play_now = should_play()
                 if not should_play():
-                    if guild_id in bot.to_skip and message.channel.id in bot.to_skip[guild_id] and user_id in bot.to_skip[guild_id][message.channel.id]:
-                        bot.to_skip[guild_id][message.channel.id][user_id] -= 1
-                        if bot.to_skip[guild_id][message.channel.id][user_id] <= 0:
-                            del bot.to_skip[guild_id][message.channel.id][user_id]
-                        if len(bot.to_skip[guild_id][message.channel.id]) == 0:
-                            del bot.to_skip[guild_id][message.channel.id]
-                        if len(bot.to_skip[guild_id]) == 0:
-                            del bot.to_skip[guild_id]
+                    decrement_skips()
                     voice_client.stop()
                     # cleanup()
 
