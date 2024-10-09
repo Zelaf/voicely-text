@@ -601,7 +601,7 @@ class AccentsView2(discord.ui.View):
 # endregion
 
 # region tld mappings
-async def tld_get_countries():
+def tld_get_countries():
     url = "https://en.wikipedia.org/wiki/Country_code_top-level_domain"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
@@ -618,7 +618,7 @@ async def tld_get_countries():
 
     return ccTLD_dict
 
-tld_countries: dict = tld_get_countries()
+tld_countries = tld_get_countries()
 
 
 def get_country(tld):
