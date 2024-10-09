@@ -627,11 +627,11 @@ def get_country(tld):
         tld = tld[start:]
     else:
         tld = "." + tld
-    print(tld)
+    # print(tld)
     return str(tld_countries.get(tld)).strip()
 
-print(get_country('us'))
-print(get_country('co.uk'))
+# print(get_country('us'))
+# print(get_country('co.uk'))
 # print(get_country('us'))
 # endregion
 
@@ -679,7 +679,7 @@ async def accents(ctx: commands.Context):
     #     else:
     #         text += f"and `{tld_list_raw[x]}`"
 
-    # print(len(text))
+    print(len(text))
 
     embed = discord.Embed(title="Supported **top-level domains**", description=text)
     await ctx.send(embed=embed, reference=ctx.message, ephemeral=True)
