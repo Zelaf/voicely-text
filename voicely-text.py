@@ -751,7 +751,7 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
     match enabled:
         case "true":
             enabled_bool = True
-            confirm_message = f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/tts start`.\n\nThis will be disabled when you leave the voice channel."
+            confirm_message = f"Autoread has been **enabled**.\n\nI will automatically read all of your messages when you join a voice channel without having to use `/tts start`.\n\nThis will be disabled when you leave the voice channel or type `/tts stop`."
         case "false":
             enabled_bool = False
             confirm_message = f"Autoread has been **disabled**.\n\nYou will need to type `/tts start` for me to start reading your messages.\n\nAlternatively, you can type `/tts speak [your message]` for me to read a single message."
@@ -1048,6 +1048,45 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
     else:
         await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
+# endregion
+
+# region autoread
+@server.command()
+@app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
+async def autoread(ctx: commands.Context, enabled: to_lower):
+    """Set the autoread default for the server."""
+
+    # user_id_str = str(ctx.author.id)
+    guild = ctx.guild
+    guild_id_str = str(guild.id)
+
+    match enabled:
+        case "true":
+            enabled_bool = True
+            confirm_message = f"Autoread has been **enabled** by default for {guild.name}.\n\nI will automatically read all messages sent when someone joins a voice channel without having to use `/tts start`.\n\nThis will be disabled when they leave the voice channel or type `/tts stop`."
+        case "false":
+            enabled_bool = False
+            confirm_message = f"Autoread has been **disabled** by default for {guild.name}..\n\nMembers will need to type `/tts start` for me to start reading their messages.\n\nAlternatively, they can type `/tts speak [their message]` for me to read a single message."
+        case "reset":
+            if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
+                del servers_settings[guild_id_str]["autoread"]
+            
+            default = bot.default_settings["autoread"]
+            save_servers_settings()
+            await ctx.send(f"Autoread for {guild.name} has been **reset** to default: `{default}`", reference=ctx.message, ephemeral=True)
+            return
+        case _:
+            await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", reference=ctx.message, ephemeral=True)
+            return
+
+    if guild_id_str in servers_settings:
+        servers_settings[guild_id_str]["autoread"] = enabled_bool
+    else:
+        servers_settings[guild_id_str] = {"autoread": enabled_bool}
+    
+    save_servers_settings()
+    await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
+
 # endregion
 
 # endregion
