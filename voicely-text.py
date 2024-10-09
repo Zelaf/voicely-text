@@ -506,10 +506,9 @@ class LanguagesView(discord.ui.View):
         # user_id = interaction.user.id
         if self.type == "user":
             user_id_str = str(interaction.user.id)
-            if user_id_str in members_settings:
-                members_settings[user_id_str]["language"] = select.values[0]
-            else:
-                members_settings[user_id_str] = {"language": select.values[0]}
+            if user_id_str not in members_settings:
+                members_settings[user_id_str] = builtins.set()
+            members_settings[user_id_str]["language"] = select.values[0]
             
             save_members_settings()
             
@@ -517,10 +516,9 @@ class LanguagesView(discord.ui.View):
         elif self.type == "server":
             guild = interaction.guild
             guild_id_str = str(guild.id)
-            if guild_id_str in servers_settings:
-                servers_settings[guild_id_str]["language"] = select.values[0]
-            else:
-                servers_settings[guild_id_str] = {"language": select.values[0]}
+            if guild_id_str not in servers_settings:
+                servers_settings[guild_id_str] = builtins.set()
+            servers_settings[guild_id_str]["language"] = select.values[0]
             
             save_servers_settings()
             return await interaction.response.send_message(get_language_response(langs[select.values[0]], ResponseType.server, False, guild), ephemeral=True)
@@ -570,10 +568,9 @@ def get_accent_response(tld: str, typeof: ResponseType, reset: bool, guild: disc
 async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select, typeof: ResponseType):
     if typeof == ResponseType.user:
         user_id_str = str(interaction.user.id)
-        if user_id_str in members_settings:
-            members_settings[user_id_str]["accent"] = select.values[0]
-        else:
-            members_settings[user_id_str] = {"accent": select.values[0]}
+        if user_id_str not in members_settings:
+            members_settings[user_id_str] = builtins.set()
+        members_settings[user_id_str]["accent"] = select.values[0]
 
         save_members_settings()
 
@@ -581,10 +578,9 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
     elif typeof == ResponseType.server:
         guild = interaction.guild
         guild_id_str = str(guild.id)
-        if guild_id_str in servers_settings:
-            servers_settings[guild_id_str]["accent"] = select.values[0]
-        else:
-            servers_settings[guild_id_str] = {"accent": select.values[0]}
+        if guild_id_str not in servers_settings:
+            servers_settings[guild_id_str] = builtins.set()
+        servers_settings[guild_id_str]["accent"] = select.values[0]
         
         save_servers_settings()
         
@@ -976,10 +972,9 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", reference=ctx.message, ephemeral=True)
             return
 
-    if user_id_str in members_settings:
-        members_settings[user_id_str]["autoread"] = enabled_bool
-    else:
-        members_settings[user_id_str] = {"autoread": enabled_bool}
+    if user_id_str not in members_settings:
+        members_settings[user_id_str] = builtins.set()
+    members_settings[user_id_str]["autoread"] = enabled_bool
     
     save_members_settings()
     await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
@@ -1018,10 +1013,9 @@ async def language(ctx: commands.Context, tag: str = None):
 
         if tag in langs:
             user_id_str = ctx.author.id
-            if user_id_str in members_settings:
-                members_settings[user_id_str]["language"] = tag
-            else:
-                members_settings[user_id_str] = {"language": tag}
+            if user_id_str not in members_settings:
+                members_settings[user_id_str] = builtins.set()
+            members_settings[user_id_str]["language"] = tag
 
             save_members_settings()
             
@@ -1068,10 +1062,9 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             return
 
         user_id_str = str(ctx.author.id)
-        if user_id_str in members_settings:
-            members_settings[user_id_str]["accent"] = tld
-        else:
-            members_settings[user_id_str] = {"accent": tld}
+        if user_id_str not in members_settings:
+            members_settings[user_id_str] = builtins.set()
+        members_settings[user_id_str]["accent"] = tld
         
         save_members_settings()
         await ctx.send(get_accent_response(tld, ResponseType.user, False), reference=ctx.message, ephemeral=True)
@@ -1159,10 +1152,10 @@ async def timeout(ctx: commands.Context, seconds: return_int):
         else:
             unit = "second"
 
-        if guild_id_str in servers_settings and "timeout" in servers_settings[guild_id_str]:
-            servers_settings[guild_id_str]["timeout"] = seconds
-        else:
-            servers_settings[guild_id_str] = {"timeout": seconds}
+        if guild_id_str not in servers_settings:
+            servers_settings[guild_id_str] = builtins.set()
+        servers_settings[guild_id_str]["timeout"] = seconds
+
         save_servers_settings()
         await ctx.send(f"Timeout set to **{seconds} {unit}**.", reference=ctx.message, ephemeral=True)
     else:
@@ -1197,10 +1190,9 @@ async def language(ctx: commands.Context, tag = None):
             return
 
         if tag in langs:
-            if guild_id_str in servers_settings:
-                servers_settings[guild_id_str]["language"] = tag
-            else:
-                servers_settings[guild_id_str] = {"language": tag}
+            if guild_id_str not in servers_settings:
+                servers_settings[guild_id_str] = builtins.set()
+            servers_settings[guild_id_str]["language"] = tag
 
             save_servers_settings()
             
@@ -1245,10 +1237,9 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n{tld_list_desc}\n\nAlternatively, rerun `/set server accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
             return
 
-        if guild_id_str in servers_settings:
-            servers_settings[guild_id_str]["accent"] = tld
-        else:
-            servers_settings[guild_id_str] = {"accent": tld}
+        if guild_id_str not in servers_settings:
+            servers_settings[guild_id_str] = builtins.set()
+        servers_settings[guild_id_str]["accent"] = tld
         
         save_servers_settings()
         await ctx.send(get_accent_response(tld, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
@@ -1290,10 +1281,9 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", reference=ctx.message, ephemeral=True)
             return
 
-    if guild_id_str in servers_settings:
-        servers_settings[guild_id_str]["autoread"] = enabled_bool
-    else:
-        servers_settings[guild_id_str] = {"autoread": enabled_bool}
+    if guild_id_str not in servers_settings:
+        servers_settings[guild_id_str] = builtins.set()
+    servers_settings[guild_id_str]["autoread"] = enabled_bool
     
     save_servers_settings()
     await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
