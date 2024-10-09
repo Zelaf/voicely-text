@@ -610,7 +610,7 @@ async def tld_get_countries():
     for table in soup.find_all("table", class_="wikitable"):
         for row in table.find_all("tr")[1:]:
             cols = row.find_all("td")
-            ccTLD_list.append((cols[0].text.strip("."), cols[1].text))
+            ccTLD_list.append((cols[0].text, cols[1].text))
 
     ccTLD_dict = {}
     for ccTLD, country in ccTLD_list:
@@ -623,7 +623,7 @@ tld_countries = tld_get_countries()
 print('got tld mappings')
 
 def get_country(tld):
-    return tld_countries.get(tld)
+    return tld_countries.get("." + tld)
 # endregion
 
 # endregion
