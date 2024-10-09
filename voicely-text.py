@@ -13,7 +13,7 @@ import json
 import builtins
 
 import socket
-from ip2geotools.databases.commercial import DbIpWeb
+from ip2geotools.databases.noncommercial import DbIpCity
 # import signal
 
 # Define intents
@@ -645,7 +645,7 @@ async def accents(ctx: commands.Context):
         domain = f"translate.google.{tld.strip()}"
         ip_address = get_ip_from_domain(domain)
         print('got here')
-        response = DbIpWeb.get(ip_address)
+        response = DbIpCity.get(ip_address)
         if response:
             region = f" - *{response.country}*"
         else:
