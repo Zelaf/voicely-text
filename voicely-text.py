@@ -626,8 +626,8 @@ async def accents(ctx: commands.Context):
 
     
     for x in range(len(tld_list)):
-        print("got here")
         if x < len(tld_list) - 1:
+            print("got here")
             text += f"`{tld_list[x]}`, "
         else:
             text += f"and `{tld_list[x]}`."
