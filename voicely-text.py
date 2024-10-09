@@ -71,6 +71,9 @@ def load_members_settings():
         # If the file doesn't exist, return an empty dictionary
         return {}
 
+# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
+# Load the data from the JSON file when the bot starts
+members_settings = load_members_settings()
 
 # Save the current notify data to a JSON file
 def save_members_settings():
@@ -78,8 +81,7 @@ def save_members_settings():
         # Write the dictionary to the JSON file
         json.dump(members_settings, f)
 
-# Load the data from the JSON file when the bot starts
-members_settings = load_members_settings()
+    members_settings = load_members_settings()
 # endregion
 
 # region server settings
@@ -94,15 +96,17 @@ def load_servers_settings():
         # If the file doesn't exist, return an empty dictionary
         return {}
 
+# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
+# Load the data from the JSON file when the bot starts
+servers_settings = load_servers_settings()
 
 # Save the current notify data to a JSON file
 def save_servers_settings():
     with open('data/servers_settings.json', 'w') as f:
         # Write the dictionary to the JSON file
         json.dump(servers_settings, f)
-        
-# Load the data from the JSON file when the bot starts
-servers_settings = load_servers_settings()
+
+    servers_settings = load_servers_settings()
 
 # endregion
 
@@ -510,7 +514,6 @@ class LanguagesView(discord.ui.View):
                 members_settings[user_id_str] = {"language": select.values[0]}
             
             save_members_settings()
-            members_settings = load_members_settings()
             
             return await interaction.response.send_message(get_language_response(langs[select.values[0]], ResponseType.user, False), ephemeral=True)
         elif self.type == "server":
@@ -522,7 +525,6 @@ class LanguagesView(discord.ui.View):
                 servers_settings[guild_id_str] = {"language": select.values[0]}
             
             save_servers_settings()
-            servers_settings = load_servers_settings()
             return await interaction.response.send_message(get_language_response(langs[select.values[0]], ResponseType.server, False, guild), ephemeral=True)
         else:
             print(f"{interaction.guild.name}: Failed to set server language:\n\t{self.type} is not a valid ResponseType!")
@@ -576,7 +578,6 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
             members_settings[user_id_str] = {"accent": select.values[0]}
 
         save_members_settings()
-        members_settings = load_members_settings()
 
         return await interaction.response.send_message(get_accent_response(select.values[0], ResponseType.user, False), ephemeral=True)
     elif typeof == ResponseType.server:
@@ -588,7 +589,6 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
             servers_settings[guild_id_str] = {"accent": select.values[0]}
         
         save_servers_settings()
-        servers_settings = load_servers_settings()
         
         return await interaction.response.send_message(get_accent_response(select.values[0], ResponseType.server, False, guild), ephemeral=True)
     else:
@@ -972,7 +972,6 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             else:
                 default = bot.default_settings["autoread"]
             save_members_settings()
-            members_settings = load_members_settings()
             await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
             return
         case _:
@@ -985,7 +984,6 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
         members_settings[user_id_str] = {"autoread": enabled_bool}
     
     save_members_settings()
-    members_settings = load_members_settings()
     await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
 
 # endregion
@@ -1015,7 +1013,6 @@ async def language(ctx: commands.Context, tag: str = None):
                 default = bot.default_settings["language"]
             
             save_members_settings()
-            members_settings = load_members_settings()
 
             await ctx.send(get_language_response(langs[default], ResponseType.user, True), reference=ctx.message, ephemeral=True)
             return
@@ -1029,7 +1026,6 @@ async def language(ctx: commands.Context, tag: str = None):
                 members_settings[user_id_str] = {"language": tag}
 
             save_members_settings()
-            members_settings = load_members_settings()
             
             await ctx.send(get_language_response(langs[tag], ResponseType.user, False), reference=ctx.message, ephemeral=True)
         else:
@@ -1065,7 +1061,6 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
                 default = bot.default_settings["accent"]
             
             save_members_settings()
-            members_settings = load_members_settings()
             
             await ctx.send(get_accent_response(default, ResponseType.user, True), reference=ctx.message, ephemeral=True)
             return
@@ -1081,7 +1076,6 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             members_settings[user_id_str] = {"accent": tld}
         
         save_members_settings()
-        members_settings = load_members_settings()
         await ctx.send(get_accent_response(tld, ResponseType.user, False), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed(ResponseType.user), view=AccentsView1(ResponseType.user), reference=ctx.message, ephemeral=True)
@@ -1156,7 +1150,6 @@ async def timeout(ctx: commands.Context, seconds: return_int):
             if len(servers_settings[guild_id_str]) == 0:
                 del servers_settings[guild_id_str]
         save_servers_settings()
-        servers_settings = load_servers_settings()
         await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", reference=ctx.message, ephemeral=True)
     elif isinstance(seconds, int):
         if seconds <= 0:
@@ -1173,7 +1166,6 @@ async def timeout(ctx: commands.Context, seconds: return_int):
         else:
             servers_settings[guild_id_str] = {"timeout": seconds}
         save_servers_settings()
-        servers_settings = load_servers_settings()
         await ctx.send(f"Timeout set to **{seconds} {unit}**.", reference=ctx.message, ephemeral=True)
     else:
         await ctx.send(error_message, reference=ctx.message, ephemeral=True)
@@ -1202,7 +1194,6 @@ async def language(ctx: commands.Context, tag = None):
             default = bot.default_settings["language"]
             
             save_servers_settings()
-            servers_settings = load_servers_settings()
 
             await ctx.send(get_language_response(langs[default], ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
             return
@@ -1214,7 +1205,6 @@ async def language(ctx: commands.Context, tag = None):
                 servers_settings[guild_id_str] = {"language": tag}
 
             save_servers_settings()
-            servers_settings = load_servers_settings()
             
             await ctx.send(get_language_response(langs[tag], ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
         else:
@@ -1249,7 +1239,6 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             default = bot.default_settings["accent"]
             
             save_servers_settings()
-            servers_settings = load_servers_settings()
             
             await ctx.send(get_accent_response(default, ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
             return
@@ -1264,7 +1253,6 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             servers_settings[guild_id_str] = {"accent": tld}
         
         save_servers_settings()
-        servers_settings = load_servers_settings()
         await ctx.send(get_accent_response(tld, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed(ResponseType.server, guild), view=AccentsView1(ResponseType.server), reference=ctx.message, ephemeral=True)
@@ -1298,7 +1286,6 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             
             default = bot.default_settings["autoread"]
             save_servers_settings()
-            servers_settings = load_servers_settings()
             await ctx.send(f"Autoread for {guild.name} has been **reset** to default: `{default}`", reference=ctx.message, ephemeral=True)
             return
         case _:
@@ -1311,7 +1298,6 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
         servers_settings[guild_id_str] = {"autoread": enabled_bool}
     
     save_servers_settings()
-    servers_settings = load_servers_settings()
     await ctx.send(confirm_message, reference=ctx.message, ephemeral=True)
 
 # endregion
