@@ -435,7 +435,7 @@ def to_lower(argument):
         return None
     return argument.lower()
 
-def return_int(argument):
+def return_int(argument: str):
     try:
         return int(argument)
     except:
