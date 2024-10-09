@@ -10,6 +10,7 @@ import math
 import requests
 import datetime
 import json
+import builtins
 # import signal
 
 # Define intents
@@ -596,20 +597,6 @@ class AccentsView2(discord.ui.View):
 # endregion
 
 
-@bot.hybrid_command()
-async def languages(ctx: commands.Context):
-    """List all the IETF language tags available to use."""
-
-    langs = lang.tts_langs()
-    keys = list(langs.keys())
-
-    text = f"Supported IETF language tags include:"
-    for key in keys:
-        text += f"\n- `{key}` - *{langs[key]}*"
-
-    print(len(text))
-
-    await ctx.send(text, reference=ctx.message, ephemeral=True)
 # region information
 # Create a hybrid group
 @bot.hybrid_group()
@@ -618,6 +605,20 @@ async def list(ctx: commands.Context):
     if ctx.invoked_subcommand is None:
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
+@list.command()
+async def languages(ctx: commands.Context):
+    """List all the IETF language tags available to use."""
+
+    langs = lang.tts_langs()
+    keys = builtins.list(langs.keys())
+
+    text = f"Supported IETF language tags include:"
+    for key in keys:
+        text += f"\n- `{key}` - *{langs[key]}*"
+
+    print(len(text))
+
+    await ctx.send(text, reference=ctx.message, ephemeral=True)
     
 
 @list.command()
