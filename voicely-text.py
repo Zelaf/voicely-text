@@ -507,7 +507,7 @@ class LanguagesView(discord.ui.View):
         if self.type == "user":
             user_id_str = str(interaction.user.id)
             if user_id_str not in members_settings:
-                members_settings[user_id_str] = builtins.set()
+                members_settings[user_id_str] = {}
             members_settings[user_id_str]["language"] = select.values[0]
             
             save_members_settings()
@@ -517,7 +517,7 @@ class LanguagesView(discord.ui.View):
             guild = interaction.guild
             guild_id_str = str(guild.id)
             if guild_id_str not in servers_settings:
-                servers_settings[guild_id_str] = builtins.set()
+                servers_settings[guild_id_str] = {}
             servers_settings[guild_id_str]["language"] = select.values[0]
             
             save_servers_settings()
@@ -569,7 +569,7 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
     if typeof == ResponseType.user:
         user_id_str = str(interaction.user.id)
         if user_id_str not in members_settings:
-            members_settings[user_id_str] = builtins.set()
+            members_settings[user_id_str] = {}
         members_settings[user_id_str]["accent"] = select.values[0]
 
         save_members_settings()
@@ -579,7 +579,7 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
         guild = interaction.guild
         guild_id_str = str(guild.id)
         if guild_id_str not in servers_settings:
-            servers_settings[guild_id_str] = builtins.set()
+            servers_settings[guild_id_str] = {}
         servers_settings[guild_id_str]["accent"] = select.values[0]
         
         save_servers_settings()
@@ -973,7 +973,7 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             return
 
     if user_id_str not in members_settings:
-        members_settings[user_id_str] = builtins.set()
+        members_settings[user_id_str] = {}
     members_settings[user_id_str]["autoread"] = enabled_bool
     
     save_members_settings()
@@ -1014,7 +1014,7 @@ async def language(ctx: commands.Context, tag: str = None):
         if tag in langs:
             user_id_str = str(ctx.author.id)
             if user_id_str not in members_settings:
-                members_settings[user_id_str] = builtins.set()
+                members_settings[user_id_str] = {}
             members_settings[user_id_str]["language"] = tag
 
             save_members_settings()
@@ -1063,7 +1063,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
 
         user_id_str = str(ctx.author.id)
         if user_id_str not in members_settings:
-            members_settings[user_id_str] = builtins.set()
+            members_settings[user_id_str] = {}
         members_settings[user_id_str]["accent"] = tld
         
         save_members_settings()
@@ -1153,7 +1153,7 @@ async def timeout(ctx: commands.Context, seconds: return_int):
             unit = "second"
 
         if guild_id_str not in servers_settings:
-            servers_settings[guild_id_str] = builtins.set()
+            servers_settings[guild_id_str] = {}
         servers_settings[guild_id_str]["timeout"] = seconds
 
         save_servers_settings()
@@ -1191,7 +1191,7 @@ async def language(ctx: commands.Context, tag = None):
 
         if tag in langs:
             if guild_id_str not in servers_settings:
-                servers_settings[guild_id_str] = builtins.set()
+                servers_settings[guild_id_str] = {}
             servers_settings[guild_id_str]["language"] = tag
 
             save_servers_settings()
@@ -1238,7 +1238,7 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             return
 
         if guild_id_str not in servers_settings:
-            servers_settings[guild_id_str] = builtins.set()
+            servers_settings[guild_id_str] = {}
         servers_settings[guild_id_str]["accent"] = tld
         
         save_servers_settings()
@@ -1282,7 +1282,7 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             return
 
     if guild_id_str not in servers_settings:
-        servers_settings[guild_id_str] = builtins.set()
+        servers_settings[guild_id_str] = {}
     servers_settings[guild_id_str]["autoread"] = enabled_bool
     
     save_servers_settings()
