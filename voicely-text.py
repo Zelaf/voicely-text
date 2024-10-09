@@ -625,7 +625,7 @@ async def accents(ctx: commands.Context):
     text = f"Supported top-level domains include:\n\n`"
 
     
-    for x in len(tld_list):
+    for x in range(len(tld_list)):
         print("got here")
         if x < len(tld_list) - 1:
             text += f"`{tld_list[x]}`, "
