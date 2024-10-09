@@ -644,6 +644,7 @@ async def accents(ctx: commands.Context):
     for tld in tld_list_raw:
         domain = f"translate.google.{tld.strip()}"
         ip_address = get_ip_from_domain(domain)
+        print('got here')
         response = DbIpWeb.get(ip_address)
         if response:
             region = f" - *{response.country}*"
