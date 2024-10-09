@@ -11,6 +11,9 @@ import requests
 import datetime
 import json
 import builtins
+
+import socket
+from ip2geotools.databases import ip  
 # import signal
 
 # Define intents
@@ -627,11 +630,31 @@ async def accents(ctx: commands.Context):
 
     text = f"Supported **top-level domains** include:\n\n"
 
-    for x in range(len(tld_list_raw)):
-        if x < len(tld_list_raw) - 1:
-            text += f"`{tld_list_raw[x].strip()}`, "
+    def get_ip_from_domain(domain):
+        try:
+            return socket.gethostbyname(domain)
+        except socket.gaierror:
+            return None
+
+    def get_region_from_ip(ip_address):
+        response = ip('database.db', ip_address)
+        return response.region
+
+
+    for tld in tld_list_raw:
+        domain = f"translate.google.{tld.strip()}"
+        ip_address = get_ip_from_domain(domain)
+        if ip_address:
+            region = f" - *{get_region_from_ip(ip_address)}*"
         else:
-            text += f"and `{tld_list_raw[x]}`"
+            region = ""
+        text += f"\n- `{tld.strip()}`{region}"
+
+    # for x in range(len(tld_list_raw)):
+    #     if x < len(tld_list_raw) - 1:
+    #         text += f"`{tld_list_raw[x].strip()}`, "
+    #     else:
+    #         text += f"and `{tld_list_raw[x]}`"
 
     print(len(text))
     await ctx.send(text, reference=ctx.message, ephemeral=True)
