@@ -632,9 +632,8 @@ async def accents(ctx: commands.Context):
         else:
             text += f"and `{tld_list[x]}`."
 
-    print("got here")
     await ctx.send(text, reference=ctx.message, ephemeral=True)
-
+    print("got here")
 # endregion
 
 # region TTS
