@@ -1012,7 +1012,7 @@ async def language(ctx: commands.Context, tag: str = None):
 
 
         if tag in langs:
-            user_id_str = ctx.author.id
+            user_id_str = str(ctx.author.id)
             if user_id_str not in members_settings:
                 members_settings[user_id_str] = builtins.set()
             members_settings[user_id_str]["language"] = tag
