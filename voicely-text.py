@@ -943,6 +943,8 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
         case "reset":
             if user_id_str in members_settings and "autoread" in members_settings[user_id_str]:
                 del members_settings[user_id_str]["autoread"]
+                if len(members_settings[user_id_str]) == 0:
+                    del members_settings[user_id_str]
             
             if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
                 default = servers_settings[guild_id_str]["autoread"]
@@ -979,6 +981,8 @@ async def language(ctx: commands.Context, tag: str = None):
             user_id_str = str(ctx.author.id)
             if user_id_str in members_settings and "language" in members_settings[user_id_str]:
                 del members_settings[user_id_str]["language"]
+                if len(members_settings[user_id_str]) == 0:
+                    del members_settings[user_id_str]
             
             guild_id_str = str(ctx.guild.id)
             
@@ -1026,6 +1030,8 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             user_id_str = str(ctx.author.id)
             if user_id_str in members_settings and "accent" in members_settings[user_id_str]:
                 del members_settings[user_id_str]["accent"]
+                if len(members_settings[user_id_str]) == 0:
+                    del members_settings[user_id_str]
             
             guild_id_str = str(ctx.guild.id)
             if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
@@ -1123,6 +1129,8 @@ async def timeout(ctx: commands.Context, seconds: return_int):
     if seconds == "reset":
         if guild_id_str in servers_settings and "timeout" in servers_settings[guild_id_str]:
             del servers_settings[guild_id_str]["timeout"]
+            if len(servers_settings[guild_id_str]) == 0:
+                del servers_settings[guild_id_str]
         save_servers_settings()
         await ctx.send(f"Timeout reset to **{bot.default_settings['timeout']} seconds**.", reference=ctx.message, ephemeral=True)
     elif isinstance(seconds, int):
@@ -1162,6 +1170,8 @@ async def language(ctx: commands.Context, tag = None):
         if tag == 'reset':
             if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
                 del servers_settings[guild_id_str]["language"]
+                if len(servers_settings[guild_id_str]) == 0:
+                    del servers_settings[guild_id_str]
             
             default = bot.default_settings["language"]
             
@@ -1205,6 +1215,8 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
         if tld == 'reset':
             if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
                 del servers_settings[guild_id_str]["accent"]
+                if len(servers_settings[guild_id_str]) == 0:
+                    del servers_settings[guild_id_str]
             
             default = bot.default_settings["accent"]
             
@@ -1253,6 +1265,8 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
         case "reset":
             if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
                 del servers_settings[guild_id_str]["autoread"]
+                if len(servers_settings[guild_id_str]) == 0:
+                    del servers_settings[guild_id_str]
             
             default = bot.default_settings["autoread"]
             save_servers_settings()
