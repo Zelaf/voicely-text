@@ -71,15 +71,17 @@ def load_members_settings():
         # If the file doesn't exist, return an empty dictionary
         return {}
 
+# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
+# Load the data from the JSON file when the bot starts
+members_settings = load_members_settings()
+
 # Save the current notify data to a JSON file
 def save_members_settings():
     with open('data/members_settings.json', 'w') as f:
         # Write the dictionary to the JSON file
         json.dump(members_settings, f)
 
-# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
-# Load the data from the JSON file when the bot starts
-members_settings = load_members_settings()
+    members_settings = load_members_settings()
 # endregion
 
 # region server settings
@@ -94,15 +96,18 @@ def load_servers_settings():
         # If the file doesn't exist, return an empty dictionary
         return {}
 
+# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
+# Load the data from the JSON file when the bot starts
+servers_settings = load_servers_settings()
+
 # Save the current notify data to a JSON file
 def save_servers_settings():
     with open('data/servers_settings.json', 'w') as f:
         # Write the dictionary to the JSON file
         json.dump(servers_settings, f)
 
-# Store users who want to be notified in a dictionary {guild_id: set(user_ids)}
-# Load the data from the JSON file when the bot starts
-servers_settings = load_servers_settings()
+    servers_settings = load_servers_settings()
+
 # endregion
 
 # endregion
