@@ -618,7 +618,7 @@ async def tld_get_countries():
 
     return ccTLD_dict
 
-tld_countries = tld_get_countries()
+tld_countries: dict = tld_get_countries()
 
 
 def get_country(tld):
