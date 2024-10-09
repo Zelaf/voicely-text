@@ -874,7 +874,7 @@ async def skip(ctx: commands.Context, count: return_int = 1):
         await ctx.send("You can only use this command in a voice channel's text chat.", reference=ctx.message, ephemeral=True)
         return
     
-    if count >= 0:
+    if count <= 0:
         await ctx.send("`count` must be a positive whole number!", reference=ctx.message, ephemeral=True)
         return
     elif isinstance(count, int):
