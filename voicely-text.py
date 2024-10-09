@@ -39,6 +39,15 @@ class Bot(commands.Bot):
         self.active_timeouts = {}
         self.last_speakers = {}
         self.members_to_read = []
+        self.to_skip = {}
+        # to_skip will look like:
+        # {
+        #     guild_id: {
+        #         text_channel_id: {
+        #             user_id: amount_to_skip
+        #         }
+        #     }
+        # }
 
     async def setup_hook(self):
         print(f"Setup complete for {self.user}")
@@ -840,8 +849,52 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
 # region cancel
 
 @tts.command()
-async def cancel(ctx: commands.Context):
-    """Cancel your message from being read"""
+@app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
+async def skip(ctx: commands.Context, count: return_int = 1):
+    """Skip your next message(s) in this channel. This includes currently playing or sent messages."""
+
+    text_channel_name = ctx.channel.name
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
+    if voice_channel is None:
+        await ctx.send("You can only use this command in a voice channel's text chat.", reference=ctx.message, ephemeral=True)
+        return
+    
+    if count >= 0:
+        await ctx.send("`count` must be a positive whole number!", reference=ctx.message, ephemeral=True)
+        return
+    elif isinstance(count, int):
+        guild_id = ctx.guild.id
+        channel_id = ctx.channel.id
+        user_id = ctx.author.id
+        if guild_id not in bot.to_skip:
+            bot.to_skip[guild_id] = builtins.set()
+        if channel_id not in bot.to_skip[guild_id]:
+            bot.to_skip[guild_id][channel_id] = builtins.set()
+        
+        bot.to_skip[guild_id][channel_id][user_id] = count
+
+        if count > 1:
+            plural = "s"
+        else:
+            plural = ""
+
+        await ctx.send(f"Your next **{count}** message{plural} will not be read.\n\nIf one of your messages are currently being read, it will be skipped.\n\nType `/tts skip cancel` to speak all your upcoming messages.", reference=ctx.message, ephemeral=True)
+    elif count == "cancel":
+        guild_id = ctx.guild.id
+        channel_id = ctx.channel.id
+        user_id = ctx.author.id
+        if guild_id not in bot.to_skip:
+            bot.to_skip[guild_id] = builtins.set()
+        if channel_id not in bot.to_skip[guild_id]:
+            bot.to_skip[guild_id][channel_id] = builtins.set()
+        
+        bot.to_skip[guild_id][channel_id][user_id] = 0
+
+        await ctx.send("All your upcoming messages will be read.", reference=ctx.message, ephemeral=True)
+
+
+
+    
 # endregion
 
 # endregion
