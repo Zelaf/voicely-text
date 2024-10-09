@@ -454,7 +454,7 @@ def return_int(argument: str):
 language_desc = "The IETF language tag of the language you will write in. Type 'reset' to set to default."
 language_list_desc = "Type `/list languages` to list the supported language tags"
 tld_desc = "A localized top-level domain from which the accent will be read. Type 'reset' to set to default."
-tld_list_desc = "Type `/list accents` for a list of supported top-level domains"
+tld_list_desc = "Type `/list accents` for a list of supported top-level domains."
     
 class ResponseType(Enum):
     user = "user"
@@ -1060,21 +1060,18 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             await ctx.send(get_accent_response(default, ResponseType.user, True), reference=ctx.message, ephemeral=True)
             return
         
-        try:
-            requests.get(f"https://translate.google.{tld}")
-        except requests.ConnectionError:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\n{tld_list_desc}, or try again later.\n\nAlternatively, rerun `/set accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+        if tld not in tld_list_raw:
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n{tld_list_desc}\n\nAlternatively, rerun `/set accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+            return
 
+        user_id_str = str(ctx.author.id)
+        if user_id_str in members_settings:
+            members_settings[user_id_str]["accent"] = tld
         else:
-            # user_id = ctx.author.id
-            user_id_str = str(ctx.author.id)
-            if user_id_str in members_settings:
-                members_settings[user_id_str]["accent"] = tld
-            else:
-                members_settings[user_id_str] = {"accent": tld}
-            
-            save_members_settings()
-            await ctx.send(get_accent_response(tld, ResponseType.user, False), reference=ctx.message, ephemeral=True)
+            members_settings[user_id_str] = {"accent": tld}
+        
+        save_members_settings()
+        await ctx.send(get_accent_response(tld, ResponseType.user, False), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed(ResponseType.user), view=AccentsView1(ResponseType.user), reference=ctx.message, ephemeral=True)
     else:
@@ -1241,19 +1238,17 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             await ctx.send(get_accent_response(default, ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
             return
         
-        try:
-            requests.get(f"https://translate.google.{tld}")
-        except requests.ConnectionError:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n`https://translate.google.`**`{tld}`** is **not a valid url** or is otherwise temporarily unavailable.\n\n{tld_list_desc}, or try again later.\n\nAlternatively, rerun `/set server accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+        if tld not in tld_list_raw:
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n{tld_list_desc}\n\nAlternatively, rerun `/set server accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+            return
 
+        if guild_id_str in servers_settings:
+            servers_settings[guild_id_str]["accent"] = tld
         else:
-            if guild_id_str in servers_settings:
-                servers_settings[guild_id_str]["accent"] = tld
-            else:
-                servers_settings[guild_id_str] = {"accent": tld}
-            
-            save_servers_settings()
-            await ctx.send(get_accent_response(tld, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
+            servers_settings[guild_id_str] = {"accent": tld}
+        
+        save_servers_settings()
+        await ctx.send(get_accent_response(tld, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
         await ctx.send(embed=accent_embed(ResponseType.server, guild), view=AccentsView1(ResponseType.server), reference=ctx.message, ephemeral=True)
     else:
