@@ -303,9 +303,6 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
     if message_content == "" or re.match(r'^[\s\t\n]+$', message_content, re.MULTILINE) != None:
         print(f"{ctx.guild.name}: Message contains no text, skipping.")
         return
-    
-    # message_content = f"{ctx.author.display_name} says, " + message_content
-
 
     if isinstance(ctx, discord.Message):
         message = ctx
@@ -323,7 +320,6 @@ async def on_message(message: discord.Message):
         await process_message(message, message.content)
     
     await bot.process_commands(message)
-
 
 @bot.event
 async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -355,7 +351,6 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
             if user_id in bot.members_to_read:
                 bot.members_to_read.remove(user_id)
         
-
 
 # endregion
 
@@ -679,7 +674,6 @@ class AccentsView2(discord.ui.View):
 # endregion
 
 # endregion
-
 
 # region information
 # Create a hybrid group
