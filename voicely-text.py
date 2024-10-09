@@ -532,7 +532,7 @@ def get_tlds():
     for x in range(select_count):
         options.append([])
 
-        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list_raw))]
+        new_list = tld_list_raw[(x * 25):min((x * 25) + 25, len(tld_list_raw))]
 
         for y in range(len(new_list)):
             options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
