@@ -625,7 +625,7 @@ async def accents(ctx: commands.Context):
     text = f"Supported top-level domains include:\n"
 
     for tld in tld_list_raw:
-        text += f"\n- `{tld}`"
+        text += f"\n- `{tld.strip()}`"
 
 
     await ctx.send(text, reference=ctx.message, ephemeral=True)
