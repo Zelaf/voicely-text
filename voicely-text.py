@@ -493,7 +493,7 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
 
         save_members_settings()
 
-        return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}`.", ephemeral=True)
+        return await interaction.response.send_message(f"Your accent's **top-level domain** has been set to `{select.values[0]}` - *{get_country(select.values[0])}*.", ephemeral=True)
     elif typeof == "server":
         guild = interaction.guild
         guild_id_str = str(guild.id)
@@ -504,7 +504,7 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
         
         save_servers_settings()
         
-        return await interaction.response.send_message(f"The **top-level domain** for {guild.name}'s accent has been set to `{select.values[0]}`.", ephemeral=True)
+        return await interaction.response.send_message(f"The **top-level domain** for {guild.name}'s accent has been set to `{select.values[0]}` - *{get_country(select.values[0])}*.", ephemeral=True)
     else:
         print(f"{interaction.guild.name}: Failed to set server accent:\n\t{typeof} is not a valid type!")
         return await interaction.response.send_message(f"There was an error setting the server accent. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{typeof} is not a valid type!\n```")
