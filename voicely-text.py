@@ -179,6 +179,15 @@ async def process_queue(guild: discord.Guild):
                 return True
         
         if not should_play():
+            if guild_id in bot.to_skip and message.channel.id in bot.to_skip[guild_id] and user_id in bot.to_skip[guild_id][message.channel.id]:
+                bot.to_skip[guild_id][message.channel.id][user_id] -= 1
+                if bot.to_skip[guild_id][message.channel.id][user_id] <= 0:
+                    del bot.to_skip[guild_id][message.channel.id][user_id]
+                if len(bot.to_skip[guild_id][message.channel.id]) == 0:
+                    del bot.to_skip[guild_id][message.channel.id]
+                if len(bot.to_skip[guild_id]) == 0:
+                    del bot.to_skip[guild_id]
+            print(f"{guild.name}: {user.global_name} skipped their message.")
             bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
             continue
         
