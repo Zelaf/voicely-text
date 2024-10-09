@@ -891,10 +891,10 @@ async def skip(ctx: commands.Context, count: return_int = 1):
         await ctx.send("`count` must be a positive whole number!", reference=ctx.message, ephemeral=True)
         return
     
+    guild_id = ctx.guild.id
+    channel_id = ctx.channel.id
+    user_id = ctx.author.id
     if isinstance(count, int):
-        guild_id = ctx.guild.id
-        channel_id = ctx.channel.id
-        user_id = ctx.author.id
         if guild_id not in bot.to_skip:
             bot.to_skip[guild_id] = {channel_id: {user_id: count}}
         elif channel_id not in bot.to_skip[guild_id]:
@@ -909,15 +909,12 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 
         await ctx.send(f"Your next **{count}** message{plural} will not be read.\n\nIf one of your messages are currently being read, it will be skipped.\n\nType `/tts skip cancel` to speak all your upcoming messages.", reference=ctx.message, ephemeral=True)
     elif count == "cancel":
-        guild_id = ctx.guild.id
-        channel_id = ctx.channel.id
-        user_id = ctx.author.id
-        if guild_id not in bot.to_skip:
-            bot.to_skip[guild_id] = {channel_id: {user_id: 0}}
-        elif channel_id not in bot.to_skip[guild_id]:
-            bot.to_skip[guild_id][channel_id] = {user_id: 0}
-        else:
-            bot.to_skip[guild_id][channel_id][user_id] = 0
+        if guild_id in bot.to_skip and channel_id in bot.to_skip[guild_id] and user_id in bot.to_skip[guild_id][channel_id]:
+            del bot.to_skip[guild_id][channel_id][user_id]
+            if len(bot.to_skip[guild_id][channel_id]) == 0:
+                del bot.to_skip[guild_id][channel_id]
+            if len(bot.to_skip[guild_id]) == 0:
+                del bot.to_skip[guild_id]
 
         await ctx.send("All your upcoming messages will be read.", reference=ctx.message, ephemeral=True)
 
