@@ -397,7 +397,7 @@ def to_lower(argument):
         return None
     return argument.lower()
 
-def return_seconds(argument):
+def return_int(argument):
     try:
         return int(argument)
     except:
@@ -1038,7 +1038,7 @@ async def server(ctx: commands.Context):
 @server.command()
 @commands.has_guild_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
-async def timeout(ctx: commands.Context, seconds: return_seconds):
+async def timeout(ctx: commands.Context, seconds: return_int):
     """Set the number of seconds of inactivity after which the bot will leave the voice channel."""
 
     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings['timeout']} seconds)*."
