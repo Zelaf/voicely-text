@@ -683,13 +683,15 @@ async def languages(ctx: commands.Context):
     langs = lang.tts_langs()
     keys = builtins.list(langs.keys())
 
-    text = f"Supported **IETF language tags** include:"
+    text = f"## Supported **IETF language tags**:"
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
+    embed = discord.Embed(description=text)
+
     # print(len(text))
 
-    await ctx.send(text, reference=ctx.message, ephemeral=True)
+    await ctx.send(embed=embed, reference=ctx.message, ephemeral=True)
     
 
 @list.command()
