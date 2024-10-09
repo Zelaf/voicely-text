@@ -620,6 +620,8 @@ async def tld_get_countries():
 
 tld_countries = tld_get_countries()
 
+print('got tld mappings')
+
 def get_country(tld):
     return tld_countries.get(tld)
 # endregion
@@ -659,8 +661,8 @@ async def accents(ctx: commands.Context):
 
 
     for tld in tld_list_raw:
-        tld = tld.strip()
-        text += f"\n- `{tld}` - *{get_country(tld)}*"
+        new_tld = tld.strip()
+        text += f"\n- `{new_tld}` - *{get_country(new_tld)}*"
 
     # for x in range(len(tld_list_raw)):
     #     if x < len(tld_list_raw) - 1:
