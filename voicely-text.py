@@ -1066,7 +1066,7 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
             confirm_message = f"Autoread has been **enabled** by default for {guild.name}.\n\nI will automatically read all messages sent when someone joins a voice channel without having to use `/tts start`.\n\nThis will be disabled when they leave the voice channel or type `/tts stop`."
         case "false":
             enabled_bool = False
-            confirm_message = f"Autoread has been **disabled** by default for {guild.name}..\n\nMembers will need to type `/tts start` for me to start reading their messages.\n\nAlternatively, they can type `/tts speak [their message]` for me to read a single message."
+            confirm_message = f"Autoread has been **disabled** by default for {guild.name}.\n\nMembers will need to type `/tts start` for me to start reading their messages.\n\nAlternatively, they can type `/tts speak [message]` for me to read a single message."
         case "reset":
             if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
                 del servers_settings[guild_id_str]["autoread"]
