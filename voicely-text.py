@@ -623,6 +623,8 @@ async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
     text = f"Supported top-level domains include:\n\n`"
+
+    print("got here")
     
     for x in len(tld_list):
         if x < len(tld_list) - 1:
