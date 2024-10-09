@@ -178,6 +178,7 @@ async def process_queue(guild: discord.Guild):
                 return True
         
         if not should_play():
+            bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
             return
         
         # region reset timeout
