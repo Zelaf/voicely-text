@@ -298,9 +298,11 @@ async def process_queue(guild: discord.Guild):
                 voice_client.play(discord.FFmpegPCMAudio(f"voice_files/{guild_id}-tts.mp3", executable='bot-env/ffmpeg/bin/ffmpeg'), after=after_playing)
                 # ffmpeg currently uses version 7.1 on windows and 7.0.2 on linux
 
+                should_play_now = should_play()
                 # Wait until the current message is finished playing
-                while voice_client.is_playing() and should_play():
+                while voice_client.is_playing() and should_play_now:
                     await asyncio.sleep(1)
+                    should_play_now = should_play()
                 print(f"{guild.name}: Audio finished playing")
             else:
                 print(f"{guild.name}: Voice client is not connected; task done")
