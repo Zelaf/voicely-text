@@ -608,7 +608,7 @@ async def list(ctx: commands.Context):
 async def languages(ctx: commands.Context):
     """List all the IETF language tags available to use."""
 
-    langs = lang.tts_langs()
+    langs = await lang.tts_langs()
     keys = list(langs.keys())
 
     text = f"Supported IETF language tags include:"
