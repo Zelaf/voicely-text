@@ -14,6 +14,9 @@ You can also set the **language** and the **accent** that the bot will read your
 ## Text-to-speech override
 If you don't want the bot to read *all* of your messages, but just want it to **read a single message**, or if you already have your messages being read but want to **override the language or accent** for a single message, use the `/tts speak` command, and specify the text you want to be read under `text`.
 - If you don't provide a `language` or `tld` (for the accent), your default language and accent will be used.
+## Skipping messages
+If you want to **skip speaking messages** you may have already sent or are about to send, type `/tts skip`, with an optional `count` being the number of messages you want to skip.
+- If one of your messages is currently being read, the currently spoken message will be included in the `count`.
 # Early development
 This bot is still in early development, and I still need to fix up some things and add server-side settings, but the bot is completely useable in this state! Feel free to invite it to any of your servers, and just remember that things may change in the future!
 
