@@ -11,9 +11,7 @@ import requests
 import datetime
 import json
 import builtins
-
-import socket
-from ip2geotools.databases.noncommercial import DbIpCity
+from bs4 import BeautifulSoup
 # import signal
 
 # Define intents
@@ -511,6 +509,7 @@ async def select_accent(self, interaction: discord.Interaction, select: discord.
         print(f"{interaction.guild.name}: Failed to set server accent:\n\t{typeof} is not a valid type!")
         return await interaction.response.send_message(f"There was an error setting the server accent. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{typeof} is not a valid type!\n```")
 
+# region tld_list
 def get_tld_list():
     response = requests.get("https://www.google.com/supported_domains")
 
@@ -544,7 +543,9 @@ def get_tlds():
 
 tld_list = get_tlds()
 # tld_list = []
+# endregion
 
+# region views
 class AccentsView1(discord.ui.View):
     def __init__(self, typeof):
         super().__init__()
@@ -599,6 +600,32 @@ class AccentsView2(discord.ui.View):
             await interaction.response.send_message(embed=accent_embed(self.type, interaction.guild), view=AccentsView1(self.type), ephemeral=True)
 # endregion
 
+# region tld mappings
+async def tld_get_countries():
+    url = "https://en.wikipedia.org/wiki/Country_code_top-level_domain"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    ccTLD_list = []
+    for table in soup.find_all("table", class_="wikitable"):
+        for row in table.find_all("tr")[1:]:
+            cols = row.find_all("td")
+            ccTLD_list.append((cols[0].text.strip("."), cols[1].text))
+
+    ccTLD_dict = {}
+    for ccTLD, country in ccTLD_list:
+        ccTLD_dict[ccTLD] = country
+
+    return ccTLD_dict
+
+tld_countries = tld_get_countries()
+
+def get_country(tld):
+    return tld_countries.get(tld)
+# endregion
+
+# endregion
+
 
 # region information
 # Create a hybrid group
@@ -630,27 +657,10 @@ async def accents(ctx: commands.Context):
 
     text = f"Supported **top-level domains** include:\n\n"
 
-    def get_ip_from_domain(domain):
-        try:
-            return socket.gethostbyname(domain)
-        except socket.gaierror:
-            return None
-
-    # def get_region_from_ip(ip_address):
-    #     response = ip('database.db', ip_address)
-    #     return response.region
-
 
     for tld in tld_list_raw:
-        domain = f"translate.google.{tld.strip()}"
-        ip_address = get_ip_from_domain(domain)
-        print('got here')
-        response = DbIpCity.get(ip_address)
-        if response:
-            region = f" - *{response.country}*"
-        else:
-            region = ""
-        text += f"\n- `{tld.strip()}`{region}"
+        tld = tld.strip()
+        text += f"\n- `{tld}` - *{get_country(tld)}*"
 
     # for x in range(len(tld_list_raw)):
     #     if x < len(tld_list_raw) - 1:
