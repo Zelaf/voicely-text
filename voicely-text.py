@@ -522,17 +522,17 @@ def get_tld_list():
         print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
         return []
 
-tld_list = get_tld_list()
+tld_list_raw = get_tld_list()
 
 def get_tlds():
     options = []
     
-    select_count = math.ceil(len(tld_list) / 25)
+    select_count = math.ceil(len(tld_list_raw) / 25)
 
     for x in range(select_count):
         options.append([])
 
-        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list))]
+        new_list = tld_list[(x * 25):min((x * 25) + 25, len(tld_list_raw))]
 
         for y in range(len(new_list)):
             options[x].append(discord.SelectOption(label=new_list[y], value=new_list[y], description=f"translate.google.{new_list[y]}"))
@@ -622,20 +622,13 @@ async def languages(ctx: commands.Context):
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
-    text = f"Supported top-level domains include:\n\n`"
+    text = f"Supported top-level domains include:\n`"
 
-    # print(len(tld_list))
-    
-    for x in range(len(tld_list)):
-        if x < len(tld_list) - 1:
-            text += f"`{tld_list[x]}`, "
-        else:
-            text += f"and `{tld_list[x]}`."
+    for tld in tld_list_raw:
+        text += f"\n- `{tld}`"
 
-    print(len(text))
 
     await ctx.send(text, reference=ctx.message, ephemeral=True)
-    # print("got here")
 # endregion
 
 # region TTS
