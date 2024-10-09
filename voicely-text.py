@@ -624,15 +624,15 @@ async def accents(ctx: commands.Context):
 
     text = f"Supported top-level domains include:\n\n`"
 
-    print(len(tld_list))
+    # print(len(tld_list))
     
     for x in range(len(tld_list)):
         if x < len(tld_list) - 1:
             text += f"`{tld_list[x]}`, "
         else:
-            print("got here")
             text += f"and `{tld_list[x]}`."
 
+    print("got here")
     await ctx.send(text, reference=ctx.message, ephemeral=True)
 
 # endregion
