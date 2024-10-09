@@ -273,6 +273,13 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
         if text.startswith(f"{bot.command_prefix}{command}"):
             print(f"{ctx.guild.name}: Message is a command, skipping.")
             return
+    
+    text_channel_name = ctx.channel.name
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
+    if ctx.channel is not voice_channel:
+        print(f'{ctx.guild.name}: text channel is not the same voice channel.')
+        return
+    
     # Remove emote IDs, leaving only emote names (e.g., :emote_name:) 
     # This replaces <emote_name:123456789> with :emote_name:
     message_content = re.sub(r'<:(\w+):\d+>', r':\1:', text)
@@ -290,8 +297,6 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
     
     # message_content = f"{ctx.author.display_name} says, " + message_content
 
-    text_channel_name = ctx.channel.name
-    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
 
     if isinstance(ctx, discord.Message):
         message = ctx
