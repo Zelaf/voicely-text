@@ -666,12 +666,28 @@ async def languages(ctx: commands.Context):
 async def accents(ctx: commands.Context):
     """List all the top-level domains available to use for accents."""
 
-    text = f"Supported **top-level domains** include:\n\n"
+    embed_text = []
 
+    this_list = [f"Supported **top-level domains** include:"]
 
     for tld in tld_list_raw:
         tld = tld.strip()
-        text += f"\n- `{tld}` - *{get_country(tld)}*"
+        text = f"- `{tld}` - *{get_country(tld)}*"
+        test_join = "\n".join(this_list)
+        # this_list.append(text)
+        if len(test_join) + len(text) + 1 > 2048:
+            embed_text.append(test_join)
+            this_list = []
+        this_list.append(text)
+
+    if len(this_list) != 0:
+        full_text = "\n".join(this_list)
+        embed_text.append(full_text)
+
+    embeds = []
+    for this_text in embed_text:
+        embed = discord.Embed(description=this_text)
+        embeds.append(embed)
 
     # for x in range(len(tld_list_raw)):
     #     if x < len(tld_list_raw) - 1:
@@ -679,10 +695,10 @@ async def accents(ctx: commands.Context):
     #     else:
     #         text += f"and `{tld_list_raw[x]}`"
 
-    print(len(text))
+    # print(len(text))
 
     embed = discord.Embed(title="Supported **top-level domains**", description=text)
-    await ctx.send(embed=embed, reference=ctx.message, ephemeral=True)
+    await ctx.send(embeds=embeds, reference=ctx.message, ephemeral=True)
 # endregion
 
 # region TTS
