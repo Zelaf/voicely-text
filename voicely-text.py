@@ -307,7 +307,7 @@ async def process_queue(guild: discord.Guild):
                         if len(bot.to_skip[guild_id]) == 0:
                             del bot.to_skip[guild_id]
                     voice_client.stop()
-                    cleanup()
+                    # cleanup()
 
                 print(f"{guild.name}: Audio finished playing")
             else:
