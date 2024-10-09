@@ -596,15 +596,7 @@ class AccentsView2(discord.ui.View):
 # endregion
 
 
-# region information
-# Create a hybrid group
-@bot.hybrid_group()
-async def list(ctx: commands.Context):
-    """List different options."""
-    if ctx.invoked_subcommand is None:
-        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
-
-@bot.command()
+@bot.hybrid_command()
 async def languages(ctx: commands.Context):
     """List all the IETF language tags available to use."""
 
@@ -618,6 +610,14 @@ async def languages(ctx: commands.Context):
     print(len(text))
 
     await ctx.send(text, reference=ctx.message, ephemeral=True)
+# region information
+# Create a hybrid group
+@bot.hybrid_group()
+async def list(ctx: commands.Context):
+    """List different options."""
+    if ctx.invoked_subcommand is None:
+        await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
+
     
 
 @list.command()
