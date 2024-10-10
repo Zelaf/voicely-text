@@ -120,10 +120,7 @@ async def on_ready():
             "queue": asyncio.Queue(),
             "task": bot.loop.create_task(process_queue(guild))
         }
-        bot.loop.create_task(check_empty_channel(guild))
-
-    """ bot.queue_task = bot.loop.create_task(process_queue())
-    bot.loop.create_task(check_empty_channel())  # Start the empty channel check """
+        bot.loop.create_task(check_empty_channel(guild)) # Start the empty channel check
 
     # Print out all registered commands
     print("Registered commands:")
