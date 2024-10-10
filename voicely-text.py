@@ -30,8 +30,8 @@ class Bot(commands.Bot):
         self.run_loop = None
         self.queue = {}
         self.default_settings = {
-            "language": "en",
-            "accent": "com",
+            "accent": "en",
+            "region": "com",
             "autoread": False,
             "timeout": 300
             # "prefix": "!"
@@ -168,7 +168,7 @@ async def on_guild_remove(guild: discord.Guild):
 async def process_queue(guild: discord.Guild):
     while True:
         print(f"{guild.name}: Waiting for the next message in the queue for...")
-        message, text, user, voice_channel, language_override, tld_override = await bot.queue[guild.id]["queue"].get()
+        message, text, user, voice_channel, accent_override, tld_override = await bot.queue[guild.id]["queue"].get()
         guild_id = guild.id
         user_id = user.id
 
@@ -218,34 +218,34 @@ async def process_queue(guild: discord.Guild):
 
         print(f"{guild.name}: Processing message: {text}")
         
-        # region set language and accent
+        # region set accent and region
         user_id_str = str(user_id)
         guild_id_str = str(guild_id)
 
-        if language_override:
-            language = language_override
-        elif user_id_str in members_settings and "language" in members_settings[user_id_str]:
-            language = members_settings[user_id_str]["language"]
-        elif guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
-            language = servers_settings[guild_id_str]["language"]
-        else:
-            language = bot.default_settings["language"]
-
-        if tld_override:
-            accent = tld_override
+        if accent_override:
+            accent = accent_override
         elif user_id_str in members_settings and "accent" in members_settings[user_id_str]:
             accent = members_settings[user_id_str]["accent"]
         elif guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
             accent = servers_settings[guild_id_str]["accent"]
         else:
             accent = bot.default_settings["accent"]
+
+        if tld_override:
+            region = tld_override
+        elif user_id_str in members_settings and "region" in members_settings[user_id_str]:
+            region = members_settings[user_id_str]["region"]
+        elif guild_id_str in servers_settings and "region" in servers_settings[guild_id_str]:
+            region = servers_settings[guild_id_str]["region"]
+        else:
+            region = bot.default_settings["region"]
         
         # endregion
 
         try:
-            requests.get(f"https://translate.google.{accent}")
+            requests.get(f"https://translate.google.{region}")
         except requests.ConnectionError:
-            await message.reply(f"I cannot read your message because `https://translate.google.`**`{accent}`** is currently down. Please run `/set accent` and specify another top-level domain or try again later.\n\nOtherwise, type `/tts stop`, and I will stop reading your messages.")
+            await message.reply(f"I cannot read your message because `https://translate.google.`**`{region}`** is currently down. Please run `/set region` and specify another top-level domain or try again later.\n\nOtherwise, type `/tts stop`, and I will stop reading your messages.")
             # Indicate that the current task is done
             bot.loop.call_soon_threadsafe(bot.queue[guild_id]["queue"].task_done)
             continue
@@ -263,7 +263,7 @@ async def process_queue(guild: discord.Guild):
             # endregion
 
             # Convert the text to speech using gTTS
-            tts = gTTS(text=text, lang=language, tld=accent)
+            tts = gTTS(text=text, lang=accent, tld=region)
             tts.save(f"voice_files/{guild_id}-tts.mp3")
             
             voice_client = guild.voice_client
@@ -320,7 +320,7 @@ async def process_queue(guild: discord.Guild):
 
 # region When a message is sent
 
-async def process_message(ctx: commands.Context | discord.Message, text: str, language: str = None, tld: str = None):
+async def process_message(ctx: commands.Context | discord.Message, text: str, accent: str = None, tld: str = None):
     if ctx.author == bot.user or not ctx.guild:
         return
 
@@ -357,7 +357,7 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, la
 
     if voice_channel:
         # Add the filtered message content to the queue
-        await bot.queue[ctx.guild.id]["queue"].put((message, message_content, ctx.author, voice_channel, language, tld))
+        await bot.queue[ctx.guild.id]["queue"].put((message, message_content, ctx.author, voice_channel, accent, tld))
         print(f"{ctx.guild.name}: Added message to queue for {ctx.author.display_name}: {message_content}")
 
 @bot.event
@@ -458,32 +458,32 @@ def return_int(argument: str):
 
 # endregion
 
-language_desc = "The IETF language tag of the language you will write in. Type 'reset' to set to default."
-language_list_desc = "Type `/list languages` to list the supported language tags"
-tld_desc = "A localized top-level domain from which the accent will be read. Type 'reset' to set to default."
-tld_list_desc = "Type `/list accents` for a list of supported top-level domains."
+accent_desc = "The IETF language tag of the accent I will speak your messages with. Type 'reset' to set to default."
+accent_list_desc = "Type `/list accents` to list the supported language tags."
+tld_desc = "A localized top-level domain of the region from which I will speak. Type 'reset' to set to default."
+tld_list_desc = "Type `/list regions` for a list of supported top-level domains."
     
 class ResponseType(Enum):
     user = "user"
     server = "server"
 
-# region Languages setup
+# region Accents setup
 
-def get_language_response(language: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
+def get_accent_response(accent: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
     # langs = lang.tts_langs()
     if not reset:
         if typeof == ResponseType.user:
-            return f"Your language has been set to **{language}**."
+            return f"Your accent has been set to **{accent}**."
         elif typeof == ResponseType.server and guild is not None:
-            return f"{guild.name}'s server language has been set to **{language}**."
+            return f"{guild.name}'s server accent has been set to **{accent}**."
     else:
         if typeof == ResponseType.user:
-            return f"Your language has been **reset** to the server default: `{language}`"
+            return f"Your accent has been **reset** to the server default: `{accent}`"
         elif typeof == ResponseType.server and guild is not None:
-            return f"{guild.name}'s server language has been **reset** to default: `{language}`"
+            return f"{guild.name}'s server accent has been **reset** to default: `{accent}`"
 
 
-class LanguagesView(discord.ui.View):
+class AccentsView(discord.ui.View):
     def __init__(self, typeof):
         super().__init__()
         self.type = typeof
@@ -505,93 +505,93 @@ class LanguagesView(discord.ui.View):
             options[x].append(discord.SelectOption(label=key, value=key, description=langs[key]))
 
     
-    async def select_language(self, interaction: discord.Interaction, select: discord.ui.Select):
+    async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select):
         langs = lang.tts_langs()
         # user_id = interaction.user.id
         if self.type == "user":
             user_id_str = str(interaction.user.id)
             if user_id_str not in members_settings:
                 members_settings[user_id_str] = {}
-            members_settings[user_id_str]["language"] = select.values[0]
+            members_settings[user_id_str]["accent"] = select.values[0]
             
             save_members_settings()
             
-            return await interaction.response.send_message(get_language_response(langs[select.values[0]], ResponseType.user, False), ephemeral=True)
+            return await interaction.response.send_message(get_accent_response(langs[select.values[0]], ResponseType.user, False), ephemeral=True)
         elif self.type == "server":
             guild = interaction.guild
             guild_id_str = str(guild.id)
             if guild_id_str not in servers_settings:
                 servers_settings[guild_id_str] = {}
-            servers_settings[guild_id_str]["language"] = select.values[0]
+            servers_settings[guild_id_str]["accent"] = select.values[0]
             
             save_servers_settings()
-            return await interaction.response.send_message(get_language_response(langs[select.values[0]], ResponseType.server, False, guild), ephemeral=True)
+            return await interaction.response.send_message(get_accent_response(langs[select.values[0]], ResponseType.server, False, guild), ephemeral=True)
         else:
-            print(f"{interaction.guild.name}: Failed to set server language:\n\t{self.type} is not a valid ResponseType!")
-            return await interaction.response.send_message(f"There was an error setting the server language. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{self.type} is not a valid type!\n```")
+            print(f"{interaction.guild.name}: Failed to set server accent:\n\t{self.type} is not a valid ResponseType!")
+            return await interaction.response.send_message(f"There was an error setting the server accent. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{self.type} is not a valid ResponseType!\n```")
 
 
     @discord.ui.select(placeholder="Language tags af through id", options=options[0])
-    async def select_language_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_language(interaction, select)
+    async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
     
     @discord.ui.select(placeholder="Language tags is through si", options=options[1])
-    async def select_language_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_language(interaction, select)
+    async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
     
     @discord.ui.select(placeholder="Language tags sk through zh", options=options[2])
-    async def select_language_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-        await self.select_language(interaction, select)
+    async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
+        await self.select_accent(interaction, select)
 
 # endregion
 
-# region Accents setup
+# region Regions setup
 
-def accent_embed(typeof: ResponseType, guild: discord.Guild = None):
+def region_embed(typeof: ResponseType, guild: discord.Guild = None):
     if typeof == ResponseType.user:
-        return discord.Embed(title="Set your preferred accent", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
+        return discord.Embed(title="Set your preferred region", description='Choose one **top-level domain** from the series of dropdowns below.\n\nI will read your messages as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
     elif typeof == ResponseType.server and guild is not None:
-        return discord.Embed(title=f"Set {guild.name}'s accent", description='Choose one **top-level domain** from the series of dropdowns below to set the server default.\n\nI will read messages in your server as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
+        return discord.Embed(title=f"Set {guild.name}'s region", description='Choose one **top-level domain** from the series of dropdowns below to set the server default.\n\nI will read messages in your server as though I am from a region that uses that domain.\n\nDomains are sorted **alphabetically**.')
     else:
-        print("Error getting accent_embed")
+        print("Error getting region_embed")
 
-def get_accent_response(tld: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
+def get_region_response(tld: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
     display_tld = f"`{tld}` - *{get_country(tld)}*"
     if not reset:
         if typeof == ResponseType.user:
-            return f"Your accent's **top-level domain** has been set to {display_tld}."
+            return f"Your region's **top-level domain** has been set to {display_tld}."
         elif typeof == ResponseType.server and guild is not None:
-            return f"The **top-level domain** for {guild.name}'s accent has been set to {display_tld}."
+            return f"The **top-level domain** for {guild.name}'s region has been set to {display_tld}."
     else:
         if typeof == ResponseType.user:
-            return f"Your accent's **top-level domain** has been reset to the server default: {display_tld}"
+            return f"Your region's **top-level domain** has been reset to the server default: {display_tld}"
         elif typeof == ResponseType.server and guild is not None:
-            return f"The **top-level domain** for {guild.name}'s accent has been reset to default: {display_tld}"
+            return f"The **top-level domain** for {guild.name}'s region has been reset to default: {display_tld}"
 
 
-async def select_accent(self, interaction: discord.Interaction, select: discord.ui.Select, typeof: ResponseType):
+async def select_region(self, interaction: discord.Interaction, select: discord.ui.Select, typeof: ResponseType):
     if typeof == ResponseType.user:
         user_id_str = str(interaction.user.id)
         if user_id_str not in members_settings:
             members_settings[user_id_str] = {}
-        members_settings[user_id_str]["accent"] = select.values[0]
+        members_settings[user_id_str]["region"] = select.values[0]
 
         save_members_settings()
 
-        return await interaction.response.send_message(get_accent_response(select.values[0], ResponseType.user, False), ephemeral=True)
+        return await interaction.response.send_message(get_region_response(select.values[0], ResponseType.user, False), ephemeral=True)
     elif typeof == ResponseType.server:
         guild = interaction.guild
         guild_id_str = str(guild.id)
         if guild_id_str not in servers_settings:
             servers_settings[guild_id_str] = {}
-        servers_settings[guild_id_str]["accent"] = select.values[0]
+        servers_settings[guild_id_str]["region"] = select.values[0]
         
         save_servers_settings()
         
-        return await interaction.response.send_message(get_accent_response(select.values[0], ResponseType.server, False, guild), ephemeral=True)
+        return await interaction.response.send_message(get_region_response(select.values[0], ResponseType.server, False, guild), ephemeral=True)
     else:
-        print(f"{interaction.guild.name}: Failed to set server accent:\n\t{typeof} is not a valid type!")
-        return await interaction.response.send_message(f"There was an error setting the server accent. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{typeof} is not a valid type!\n```")
+        print(f"{interaction.guild.name}: Failed to set server region:\n\t{typeof} is not a valid type!")
+        return await interaction.response.send_message(f"There was an error setting the server region. Please create an [issue](https://github.com/Erallie/voicely-text/issues) and include the following error:\n\n```\n{typeof} is not a valid ResponseType!\n```")
 
 # region tld mappings
 def tld_get_countries():
@@ -637,7 +637,7 @@ def get_tld_list():
 
         return tld_list
     else:
-        print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for accents!")
+        print("\nError: You should restart the bot because I was unable to fetch https://www.google.com/supported_domains for regions!")
         return []
 
 tld_list_raw = get_tld_list()
@@ -661,58 +661,58 @@ tld_list = get_tlds()
 # endregion
 
 # region views
-class AccentsView1(discord.ui.View):
+class RegionsView1(discord.ui.View):
     def __init__(self, typeof: ResponseType):
         super().__init__()
         self.type = typeof
         
     if len(tld_list) > 3:
         @discord.ui.select(placeholder="Domains .ad through .cm", options=tld_list[0])
-        async def select_accent_1(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_1(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .cn through .co.zw", options=tld_list[1])
-        async def select_accent_2(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_2(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .com through .com.kh", options=tld_list[2])
-        async def select_accent_3(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_3(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .com.kw through .com.sv", options=tld_list[3])
-        async def select_accent_4(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_4(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         if len(tld_list) > 4:
             @discord.ui.button(label="Next page")
             async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-                await interaction.response.send_message(embed=accent_embed(self.type, interaction.guild), view=AccentsView2(self.type), ephemeral=True)
+                await interaction.response.send_message(embed=region_embed(self.type, interaction.guild), view=RegionsView2(self.type), ephemeral=True)
 
-class AccentsView2(discord.ui.View):
+class RegionsView2(discord.ui.View):
     def __init__(self, typeof: ResponseType):
         super().__init__()
         self.type = typeof
     
     if len(tld_list) > 7:
         @discord.ui.select(placeholder="Domains .com.tj through .gr", options=tld_list[4])
-        async def select_accent_5(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_5(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .gy through .mk", options=tld_list[5])
-        async def select_accent_6(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_6(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .ml through .sn", options=tld_list[6])
-        async def select_accent_7(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_7(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         @discord.ui.select(placeholder="Domains .so through .ws", options=tld_list[7])
-        async def select_accent_8(self, interaction: discord.Interaction, select: discord.ui.Select):
-            await select_accent(self, interaction, select, self.type)
+        async def select_region_8(self, interaction: discord.Interaction, select: discord.ui.Select):
+            await select_region(self, interaction, select, self.type)
 
         @discord.ui.button(label="Previous page")
         async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(embed=accent_embed(self.type, interaction.guild), view=AccentsView1(self.type), ephemeral=True)
+            await interaction.response.send_message(embed=region_embed(self.type, interaction.guild), view=RegionsView1(self.type), ephemeral=True)
 # endregion
 
 # endregion
@@ -726,13 +726,13 @@ async def list(ctx: commands.Context):
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
 @list.command()
-async def languages(ctx: commands.Context):
-    """List all the IETF language tags available to use."""
+async def accents(ctx: commands.Context):
+    """List the IETF language tags of all the accents available to use."""
 
     langs = lang.tts_langs()
     keys = builtins.list(langs.keys())
 
-    text = f"## Supported **IETF language tags**:"
+    text = f"## Supported IETF language tags:"
     for key in keys:
         text += f"\n- `{key}` - *{langs[key]}*"
 
@@ -744,12 +744,12 @@ async def languages(ctx: commands.Context):
     
 
 @list.command()
-async def accents(ctx: commands.Context):
-    """List all the top-level domains available to use for accents."""
+async def regions(ctx: commands.Context):
+    """List the top-level domains of all the regions available to use."""
 
     embed_text = []
 
-    this_list = [f"## Supported **top-level domains**:"]
+    this_list = [f"## Supported top-level domains:"]
 
     for tld in tld_list_raw:
         tld = tld.strip()
@@ -828,7 +828,7 @@ async def stop(ctx: commands.Context):
 
     if user_id in bot.members_to_read:
         bot.members_to_read.remove(user_id)
-        await ctx.send('I am no longer reading your messages. Type `/tts start` to have me read your messages again, or type `/tts speak [your message]` to have me read a single message with optional language and accent overrides.', reference=ctx.message, ephemeral=True)
+        await ctx.send('I am no longer reading your messages. Type `/tts start` to have me read your messages again, or type `/tts speak [your message]` to have me read a single message with optional accent and region overrides.', reference=ctx.message, ephemeral=True)
     else:
         await ctx.send('I already not reading your messages.', reference=ctx.message, ephemeral=True)
 
@@ -837,9 +837,9 @@ async def stop(ctx: commands.Context):
 # region speak
 
 @tts.command()
-@app_commands.describe(text="The text you want me to speak.", language=language_desc, tld=tld_desc)
-async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_lower = None):
-    """Speak a single message with optional language and accent overrides."""
+@app_commands.describe(text="The text you want me to speak.", accent=accent_desc, tld=tld_desc)
+async def speak(ctx: commands.Context, text: str, accent: str = None, tld: to_lower = None):
+    """Speak a single message with optional accent and region overrides."""
     
     text_channel_name = ctx.channel.name
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
@@ -849,19 +849,19 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
     
     errors = []
 
-    if language:
+    if accent:
         langs = lang.tts_langs()
         
-        if language not in langs:
-            errors.append(f"`{language}` is not a valid IETF language tag! Type `/list languages` for a list of supported language tags.")
+        if accent not in langs:
+            errors.append(f"`{accent}` is not a valid IETF language tag! {accent_list_desc}")
             
-            language = None
+            accent = None
         
     if tld:
         try:
             requests.get(f"https://translate.google.{tld}")
         except requests.ConnectionError:
-            errors.append(f"I cannot retrieve your desired accent because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another **top-level domain** or try again later. Type `/list accents` for a list of supported top-level domains. Otherwise, leave `tld` blank to use your default accent.")
+            errors.append(f"I cannot retrieve your desired region because `https://translate.google.`**`{tld}`** is currently down or does not exist. Please specify another **top-level domain** or try again later. Type `/list regions` for a list of supported top-level domains. Otherwise, leave `tld` blank to use your default region.")
             tld = None
             
     if len(errors) != 0:
@@ -876,7 +876,7 @@ async def speak(ctx: commands.Context, text: str, language: str = None, tld: to_
 
         await ctx.send(final_error, reference=ctx.message, ephemeral=True)
     else:
-        await process_message(ctx, text, language, tld)
+        await process_message(ctx, text, accent, tld)
         if ctx.interaction is not None:
             await ctx.send(f"**{ctx.author.display_name}:** {text}")
 
@@ -985,65 +985,17 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 
 # endregion
 
-# region Languages
+# region Accents
 
 @set.command()
-@app_commands.describe(tag=language_desc)
-async def language(ctx: commands.Context, tag: str = None):
-    """Set the language you want me to read your messages in."""
+@app_commands.describe(tag=accent_desc)
+async def accent(ctx: commands.Context, tag: str = None):
+    """Set the accent you want me to read your messages in."""
 
     if tag:
         langs = lang.tts_langs()
 
         if tag == 'reset':
-            user_id_str = str(ctx.author.id)
-            if user_id_str in members_settings and "language" in members_settings[user_id_str]:
-                del members_settings[user_id_str]["language"]
-                if len(members_settings[user_id_str]) == 0:
-                    del members_settings[user_id_str]
-            
-            guild_id_str = str(ctx.guild.id)
-            
-            if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
-                default = servers_settings[guild_id_str]["language"]
-            else:
-                default = bot.default_settings["language"]
-            
-            save_members_settings()
-
-            await ctx.send(get_language_response(langs[default], ResponseType.user, True), reference=ctx.message, ephemeral=True)
-            return
-
-
-        if tag in langs:
-            user_id_str = str(ctx.author.id)
-            if user_id_str not in members_settings:
-                members_settings[user_id_str] = {}
-            members_settings[user_id_str]["language"] = tag
-
-            save_members_settings()
-            
-            await ctx.send(get_language_response(langs[tag], ResponseType.user, False), reference=ctx.message, ephemeral=True)
-        else:
-            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set language` without arguments to generate dropdowns to choose from."
-            
-            await ctx.send(language_error, reference=ctx.message, ephemeral=True)
-    else:
-        embed = discord.Embed(title="Set your preferred language", description='Choose from the dropdown below to have me read your messages in that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
-
-        await ctx.send(embed=embed, view=LanguagesView("user"), reference=ctx.message, ephemeral=True)
-
-# endregion
-
-# region Accents
-
-@set.command()
-@app_commands.describe(tld=tld_desc)
-async def accent(ctx: commands.Context, tld: to_lower = None):
-    """Set the accent you want me to read your messages in."""
-
-    if tld:
-        if tld == 'reset':
             user_id_str = str(ctx.author.id)
             if user_id_str in members_settings and "accent" in members_settings[user_id_str]:
                 del members_settings[user_id_str]["accent"]
@@ -1051,29 +1003,77 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
                     del members_settings[user_id_str]
             
             guild_id_str = str(ctx.guild.id)
+            
             if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
                 default = servers_settings[guild_id_str]["accent"]
             else:
                 default = bot.default_settings["accent"]
             
             save_members_settings()
+
+            await ctx.send(get_accent_response(langs[default], ResponseType.user, True), reference=ctx.message, ephemeral=True)
+            return
+
+
+        if tag in langs:
+            user_id_str = str(ctx.author.id)
+            if user_id_str not in members_settings:
+                members_settings[user_id_str] = {}
+            members_settings[user_id_str]["accent"] = tag
+
+            save_members_settings()
             
-            await ctx.send(get_accent_response(default, ResponseType.user, True), reference=ctx.message, ephemeral=True)
+            await ctx.send(get_accent_response(langs[tag], ResponseType.user, False), reference=ctx.message, ephemeral=True)
+        else:
+            accent_error = f"`{tag}` is not a valid IETF language tag! {accent_list_desc}\n\n Alternatively, rerun `/set accent` without arguments to generate dropdowns to choose from."
+            
+            await ctx.send(accent_error, reference=ctx.message, ephemeral=True)
+    else:
+        embed = discord.Embed(title="Set your preferred accent", description='Choose from the dropdown below to have me read your messages in that accent.\n\nAccents are sorted **alphabetically** by **IETF language tag**.')
+
+        await ctx.send(embed=embed, view=AccentsView("user"), reference=ctx.message, ephemeral=True)
+
+# endregion
+
+# region Regions
+
+@set.command()
+@app_commands.describe(tld=tld_desc)
+async def region(ctx: commands.Context, tld: to_lower = None):
+    """Set the region you want me to read your messages in."""
+
+    if tld:
+        if tld == 'reset':
+            user_id_str = str(ctx.author.id)
+            if user_id_str in members_settings and "region" in members_settings[user_id_str]:
+                del members_settings[user_id_str]["region"]
+                if len(members_settings[user_id_str]) == 0:
+                    del members_settings[user_id_str]
+            
+            guild_id_str = str(ctx.guild.id)
+            if guild_id_str in servers_settings and "region" in servers_settings[guild_id_str]:
+                default = servers_settings[guild_id_str]["region"]
+            else:
+                default = bot.default_settings["region"]
+            
+            save_members_settings()
+            
+            await ctx.send(get_region_response(default, ResponseType.user, True), reference=ctx.message, ephemeral=True)
             return
         
         if tld not in tld_list_raw:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n{tld_list_desc}\n\nAlternatively, rerun `/set accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n{tld_list_desc}\n\nAlternatively, rerun `/set region` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
             return
 
         user_id_str = str(ctx.author.id)
         if user_id_str not in members_settings:
             members_settings[user_id_str] = {}
-        members_settings[user_id_str]["accent"] = tld
+        members_settings[user_id_str]["region"] = tld
         
         save_members_settings()
-        await ctx.send(get_accent_response(tld, ResponseType.user, False), reference=ctx.message, ephemeral=True)
+        await ctx.send(get_region_response(tld, ResponseType.user, False), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
-        await ctx.send(embed=accent_embed(ResponseType.user), view=AccentsView1(ResponseType.user), reference=ctx.message, ephemeral=True)
+        await ctx.send(embed=region_embed(ResponseType.user), view=RegionsView1(ResponseType.user), reference=ctx.message, ephemeral=True)
     else:
         await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
@@ -1121,11 +1121,11 @@ async def server(ctx: commands.Context):
 #         bot.command_prefix = 
 #         save_servers_settings()
         
-#         await ctx.send(f"{guild.name}'s server language has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
+#         await ctx.send(f"{guild.name}'s server accent has been set to **{langs[tag]}**.", reference=ctx.message, ephemeral=True)
 #     else:
-#         language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set server language` without arguments to generate dropdowns to choose from."
+#         accent_error = f"`{tag}` is not a valid IETF language tag! {accent_list_desc}\n\n Alternatively, rerun `/set server accent` without arguments to generate dropdowns to choose from."
         
-#         await ctx.send(language_error, reference=ctx.message, ephemeral=True)
+#         await ctx.send(accent_error, reference=ctx.message, ephemeral=True)
 # endregion
 
 # region Timeout
@@ -1167,13 +1167,13 @@ async def timeout(ctx: commands.Context, seconds: return_int):
 
 # endregion
 
-# region Languages
+# region Accents
 
 @server.command()
 @commands.has_guild_permissions(administrator=True)
-@app_commands.describe(tag=language_desc)
-async def language(ctx: commands.Context, tag = None):
-    """Set the default language for the server. This can be overridden on a per-user basis."""
+@app_commands.describe(tag=accent_desc)
+async def accent(ctx: commands.Context, tag = None):
+    """Set the default accent for the server. This can be overridden on a per-user basis."""
     
     guild = ctx.guild
 
@@ -1181,50 +1181,6 @@ async def language(ctx: commands.Context, tag = None):
         guild_id_str = str(guild.id)
         langs = lang.tts_langs()
         if tag == 'reset':
-            if guild_id_str in servers_settings and "language" in servers_settings[guild_id_str]:
-                del servers_settings[guild_id_str]["language"]
-                if len(servers_settings[guild_id_str]) == 0:
-                    del servers_settings[guild_id_str]
-            
-            default = bot.default_settings["language"]
-            
-            save_servers_settings()
-
-            await ctx.send(get_language_response(langs[default], ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
-            return
-
-        if tag in langs:
-            if guild_id_str not in servers_settings:
-                servers_settings[guild_id_str] = {}
-            servers_settings[guild_id_str]["language"] = tag
-
-            save_servers_settings()
-            
-            await ctx.send(get_language_response(langs[tag], ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
-        else:
-            language_error = f"`{tag}` is not a valid IETF language tag! {language_list_desc}.\n\n Alternatively, rerun `/set server language` without arguments to generate dropdowns to choose from."
-            
-            await ctx.send(language_error, reference=ctx.message, ephemeral=True)
-    else:
-        embed = discord.Embed(title=f"Set {guild.name}'s language", description='Choose from the dropdown below to set the server default to that language.\n\nLanguages are sorted **alphabetically** by **IETF language tag**.')
-
-        await ctx.send(embed=embed, view=LanguagesView("server"), reference=ctx.message, ephemeral=True)
-
-# endregion
-
-# region Accents
-
-@server.command()
-@commands.has_guild_permissions(administrator=True)
-@app_commands.describe(tld=tld_desc)
-async def accent(ctx: commands.Context, tld: to_lower = None):
-    """Set the default accent for the server. This can be overridden on a per-user basis."""
-
-    guild = ctx.guild
-
-    if tld:
-        guild_id_str = str(guild.id)
-        if tld == 'reset':
             if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
                 del servers_settings[guild_id_str]["accent"]
                 if len(servers_settings[guild_id_str]) == 0:
@@ -1233,22 +1189,66 @@ async def accent(ctx: commands.Context, tld: to_lower = None):
             default = bot.default_settings["accent"]
             
             save_servers_settings()
+
+            await ctx.send(get_accent_response(langs[default], ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
+            return
+
+        if tag in langs:
+            if guild_id_str not in servers_settings:
+                servers_settings[guild_id_str] = {}
+            servers_settings[guild_id_str]["accent"] = tag
+
+            save_servers_settings()
             
-            await ctx.send(get_accent_response(default, ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
+            await ctx.send(get_accent_response(langs[tag], ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
+        else:
+            accent_error = f"`{tag}` is not a valid IETF language tag! {accent_list_desc}\n\n Alternatively, rerun `/set server accent` without arguments to generate dropdowns to choose from."
+            
+            await ctx.send(accent_error, reference=ctx.message, ephemeral=True)
+    else:
+        embed = discord.Embed(title=f"Set {guild.name}'s accent", description='Choose from the dropdown below to set the server default to that accent.\n\nAccents are sorted **alphabetically** by **IETF language tag**.')
+
+        await ctx.send(embed=embed, view=AccentsView("server"), reference=ctx.message, ephemeral=True)
+
+# endregion
+
+# region Regions
+
+@server.command()
+@commands.has_guild_permissions(administrator=True)
+@app_commands.describe(tld=tld_desc)
+async def region(ctx: commands.Context, tld: to_lower = None):
+    """Set the default region for the server. This can be overridden on a per-user basis."""
+
+    guild = ctx.guild
+
+    if tld:
+        guild_id_str = str(guild.id)
+        if tld == 'reset':
+            if guild_id_str in servers_settings and "region" in servers_settings[guild_id_str]:
+                del servers_settings[guild_id_str]["region"]
+                if len(servers_settings[guild_id_str]) == 0:
+                    del servers_settings[guild_id_str]
+            
+            default = bot.default_settings["region"]
+            
+            save_servers_settings()
+            
+            await ctx.send(get_region_response(default, ResponseType.server, True, guild), reference=ctx.message, ephemeral=True)
             return
         
         if tld not in tld_list_raw:
-            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n{tld_list_desc}\n\nAlternatively, rerun `/set server accent` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
+            await ctx.send(f"`{tld}` is not a valid top-level domain!\n\n{tld_list_desc}\n\nAlternatively, rerun `/set server region` without arguments to generate dropdowns to choose from.", ephemeral=True, reference=ctx.message, suppress_embeds=True)
             return
 
         if guild_id_str not in servers_settings:
             servers_settings[guild_id_str] = {}
-        servers_settings[guild_id_str]["accent"] = tld
+        servers_settings[guild_id_str]["region"] = tld
         
         save_servers_settings()
-        await ctx.send(get_accent_response(tld, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
+        await ctx.send(get_region_response(tld, ResponseType.server, False, guild), reference=ctx.message, ephemeral=True)
     elif len(tld_list) != 0:
-        await ctx.send(embed=accent_embed(ResponseType.server, guild), view=AccentsView1(ResponseType.server), reference=ctx.message, ephemeral=True)
+        await ctx.send(embed=region_embed(ResponseType.server, guild), view=RegionsView1(ResponseType.server), reference=ctx.message, ephemeral=True)
     else:
         await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
