@@ -614,13 +614,15 @@ def tld_get_countries():
 tld_countries = tld_get_countries()
 
 
-def get_country(tld):
+def get_country(tld: str):
     start = tld.rfind('.')
     if start != -1:
         tld = tld[start:]
     else:
         tld = "." + tld
-    return str(tld_countries.get(tld)).strip()
+    country = str(tld_countries.get(tld))
+    country = re.sub(r"\[\d+]", "", country)
+    return country.strip()
 
 # endregion
 
