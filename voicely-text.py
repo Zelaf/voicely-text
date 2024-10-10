@@ -111,6 +111,8 @@ def save_servers_settings():
 # endregion
 
 # region bot events
+
+# region on ready
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
@@ -126,7 +128,9 @@ async def on_ready():
     print("Registered commands:")
     for command in bot.tree.get_commands():
         print(f"- /{command.name}")
+# endregion
 
+# region on guild join
 @bot.event
 async def on_guild_join(guild: discord.Guild):
     if not guild.id in bot.queue:
@@ -142,6 +146,9 @@ async def on_guild_join(guild: discord.Guild):
 
     print(f"Bot added to guild: {guild.name}")
 
+# endregion
+
+# region on guild remove
 @bot.event
 async def on_guild_remove(guild: discord.Guild):
     if guild.id in bot.queue:
@@ -156,7 +163,7 @@ async def on_guild_remove(guild: discord.Guild):
 
         print(f"Bot removed from guild: {guild.name}")
 
-
+# endregion
 
 async def process_queue(guild: discord.Guild):
     while True:
@@ -395,7 +402,7 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
 
 # endregion
 
-# region Leave voice channel when empty
+# region Leave empty channel
 # Check if the bot is alone in the voice channel and disconnect if empty
 async def check_empty_channel(guild: discord.Guild):
     """Periodically check if the bot is alone in the voice channel and disconnect."""
