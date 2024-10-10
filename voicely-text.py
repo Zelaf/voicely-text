@@ -427,9 +427,9 @@ async def leave_after_timeout(guild: discord.Guild):
         
         print(f'Timeout set for {guild.name}.')
         await asyncio.sleep(timeout)
-        
-        await guild.voice_client.disconnect()
-        print(f'Disconnected from {guild.name} due to timeout.')
+        if guild.voice_client:
+            await guild.voice_client.disconnect()
+            print(f'Disconnected from {guild.name} due to timeout.')
     except asyncio.CancelledError:
         print(f'Timeout cancelled for {guild.name}')
 
