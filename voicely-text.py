@@ -1031,7 +1031,7 @@ async def accent(ctx: commands.Context, tag: str = None):
             
             await ctx.send(accent_error, reference=ctx.message, ephemeral=True)
     else:
-        embed = discord.Embed(title="Set your preferred accent", description='Choose from the dropdown below to have me read your messages in that accent.\n\nAccents are sorted **alphabetically** by **IETF language tag**.')
+        embed = discord.Embed(title="Set your preferred accent", description='Choose from the dropdown below to have me read your messages in that accent.\n\nAccents are sorted **alphabetically** by **IETF language tag**.\n\nIf your region\'s accent is not listed below, you may need to run `/set region` to set your region.')
 
         await ctx.send(embed=embed, view=AccentsView("user"), reference=ctx.message, ephemeral=True)
 
@@ -1208,7 +1208,7 @@ async def accent(ctx: commands.Context, tag = None):
             
             await ctx.send(accent_error, reference=ctx.message, ephemeral=True)
     else:
-        embed = discord.Embed(title=f"Set {guild.name}'s accent", description='Choose from the dropdown below to set the server default to that accent.\n\nAccents are sorted **alphabetically** by **IETF language tag**.')
+        embed = discord.Embed(title=f"Set {guild.name}'s accent", description='Choose from the dropdown below to set the server default to that accent.\n\nAccents are sorted **alphabetically** by **IETF language tag**.\n\nIf your region\'s accent is not listed below, you may need to run `/set server region` to set the server region.')
 
         await ctx.send(embed=embed, view=AccentsView("server"), reference=ctx.message, ephemeral=True)
 
