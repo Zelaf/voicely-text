@@ -13,6 +13,7 @@ import json
 import builtins
 from bs4 import BeautifulSoup
 from enum import Enum
+from typing import List
 # import signal
 
 # Define intents
@@ -491,7 +492,7 @@ class AccentsView(discord.ui.View):
     langs = lang.tts_langs()
     keys = list(langs.keys())
     
-    options = []
+    options: List[List[discord.SelectOption]] = []
     
     select_count = math.ceil(len(langs) / 25)
 
@@ -645,7 +646,7 @@ def get_tld_list():
 tld_list_raw = get_tld_list()
 
 def get_tlds():
-    options = []
+    options: List[List[discord.SelectOption]] = []
     
     select_count = math.ceil(len(tld_list_raw) / 25)
 
@@ -749,7 +750,7 @@ async def accents(ctx: commands.Context):
 async def regions(ctx: commands.Context):
     """List the top-level domains of all the regions available to use."""
 
-    embed_text = []
+    embed_text: List[str] = []
 
     this_list = [f"## Supported top-level domains:"]
 
@@ -760,14 +761,14 @@ async def regions(ctx: commands.Context):
         # this_list.append(text)
         if len(test_join) + len(text) + 1 > 2048:
             embed_text.append(test_join)
-            this_list = []
+            this_list: List[str] = []
         this_list.append(text)
 
     if len(this_list) != 0:
         full_text = "\n".join(this_list)
         embed_text.append(full_text)
 
-    embeds = []
+    embeds: List[discord.Embed] = []
     for this_text in embed_text:
         embed = discord.Embed(description=this_text)
         embeds.append(embed)
@@ -849,7 +850,7 @@ async def speak(ctx: commands.Context, text: str, accent: str = None, tld: to_lo
         await ctx.send("You can only use this command in a voice channel's text chat.", reference=ctx.message, ephemeral=True)
         return
     
-    errors = []
+    errors: List[str] = []
 
     if accent:
         langs = lang.tts_langs()
