@@ -16,7 +16,5 @@ If you don't want the bot to read *all* of your messages, but just want it to **
 ## Skipping messages
 If you want to **skip speaking messages** you may have already sent or are about to send, type `/tts skip`, with an optional `count` being the number of messages you want to skip.
 - If one of your messages is currently being read, the currently spoken message will be included in the `count`.
-# Early development
-This bot is still in early development, and I still need to fix up some things and add a few more settings, but the bot is completely useable in this state! Feel free to invite it to any of your servers, and just remember that things may change in the future!
-
-If any of you have an issue with the bot, please create an [issue](https://github.com/Erallie/voicely-text/issues), and I will address it to the best of my ability!
+# Support
+If you have any problems with the bot, please create an [issue](https://github.com/Erallie/voicely-text/issues), and I will address it to the best of my ability!
