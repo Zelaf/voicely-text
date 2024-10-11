@@ -7,7 +7,7 @@ Voicely Text is another text-to-speech bot for Discord, but instead of linking t
 If you are in a voice channel, and you want the bot to **read your messages**, type `/tts start` in the associated text chat. All of the messages you send in that channel will be read by Voicely Text until you either run `/tts stop` or leave the voice channel.
 ## Autoread
 If you would like the bot to **automatically read your messages** whenever you join a voice channel without needing to run the `/tts start` command, type the command `/set autoread` and set `enabled` to `true`, and whenever you join a voice channel, it will automatically read your messages from the associated text chat.
-## Set your language and accent
+## Set your accent and region
 You can also set the **accent** and the **region** that the bot will read your messages in by typing `/set accent` and `/set region`. Typing either of these commands *without parameters* will display a collection of dropdowns for you to choose from.
 - If you're from the UK, you can make the bot read your messages in a British accent by setting the `tag` to `en` *(English)* when running `/set accent` and setting the `tld` to `co.uk` when running `/set region`.
 ## Text-to-speech override
