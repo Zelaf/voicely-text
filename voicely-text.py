@@ -468,7 +468,7 @@ class ResponseType(Enum):
     user = "user"
     server = "server"
 
-def is_in_guild(interaction: discord.Interaction) -> bool:
+def is_in_guild(interaction: discord.Interaction | commands.Context) -> bool:
     return interaction.guild is not None
 
 # region Accents setup
