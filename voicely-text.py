@@ -1032,13 +1032,12 @@ async def accent(ctx: commands.Context, tag: str = None):
             save_members_settings()
 
             guild = ctx.guild
-            print(str(guild))
             if guild is not None:
                 guild_id_str = str(guild.id)
                 if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
-                    default = f": `{servers_settings[guild_id_str]["accent"]}`"
+                    default = f": `{servers_settings[guild_id_str]['accent']}`"
                 else:
-                    default = bot.default_settings["accent"]
+                    default = f": `{bot.default_settings['accent']}`"
 
                 this_lang = langs[default]
             else:
