@@ -723,6 +723,7 @@ class RegionsView2(discord.ui.View):
 # region information
 # Create a hybrid group
 @bot.hybrid_group()
+@app_commands.allowed_installs(guilds=True, users=True)
 async def list(ctx: commands.Context):
     """List different options."""
     if ctx.invoked_subcommand is None:
@@ -787,6 +788,7 @@ async def regions(ctx: commands.Context):
 
 # region TTS
 @bot.hybrid_group()
+@app_commands.allowed_installs(guilds=True, users=False)
 async def tts(ctx: commands.Context):
     """Toggle or trigger text-to-speech"""
     if ctx.invoked_subcommand is None:
@@ -941,6 +943,7 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 
 # Create a hybrid group for 'settings' commands
 @bot.hybrid_group()
+@app_commands.allowed_installs(guilds=True, users=True)
 async def set(ctx: commands.Context):
     """Settings for the bot."""
     if ctx.invoked_subcommand is None:
@@ -1088,6 +1091,7 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # Create a hybrid group for 'settings' commands
 @set.group()
+@app_commands.allowed_installs(guilds=True, users=False)
 async def server(ctx: commands.Context):
     """Settings that apply to the entire server. Can be overridden by user settings."""
     if ctx.invoked_subcommand is None:
@@ -1303,6 +1307,7 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 
 # Create a hybrid group for 'settings' commands
 @bot.hybrid_group()
+@app_commands.allowed_installs(guilds=True, users=False)
 async def admin(ctx: commands.Context):
     """Admin commands"""
     if ctx.invoked_subcommand is None:
