@@ -1134,7 +1134,7 @@ async def server(ctx: commands.Context):
 
 # region Botprefix
 # @server.command()
-# @app_commands.default_permissions(administrator=True)
+# @commands.has_permissions(administrator=True)
 # @app_commands.describe(prefix="One or more characters to be used as a prefix. Type 'reset' to set to default.")
 # async def botprefix(ctx: commands.Context, prefix: return_stripped):
 #     """Set the prefix used to run bot commands."""
@@ -1173,7 +1173,7 @@ async def server(ctx: commands.Context):
 # region Timeout
 @server.command()
 @app_commands.allowed_installs(guilds=True, users=False)
-@app_commands.default_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
 async def timeout(ctx: commands.Context, seconds: return_int):
     """Set the number of seconds of inactivity after which the bot will leave the voice channel."""
@@ -1214,7 +1214,7 @@ async def timeout(ctx: commands.Context, seconds: return_int):
 
 @server.command()
 @app_commands.allowed_installs(guilds=True, users=False)
-@app_commands.default_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 @app_commands.describe(tag=accent_desc)
 async def accent(ctx: commands.Context, tag = None):
     """Set the default accent for the server. This can be overridden on a per-user basis."""
@@ -1260,7 +1260,7 @@ async def accent(ctx: commands.Context, tag = None):
 
 @server.command()
 @app_commands.allowed_installs(guilds=True, users=False)
-@app_commands.default_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 @app_commands.describe(tld=tld_desc)
 async def region(ctx: commands.Context, tld: to_lower = None):
     """Set the default region for the server. This can be overridden on a per-user basis."""
@@ -1302,7 +1302,7 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 # region autoread
 @server.command()
 @app_commands.allowed_installs(guilds=True, users=False)
-@app_commands.default_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 @app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
 async def autoread(ctx: commands.Context, enabled: to_lower):
     """Set the autoread default for the server."""
@@ -1356,7 +1356,7 @@ async def admin(ctx: commands.Context):
 # region Leave
 @admin.command()
 @app_commands.allowed_installs(guilds=True, users=False)
-@app_commands.default_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
     if ctx.voice_client:
@@ -1371,7 +1371,7 @@ async def leave(ctx: commands.Context):
 
 @admin.command()
 @app_commands.allowed_installs(guilds=True, users=False)
-@app_commands.default_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 @app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
 async def skip(ctx: commands.Context, count: return_int = 1):
     """Skip the next message(s) in this channel. This includes currently playing or sent messages."""
