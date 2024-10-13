@@ -1032,6 +1032,7 @@ async def accent(ctx: commands.Context, tag: str = None):
             save_members_settings()
 
             guild = ctx.guild
+            print(str(guild))
             if guild is not None:
                 guild_id_str = str(guild.id)
                 if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
