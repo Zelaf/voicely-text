@@ -468,6 +468,9 @@ class ResponseType(Enum):
     user = "user"
     server = "server"
 
+def is_in_guild(interaction: discord.Interaction) -> bool:
+    return interaction.guild is not None
+
 # region Accents setup
 
 def get_accent_response(accent: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
@@ -731,14 +734,12 @@ class RegionsView2(discord.ui.View):
 # region information
 # Create a hybrid group
 @bot.hybrid_group()
-@app_commands.allowed_installs(guilds=True, users=True)
 async def list(ctx: commands.Context):
     """List different options."""
     if ctx.invoked_subcommand is None:
         await ctx.send(f"{ctx.invoked_subcommand} is not a valid subcommand.", reference=ctx.message, ephemeral=True)
 
 @list.command()
-@app_commands.allowed_installs(guilds=True, users=True)
 async def accents(ctx: commands.Context):
     """List the IETF language tags of all the accents available to use."""
 
@@ -757,7 +758,6 @@ async def accents(ctx: commands.Context):
     
 
 @list.command()
-@app_commands.allowed_installs(guilds=True, users=True)
 async def regions(ctx: commands.Context):
     """List the top-level domains of all the regions available to use."""
 
@@ -798,7 +798,8 @@ async def regions(ctx: commands.Context):
 
 # region TTS
 @bot.hybrid_group()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 async def tts(ctx: commands.Context):
     """Toggle or trigger text-to-speech"""
     if ctx.invoked_subcommand is None:
@@ -806,7 +807,8 @@ async def tts(ctx: commands.Context):
 
 # region start
 @tts.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 async def start(ctx: commands.Context):
     """Make me start reading your text."""
 
@@ -830,7 +832,8 @@ async def start(ctx: commands.Context):
 #region stop
     
 @tts.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 async def stop(ctx: commands.Context):
     """Make me stop reading your text."""
 
@@ -854,7 +857,8 @@ async def stop(ctx: commands.Context):
 # region speak
 
 @tts.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @app_commands.describe(text="The text you want me to speak.", accent=accent_desc, tld=tld_desc)
 async def speak(ctx: commands.Context, text: str, accent: str = None, tld: to_lower = None):
     """Speak a single message with optional accent and region overrides."""
@@ -903,7 +907,8 @@ async def speak(ctx: commands.Context, text: str, accent: str = None, tld: to_lo
 # region skip
 
 @tts.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
 async def skip(ctx: commands.Context, count: return_int = 1):
     """Skip your next message(s) in this channel. This includes currently playing or sent messages."""
@@ -957,7 +962,6 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 
 # Create a hybrid group for 'settings' commands
 @bot.hybrid_group()
-@app_commands.allowed_installs(guilds=True, users=True)
 async def set(ctx: commands.Context):
     """Settings for the bot."""
     if ctx.invoked_subcommand is None:
@@ -965,7 +969,6 @@ async def set(ctx: commands.Context):
 
 # region autoread
 @set.command()
-@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
 async def autoread(ctx: commands.Context, enabled: to_lower):
     """Set whether your messages are automatically read when you join a voice channel."""
@@ -1017,7 +1020,6 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 # region Accents
 
 @set.command()
-@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(tag=accent_desc)
 async def accent(ctx: commands.Context, tag: str = None):
     """Set the accent you want me to read your messages in."""
@@ -1074,7 +1076,6 @@ async def accent(ctx: commands.Context, tag: str = None):
 # region Regions
 
 @set.command()
-@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(tld=tld_desc)
 async def region(ctx: commands.Context, tld: to_lower = None):
     """Set the region you want me to read your messages in."""
@@ -1126,7 +1127,8 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # Create a hybrid group for 'settings' commands
 @set.group()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 async def server(ctx: commands.Context):
     """Settings that apply to the entire server. Can be overridden by user settings."""
     if ctx.invoked_subcommand is None:
@@ -1172,7 +1174,8 @@ async def server(ctx: commands.Context):
 
 # region Timeout
 @server.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
 async def timeout(ctx: commands.Context, seconds: return_int):
@@ -1213,7 +1216,8 @@ async def timeout(ctx: commands.Context, seconds: return_int):
 # region Accents
 
 @server.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(tag=accent_desc)
 async def accent(ctx: commands.Context, tag = None):
@@ -1259,7 +1263,8 @@ async def accent(ctx: commands.Context, tag = None):
 # region Regions
 
 @server.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(tld=tld_desc)
 async def region(ctx: commands.Context, tld: to_lower = None):
@@ -1301,7 +1306,8 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # region autoread
 @server.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
 async def autoread(ctx: commands.Context, enabled: to_lower):
@@ -1347,7 +1353,8 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 
 # Create a hybrid group for 'settings' commands
 @bot.hybrid_group()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 async def admin(ctx: commands.Context):
     """Admin commands"""
     if ctx.invoked_subcommand is None:
@@ -1355,7 +1362,8 @@ async def admin(ctx: commands.Context):
 
 # region Leave
 @admin.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
@@ -1370,7 +1378,8 @@ async def leave(ctx: commands.Context):
 # region skip
 
 @admin.command()
-@app_commands.allowed_installs(guilds=True, users=False)
+@commands.check(is_in_guild)
+@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
 async def skip(ctx: commands.Context, count: return_int = 1):
@@ -1421,7 +1430,6 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 
 # region Sync
 @admin.command()
-@app_commands.allowed_installs(guilds=True, users=True)
 @commands.is_owner()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
