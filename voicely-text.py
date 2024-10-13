@@ -479,7 +479,10 @@ def get_accent_response(accent: str, typeof: ResponseType, reset: bool, guild: d
             return f"{guild.name}'s server accent has been set to **{accent}**."
     else:
         if typeof == ResponseType.user:
-            return f"Your accent has been **reset** to the server default: `{accent}`"
+            if guild is not None:
+                return f"Your accent has been **reset** to the server default: `{accent}`"
+            else:
+                return "Your accent has been **reset** to the server default."
         elif typeof == ResponseType.server and guild is not None:
             return f"{guild.name}'s server accent has been **reset** to default: `{accent}`"
 
@@ -557,7 +560,9 @@ def region_embed(typeof: ResponseType, guild: discord.Guild = None):
         print("Error getting region_embed")
 
 def get_region_response(tld: str, typeof: ResponseType, reset: bool, guild: discord.Guild = None):
-    display_tld = f"`{tld}` - *{get_country(tld)}*"
+    if tld and tld != "":
+        display_tld = f"`{tld}` - *{get_country(tld)}*"
+    
     if not reset:
         if typeof == ResponseType.user:
             return f"Your region's **top-level domain** has been set to {display_tld}."
@@ -565,7 +570,10 @@ def get_region_response(tld: str, typeof: ResponseType, reset: bool, guild: disc
             return f"The **top-level domain** for {guild.name}'s region has been set to {display_tld}."
     else:
         if typeof == ResponseType.user:
-            return f"Your region's **top-level domain** has been reset to the server default: {display_tld}"
+            if guild is not None:
+                return f"Your region's **top-level domain** has been reset to the server default: {display_tld}"
+            else:
+                return "Your region's **top-level domain** has been reset to the server default."
         elif typeof == ResponseType.server and guild is not None:
             return f"The **top-level domain** for {guild.name}'s region has been reset to default: {display_tld}"
 
@@ -960,7 +968,10 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
     """Set whether your messages are automatically read when you join a voice channel."""
 
     user_id_str = str(ctx.author.id)
-    guild_id_str = str(ctx.guild.id)
+    if ctx.guild is not None:
+        guild_id_str = str(ctx.guild.id)
+    else:
+        guild_id_str = None
 
     match enabled:
         case "true":
@@ -975,12 +986,17 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
                 if len(members_settings[user_id_str]) == 0:
                     del members_settings[user_id_str]
             
-            if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
-                default = servers_settings[guild_id_str]["autoread"]
-            else:
-                default = bot.default_settings["autoread"]
             save_members_settings()
-            await ctx.send(f"Autoread has been **reset** to the server default: `{default}`", reference=ctx.message, ephemeral=True)
+            
+            if guild_id_str is not None:
+                if guild_id_str in servers_settings and "autoread" in servers_settings[guild_id_str]:
+                    default = f': `{servers_settings[guild_id_str]["autoread"]}`'
+                else:
+                    default = f': `{bot.default_settings["autoread"]}`'
+            else:
+                default = "."
+
+            await ctx.send(f"Autoread has been **reset** to the server default{default}", reference=ctx.message, ephemeral=True)
             return
         case _:
             await ctx.send(f"`enabled` must be set to either `True` or `False`. Alternatively, enter `reset` to set to default.", reference=ctx.message, ephemeral=True)
@@ -1013,16 +1029,21 @@ async def accent(ctx: commands.Context, tag: str = None):
                 if len(members_settings[user_id_str]) == 0:
                     del members_settings[user_id_str]
             
-            guild_id_str = str(ctx.guild.id)
-            
-            if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
-                default = servers_settings[guild_id_str]["accent"]
-            else:
-                default = bot.default_settings["accent"]
-            
             save_members_settings()
 
-            await ctx.send(get_accent_response(langs[default], ResponseType.user, True), reference=ctx.message, ephemeral=True)
+            guild = ctx.guild
+            if guild is not None:
+                guild_id_str = str(guild.id)
+                if guild_id_str in servers_settings and "accent" in servers_settings[guild_id_str]:
+                    default = f": `{servers_settings[guild_id_str]["accent"]}`"
+                else:
+                    default = bot.default_settings["accent"]
+
+                this_lang = langs[default]
+            else:
+                this_lang = ""
+            
+            await ctx.send(get_accent_response(this_lang, ResponseType.user, True, guild), reference=ctx.message, ephemeral=True)
             return
 
 
@@ -1062,15 +1083,19 @@ async def region(ctx: commands.Context, tld: to_lower = None):
                 if len(members_settings[user_id_str]) == 0:
                     del members_settings[user_id_str]
             
-            guild_id_str = str(ctx.guild.id)
-            if guild_id_str in servers_settings and "region" in servers_settings[guild_id_str]:
-                default = servers_settings[guild_id_str]["region"]
-            else:
-                default = bot.default_settings["region"]
-            
             save_members_settings()
+
+            guild = ctx.guild
+            if guild is not None:
+                guild_id_str = str(ctx.guild.id)
+                if guild_id_str in servers_settings and "region" in servers_settings[guild_id_str]:
+                    default = servers_settings[guild_id_str]["region"]
+                else:
+                    default = bot.default_settings["region"]
+            else:
+                default = ""
             
-            await ctx.send(get_region_response(default, ResponseType.user, True), reference=ctx.message, ephemeral=True)
+            await ctx.send(get_region_response(default, ResponseType.user, True, guild), reference=ctx.message, ephemeral=True)
             return
         
         if tld not in tld_list_raw:
