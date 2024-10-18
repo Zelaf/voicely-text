@@ -18,4 +18,4 @@ If you don't want the bot to read *all* of your messages, but just want it to **
 If you want to **skip speaking messages** you may have already sent or are about to send, type `/tts skip`, with an optional `count` being the number of messages you want to skip.
 - If one of your messages is currently being read, the currently spoken message will be included in the `count`.
 # Support
-If you have any problems with the bot, please create an [issue](https://github.com/Erallie/voicely-text/issues), and I will address it to the best of my ability!
+If you have any problems with the bot or want to request a feature, please create an [issue](https://github.com/Erallie/voicely-text/issues), and I will address it to the best of my ability!
