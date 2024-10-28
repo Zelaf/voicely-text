@@ -468,8 +468,16 @@ class ResponseType(Enum):
     user = "user"
     server = "server"
 
-def is_in_guild(interaction: discord.Interaction | commands.Context) -> bool:
-    return interaction.guild is not None
+# def is_in_guild(interaction: discord.Interaction | commands.Context) -> bool:
+#     return interaction.guild is not None
+
+async def send_dm_error(ctx: commands.Context):
+    if ctx.invoked_subcommand is not None:
+        subcommand = f" {ctx.invoked_subcommand}"
+    else:
+        subcommand = ""
+
+    await ctx.send(f"`/{ctx.command}{subcommand}` cannot be used in dm's! Please use this command in the text channel of a server.", reference=ctx.message, ephemeral=True)
 
 # region Accents setup
 
@@ -798,8 +806,6 @@ async def regions(ctx: commands.Context):
 
 # region TTS
 @bot.hybrid_group()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 async def tts(ctx: commands.Context):
     """Toggle or trigger text-to-speech"""
     if ctx.invoked_subcommand is None:
@@ -807,10 +813,12 @@ async def tts(ctx: commands.Context):
 
 # region start
 @tts.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 async def start(ctx: commands.Context):
     """Make me start reading your text."""
+
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
 
     if ctx.author.voice.channel is None:
         await ctx.send('You must be in a voice channel to use this command.', reference=ctx.message, ephemeral=True)
@@ -832,10 +840,12 @@ async def start(ctx: commands.Context):
 #region stop
     
 @tts.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 async def stop(ctx: commands.Context):
     """Make me stop reading your text."""
+
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
 
     if ctx.author.voice.channel is None:
         await ctx.send('You are not in a voice channel, so I am not reading your messages.', reference=ctx.message, ephemeral=True)
@@ -857,12 +867,14 @@ async def stop(ctx: commands.Context):
 # region speak
 
 @tts.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @app_commands.describe(text="The text you want me to speak.", accent=accent_desc, tld=tld_desc)
 async def speak(ctx: commands.Context, text: str, accent: str = None, tld: to_lower = None):
     """Speak a single message with optional accent and region overrides."""
     
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
+
     text_channel_name = ctx.channel.name
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=text_channel_name)
     if voice_channel is None:
@@ -907,11 +919,13 @@ async def speak(ctx: commands.Context, text: str, accent: str = None, tld: to_lo
 # region skip
 
 @tts.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
 async def skip(ctx: commands.Context, count: return_int = 1):
     """Skip your next message(s) in this channel. This includes currently playing or sent messages."""
+    
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
 
     invalid_count = '`count` must be a positive whole number! Alternatively, enter `cancel` to read all upcoming messages.'
 
@@ -1127,8 +1141,6 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # Create a hybrid group for 'settings' commands
 @set.group()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 async def server(ctx: commands.Context):
     """Settings that apply to the entire server. Can be overridden by user settings."""
     if ctx.invoked_subcommand is None:
@@ -1174,13 +1186,15 @@ async def server(ctx: commands.Context):
 
 # region Timeout
 @server.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(seconds="Timeout duration in seconds. Type 'reset' to reset to default.")
 async def timeout(ctx: commands.Context, seconds: return_int):
     """Set the number of seconds of inactivity after which the bot will leave the voice channel."""
-
+    
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
+        
     error_message = f"Please enter a **positive whole number** to set the **timeout duration** in **seconds**.\n\nAlternatively, type `reset` to **reset the timeout** to the default value *({bot.default_settings['timeout']} seconds)*."
 
     guild_id_str = str(ctx.guild.id)
@@ -1216,13 +1230,15 @@ async def timeout(ctx: commands.Context, seconds: return_int):
 # region Accents
 
 @server.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(tag=accent_desc)
 async def accent(ctx: commands.Context, tag = None):
     """Set the default accent for the server. This can be overridden on a per-user basis."""
     
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
+
     guild = ctx.guild
 
     if tag:
@@ -1263,12 +1279,14 @@ async def accent(ctx: commands.Context, tag = None):
 # region Regions
 
 @server.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(tld=tld_desc)
 async def region(ctx: commands.Context, tld: to_lower = None):
     """Set the default region for the server. This can be overridden on a per-user basis."""
+
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
 
     guild = ctx.guild
 
@@ -1306,12 +1324,14 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # region autoread
 @server.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(enabled="Type 'true' or 'false'. Or type 'reset' to reset to default.")
 async def autoread(ctx: commands.Context, enabled: to_lower):
     """Set the autoread default for the server."""
+
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
 
     # user_id_str = str(ctx.author.id)
     guild = ctx.guild
@@ -1353,8 +1373,6 @@ async def autoread(ctx: commands.Context, enabled: to_lower):
 
 # Create a hybrid group for 'settings' commands
 @bot.hybrid_group()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 async def admin(ctx: commands.Context):
     """Admin commands"""
     if ctx.invoked_subcommand is None:
@@ -1362,11 +1380,14 @@ async def admin(ctx: commands.Context):
 
 # region Leave
 @admin.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 async def leave(ctx: commands.Context):
     """Make the bot leave the voice channel."""
+
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
+
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
         await ctx.send("Disconnected from the voice channel.", reference=ctx.message)
@@ -1378,12 +1399,14 @@ async def leave(ctx: commands.Context):
 # region skip
 
 @admin.command()
-@commands.check(is_in_guild)
-@app_commands.check(is_in_guild)
 @commands.has_permissions(administrator=True)
 @app_commands.describe(count="The number of upcoming messages I should skip. Type 'cancel' to read all upcoming messages.")
 async def skip(ctx: commands.Context, count: return_int = 1):
     """Skip the next message(s) in this channel. This includes currently playing or sent messages."""
+
+    if ctx.guild is None:
+        await send_dm_error(ctx)
+        return
 
     invalid_count = '`count` must be a positive whole number! Alternatively, enter `cancel` to read all upcoming messages.'
 
