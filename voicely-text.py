@@ -383,6 +383,9 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, ac
     # replace channels and roles
     message_content = message_content.replace("<id:customize>", "Channels and Roles")
 
+    # replace browse channels
+    message_content = message_content.replace("<id:browse>", "Browse Channels")
+
     # Remove long numbers (e.g., numbers longer than 8 digits)
     # Replaces it with an empty string
     message_content = re.sub(r'\d{8,}', "", message_content)
