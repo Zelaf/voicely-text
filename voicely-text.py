@@ -183,7 +183,10 @@ async def process_queue(guild: discord.Guild):
             if "admin" in bot.to_skip[guild_id][message.channel.id] and bot.to_skip[guild_id][message.channel.id]["admin"] > 0:
                 return False
             else:
-                del bot.to_skip[guild_id][message.channel.id][user_id]
+                if user_id in bot.to_skip[guild_id][message.channel.id]:
+                    del bot.to_skip[guild_id][message.channel.id][user_id]
+                elif "admin" in bot.to_skip[guild_id][message.channel.id]:
+                    del bot.to_skip[guild_id][message.channel.id]["admin"]
                 return True
             
         def decrement_skips():
