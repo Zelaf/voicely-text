@@ -185,7 +185,7 @@ async def process_queue(guild: discord.Guild):
             else:
                 if user_id in bot.to_skip[guild_id][message.channel.id]:
                     del bot.to_skip[guild_id][message.channel.id][user_id]
-                elif "admin" in bot.to_skip[guild_id][message.channel.id]:
+                if "admin" in bot.to_skip[guild_id][message.channel.id]:
                     del bot.to_skip[guild_id][message.channel.id]["admin"]
                 return True
             
