@@ -343,6 +343,46 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, ac
     # Remove links, replacing it with an empty string
     message_content = re.sub(r'(https?://\S+|www\.\S+)', "", message_content)
 
+    # Replace mentions with user nickname.
+    mentions = re.finditer(r'<@(\d{18,19})>', message_content)
+    for mention in mentions:
+        member = ctx.guild.get_member(int(mention.group(1)))
+        if member is not None:
+            nickname = member.display_name
+        else:
+            user = bot.get_user(int(mention.group(1)))
+            if user is None:
+                nickname = "unknown user"
+            else:
+                nickname = bot.get_user(int(mention.group(1))).display_name
+        message_content = message_content.replace(mention.group(0), nickname, 1)
+
+    # Replace channels with channel names
+    channels = re.finditer(r'<#(\d{18,19})>', message_content)
+    for channel_id in channels:
+        channel = bot.get_channel(int(channel_id.group(1)))
+        if channel is not None:
+            channel_name = channel.name
+        else:
+            channel_name = "unknown"
+        message_content = message_content.replace(channel_id.group(0), channel_name, 1)
+
+    # Replace role mentions with role names
+    roles = re.finditer(r'<@&(\d{18,19})>', message_content)
+    for role_id in roles:
+        role = ctx.guild.get_role(int(role_id.group(1)))
+        if role is not None:
+            role_name = role.name
+        else:
+            role_name = "unknown role"
+        message_content = message_content.replace(role_id.group(0), role_name, 1)
+
+    # replace server guide
+    message_content = message_content.replace("<id:guide>", "Server Guide")
+
+    # replace channels and roles
+    message_content = message_content.replace("<id:customize>", "Channels and Roles")
+
     # Remove long numbers (e.g., numbers longer than 8 digits)
     # Replaces it with an empty string
     message_content = re.sub(r'\d{8,}', "", message_content)
