@@ -1203,7 +1203,7 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # region Nickname
 @set.command()
-@app_commands.describe(nickname="A nickname for me to call you. Type 'reset' to remove your nickname.", serverID="The ID of the server you'd like to use this nickname for. Leave blank to apply as default to all.")
+@app_commands.describe(nickname="A nickname for me to call you. Type 'reset' to remove your nickname.", serverId="The ID of the server you'd like to use this nickname for. Leave blank to apply as default to all.")
 async def nickname(ctx: commands.Context, nickname: return_stripped, serverId: return_int = None):
     """Set a nickname for me to call you. Useful to specify pronunciations or avoid special characters."""
 
