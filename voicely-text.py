@@ -1203,23 +1203,23 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # region Nickname
 @set.command()
-@app_commands.describe(nickname="A nickname for me to call you. Type 'reset' to remove your nickname.", serverId="The ID of the server you'd like to use this nickname for. Leave blank to apply as default to all.")
-async def nickname(ctx: commands.Context, nickname: return_stripped, serverId: return_int = None):
+@app_commands.describe(nickname="A nickname for me to call you. Type 'reset' to remove your nickname.", server="The ID of the server you'd like to use this nickname for. Leave blank to apply as default to all.")
+async def nickname(ctx: commands.Context, nickname: return_stripped, server: return_int = None):
     """Set a nickname for me to call you. Useful to specify pronunciations or avoid special characters."""
 
     user_id_str = str(ctx.author.id)
 
-    invalid_server = f"I cannot set your nickname in the specified server because I am not in the server with the ID `{serverId}`, or it does not exist.\n\nPlease enter another `serverId` or leave it **blank** to set your **default nickname** for all servers."
+    invalid_server = f"I cannot set your nickname in the specified server because I am not in the server with the ID `{server}`, or it does not exist.\n\nPlease enter another `server` or leave it **blank** to set your **default nickname** for all servers."
 
     server_messages = []
-    if serverId is None or serverId == "":
-        serverId = "default"
+    if server is None or server == "":
+        server = "default"
         server_messages.append("by default in **all servers**")
         server_messages.append("display name")
         server_messages.append("")
-    elif isinstance(serverId, int):
-        server = bot.get_guild(serverId)
-        serverId = str(serverId)
+    elif isinstance(server, int):
+        server = bot.get_guild(server)
+        server = str(server)
         if server is not None:
             server_messages.append(f"for the server **{server.name}**")
             server_messages.append("default nickname")
@@ -1234,8 +1234,8 @@ async def nickname(ctx: commands.Context, nickname: return_stripped, serverId: r
     if nickname is None or nickname == "":
         await ctx.send(f"The nickname you entered is not valid. Please enter text that is not just whitespaces.", reference=ctx.message, ephemeral=True)
     elif nickname.lower() == "reset":
-        if user_id_str in members_settings and "nickname" in members_settings[user_id_str] and serverId in members_settings[user_id_str]["nickname"]:
-            del members_settings[user_id_str]["nickname"][serverId]
+        if user_id_str in members_settings and "nickname" in members_settings[user_id_str] and server in members_settings[user_id_str]["nickname"]:
+            del members_settings[user_id_str]["nickname"][server]
             
             if len(members_settings[user_id_str]["nickname"]) == 0:
                 del members_settings[user_id_str]["nickname"]
@@ -1251,7 +1251,7 @@ async def nickname(ctx: commands.Context, nickname: return_stripped, serverId: r
         if "nickname" not in members_settings[user_id_str]:
             members_settings[user_id_str]["nickname"] = {}
         
-        members_settings[user_id_str]["nickname"][serverId] = nickname
+        members_settings[user_id_str]["nickname"][server] = nickname
 
         save_members_settings()
         await ctx.send(f"Your nickname has been set to **{nickname}** {server_messages[0]}.\n\nI will say this whenever I refer to you{server_messages[2]}, both when **reading mentions** and when **announcing your messages**.", reference=ctx.message, ephemeral=True)
