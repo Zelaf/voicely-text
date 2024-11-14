@@ -166,11 +166,16 @@ async def on_guild_remove(guild: discord.Guild):
 
 # endregion
 
-def return_nickname(user: discord.User | discord.Member):
-    print('got here')
+def return_nickname(user: discord.User | discord.Member, guild_id: int):
+    guild_id_str = str(guild_id)
     user_id_str = str(user.id)
     if user_id_str in members_settings and "nickname" in members_settings[user_id_str]:
-        return members_settings[user_id_str]["nickname"]
+        if guild_id_str in members_settings[user_id_str]["nickname"]:
+            return members_settings[user_id_str]["nickname"][guild_id_str]
+        elif "default" in members_settings[user_id_str]["nickname"]:
+            return members_settings[user_id_str]["nickname"]["default"]
+        else:
+            return user.display_name
     else:
         return user.display_name
 
@@ -265,7 +270,7 @@ async def process_queue(guild: discord.Guild):
         else:
 
             # region Prepend display name
-            nickname = return_nickname(user)
+            nickname = return_nickname(user, guild_id)
             
             if guild_id in bot.last_speakers and user_id is bot.last_speakers[guild_id]["user_id"]:
                 last_time: datetime.datetime = bot.last_speakers[guild_id]["time"]
@@ -362,13 +367,13 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, ac
         user_id = int(mention.group(1))
         member = ctx.guild.get_member(user_id)
         if member is not None:
-            nickname = return_nickname(member)
+            nickname = return_nickname(member, ctx.guild.id)
         else:
             user = bot.get_user(user_id)
             if user is None:
                 nickname = "unknown user"
             else:
-                nickname = return_nickname(bot.get_user(user_id))
+                nickname = return_nickname(bot.get_user(user_id), ctx.guild.id)
         message_content = message_content.replace(mention.group(0), nickname, 1)
 
     # Replace channels with channel names
