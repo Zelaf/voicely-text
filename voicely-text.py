@@ -166,6 +166,14 @@ async def on_guild_remove(guild: discord.Guild):
 
 # endregion
 
+def return_nickname(user: discord.User | discord.Member):
+    print('got here')
+    user_id_str = str(user.id)
+    if user_id_str in members_settings and "nickname" in members_settings[user_id_str]:
+        return members_settings[user_id_str]["nickname"]
+    else:
+        return user.display_name
+
 async def process_queue(guild: discord.Guild):
     while True:
         print(f"{guild.name}: Waiting for the next message in the queue for...")
@@ -257,13 +265,15 @@ async def process_queue(guild: discord.Guild):
         else:
 
             # region Prepend display name
+            nickname = return_nickname(user)
+            
             if guild_id in bot.last_speakers and user_id is bot.last_speakers[guild_id]["user_id"]:
                 last_time: datetime.datetime = bot.last_speakers[guild_id]["time"]
                 time_diff = datetime.datetime.today() - last_time
                 if time_diff.total_seconds() > 30:
-                    text = user.display_name + ' says, ' + text
+                    text = nickname + ' says, ' + text
             else:
-                text = user.display_name + ' says, ' + text
+                text = nickname + ' says, ' + text
             # endregion
 
             # Convert the text to speech using gTTS
@@ -349,15 +359,16 @@ async def process_message(ctx: commands.Context | discord.Message, text: str, ac
     # Replace mentions with user nickname.
     mentions = re.finditer(r'<@(\d{18,19})>', message_content)
     for mention in mentions:
-        member = ctx.guild.get_member(int(mention.group(1)))
+        user_id = int(mention.group(1))
+        member = ctx.guild.get_member(user_id)
         if member is not None:
-            nickname = member.display_name
+            nickname = return_nickname(member)
         else:
-            user = bot.get_user(int(mention.group(1)))
+            user = bot.get_user(user_id)
             if user is None:
                 nickname = "unknown user"
             else:
-                nickname = bot.get_user(int(mention.group(1))).display_name
+                nickname = return_nickname(bot.get_user(user_id))
         message_content = message_content.replace(mention.group(0), nickname, 1)
 
     # Replace channels with channel names
