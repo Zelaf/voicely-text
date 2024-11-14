@@ -506,11 +506,15 @@ async def leave_after_timeout(guild: discord.Guild):
 
 # region Converters
 def to_lower(argument: str):
+    if argument:
+        argument = argument.strip()
     if not argument or argument == "":
         return None
     return argument.lower()
 
 def return_int(argument: str):
+    if argument:
+        argument = argument.strip()
     try:
         return int(argument)
     except:
