@@ -1,4 +1,4 @@
 /venv/*
 /bot-env/*
-tts.mp3
-token.txt
+/data/*
+/voice_files/*
