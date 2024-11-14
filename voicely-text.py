@@ -1576,14 +1576,11 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 # endregion
 
 # region Sync
-@admin.command()
+@bot.command()
+@commands.isowner()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
-
-    if ctx.author.id != 339841608134557696:
-        ctx.send("This command can only be used by the owner of the bot.", reference=ctx.message, ephemeral=True)
-        return
 
     if guild:
         synced_commands = await bot.tree.sync(guild=guild)
