@@ -1577,7 +1577,7 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 
 # region Sync
 @bot.command()
-@commands.isowner()
+@commands.is_owner()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
