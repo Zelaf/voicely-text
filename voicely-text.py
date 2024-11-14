@@ -1203,8 +1203,8 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 
 # region Nickname
 @set.command()
-@app_commands.describe(name="A nickname for me to call you. Type 'reset' to remove your nickname.", serverID="The ID of the server you'd like to use this nickname for. Leave blank to apply as default to all.")
-async def nickname(ctx: commands.Context, name: return_stripped, serverID: return_int = None):
+@app_commands.describe(nickname="A nickname for me to call you. Type 'reset' to remove your nickname.", serverID="The ID of the server you'd like to use this nickname for. Leave blank to apply as default to all.")
+async def nickname(ctx: commands.Context, nickname: return_stripped, serverID: return_int = ""):
     """Set a nickname for me to call you. Useful to specify pronunciations or avoid special characters."""
 
     user_id_str = str(ctx.author.id)
@@ -1232,9 +1232,9 @@ async def nickname(ctx: commands.Context, name: return_stripped, serverID: retur
         await invalid_server(ctx, serverID)
         return
 
-    if name is None or name == "":
+    if nickname is None or nickname == "":
         await ctx.send(f"The nickname you entered is not valid. Please enter text that is not just whitespaces.", reference=ctx.message, ephemeral=True)
-    elif name.lower() == "reset":
+    elif nickname.lower() == "reset":
         if user_id_str in members_settings and "nickname" in members_settings[user_id_str] and serverID in members_settings[user_id_str]["nickname"]:
             del members_settings[user_id_str]["nickname"][serverID]
             
@@ -1252,7 +1252,7 @@ async def nickname(ctx: commands.Context, name: return_stripped, serverID: retur
         if "nickname" not in members_settings[user_id_str]:
             members_settings[user_id_str]["nickname"] = {}
         
-        members_settings[user_id_str]["nickname"][serverID] = name
+        members_settings[user_id_str]["nickname"][serverID] = nickname
 
         save_members_settings()
         await ctx.send(f"Your nickname has been set to **{nickname}** {server_messages[0]}.\n\nI will say this whenever I refer to you{server_messages[2]}, both when **reading mentions** and when **announcing your messages**.", reference=ctx.message, ephemeral=True)
@@ -1577,7 +1577,7 @@ async def skip(ctx: commands.Context, count: return_int = 1):
 
 # region Sync
 @bot.command()
-@commands.is_owner()
+@commands.isowner()
 @app_commands.describe(guild="The server ID of the server you want to sync commands to.")
 async def sync(ctx: commands.Context, guild: discord.Guild = None):
     """Sync slash commands either globally or for a specific guild."""
