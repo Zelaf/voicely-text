@@ -1204,39 +1204,39 @@ async def region(ctx: commands.Context, tld: to_lower = None):
 # region Nickname
 @set.command()
 @app_commands.describe(nickname="A nickname for me to call you. Type 'reset' to remove your nickname.", serverID="The ID of the server you'd like to use this nickname for. Leave blank to apply as default to all.")
-async def nick(ctx: commands.Context, nickname: return_stripped, serverID: return_int = None):
+async def nickname(ctx: commands.Context, nickname: return_stripped, serverId: return_int = None):
     """Set a nickname for me to call you. Useful to specify pronunciations or avoid special characters."""
 
     user_id_str = str(ctx.author.id)
 
-    async def invalid_server(ctx: commands.Context, serverID: str | int):
-        await ctx.send(f"I cannot set your nickname in the specified server because I am not in the server with the ID `{serverID}`, or it does not exist.\n\nPlease enter another `serverID` or leave it **blank** to set your **default nickname** for all servers.", reference=ctx.message, ephemeral=True)
+    async def invalid_server(ctx: commands.Context, serverId: str | int):
+        await ctx.send(f"I cannot set your nickname in the specified server because I am not in the server with the ID `{serverId}`, or it does not exist.\n\nPlease enter another `serverId` or leave it **blank** to set your **default nickname** for all servers.", reference=ctx.message, ephemeral=True)
 
     server_messages = []
-    if serverID is None or serverID == "":
-        serverID = "default"
+    if serverId is None or serverId == "":
+        serverId = "default"
         server_messages.append("by default in **all servers**")
         server_messages.append("display name")
         server_messages.append("")
-    elif isinstance(serverID, int):
-        server = bot.get_guild(serverID)
-        serverID = str(serverID)
+    elif isinstance(serverId, int):
+        server = bot.get_guild(serverId)
+        serverId = str(serverId)
         if server is not None:
             server_messages.append(f"for the server **{server.name}**")
             server_messages.append("default nickname")
             server_messages.append(f" in the server **{server.name}**")
         else:
-            await invalid_server(ctx, serverID)
+            await invalid_server(ctx, serverId)
             return
     else:
-        await invalid_server(ctx, serverID)
+        await invalid_server(ctx, serverId)
         return
 
     if nickname is None or nickname == "":
         await ctx.send(f"The nickname you entered is not valid. Please enter text that is not just whitespaces.", reference=ctx.message, ephemeral=True)
     elif nickname.lower() == "reset":
-        if user_id_str in members_settings and "nickname" in members_settings[user_id_str] and serverID in members_settings[user_id_str]["nickname"]:
-            del members_settings[user_id_str]["nickname"][serverID]
+        if user_id_str in members_settings and "nickname" in members_settings[user_id_str] and serverId in members_settings[user_id_str]["nickname"]:
+            del members_settings[user_id_str]["nickname"][serverId]
             
             if len(members_settings[user_id_str]["nickname"]) == 0:
                 del members_settings[user_id_str]["nickname"]
@@ -1252,7 +1252,7 @@ async def nick(ctx: commands.Context, nickname: return_stripped, serverID: retur
         if "nickname" not in members_settings[user_id_str]:
             members_settings[user_id_str]["nickname"] = {}
         
-        members_settings[user_id_str]["nickname"][serverID] = nickname
+        members_settings[user_id_str]["nickname"][serverId] = nickname
 
         save_members_settings()
         await ctx.send(f"Your nickname has been set to **{nickname}** {server_messages[0]}.\n\nI will say this whenever I refer to you{server_messages[2]}, both when **reading mentions** and when **announcing your messages**.", reference=ctx.message, ephemeral=True)
