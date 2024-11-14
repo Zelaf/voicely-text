@@ -500,8 +500,8 @@ def return_int(argument: str):
     except:
         return argument.lower()
 
-# def return_stripped(argument):
-#     return str(argument).strip()
+def return_stripped(argument: str):
+    return argument.strip()
 
 # endregion
 
@@ -1179,6 +1179,35 @@ async def region(ctx: commands.Context, tld: to_lower = None):
     else:
         await ctx.send(f"Cannot fetch list of domains because https://www.google.com/supported_domains was unavailable when I logged in.\n\nPlease specify a `tld` parameter or tell <@339841608134557696> to restart the bot.\n\nHere is an incomplete [**list of top-level domains**](https://gtts.readthedocs.io/en/latest/module.html#localized-accents) you can use.", reference=ctx.message, ephemeral=True)
             
+# endregion
+
+# region Nickname
+@set.command()
+@app_commands.describe(nickname="A nickname for me to call you. Type 'reset' to remove your nickname.")
+async def nickname(ctx: commands.Context, nickname: return_stripped):
+    """Set a nickname for me to call you. Useful to specify pronunciations or avoid special characters."""
+
+    user_id_str = str(ctx.author.id)
+
+    if nickname is None or nickname == "":
+        await ctx.send(f"The nickname you entered is not valid. Please enter text that is not just whitespaces.", reference=ctx.message, ephemeral=True)
+    elif nickname.lower() == "reset":
+        if user_id_str in members_settings and "nickname" in members_settings[user_id_str]:
+            del members_settings[user_id_str]["nickname"]
+            if len(members_settings[user_id_str]) == 0:
+                del members_settings[user_id_str]
+        
+        save_members_settings()
+        
+        await ctx.send(f"Your nickname has been **removed**.\n\nI will refer to you as your **display name** when **reading mentions** and when **announcing your messages**.", reference=ctx.message, ephemeral=True)
+    else:
+        if user_id_str not in members_settings:
+            members_settings[user_id_str] = {}
+        members_settings[user_id_str]["nickname"] = nickname
+
+        save_members_settings()
+        await ctx.send(f"Your nickname has been set to **{nickname}**.\n\nI will say this whenever I refer to you, both when **reading mentions** and when **announcing your messages**.", reference=ctx.message, ephemeral=True)
+
 # endregion
 
 # endregion
