@@ -22,6 +22,6 @@ You can set a **nickname** for Voicely Text to call you every time it refers to 
 - Setting the `nickname` parameter to `reset` will remove the nickname.
 - This is useful for if you have **special characters** in your display name that you don’t want to be read, or if the bot **mispronounces** your display name by default. Or if your display name is just **super long** and you want to shorten it.
 
-If you want to **override** your nickname for a **specific server**, you can set the `server` parameter to the ID of the server you want to use the nickname in. This nickname will only be applied to messages sent in that server.
+If you want to **override** your nickname for a **specific server**, you can set the `server` parameter to the [server ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID) of the server you want to use the nickname in. This nickname will only be applied to messages sent in that server.
 # Support
 If you have any problems with the bot or want to request a feature, please create an [issue](https://github.com/Erallie/voicely-text/issues), and I will address it to the best of my ability!

@@ -1209,7 +1209,7 @@ async def nickname(ctx: commands.Context, nickname: return_stripped, server: ret
 
     user_id_str = str(ctx.author.id)
 
-    invalid_server = f"I cannot set your nickname in the specified server because I am not in the server with the ID `{server}`, or it does not exist.\n\nPlease enter another `server` or leave it **blank** to set your **default nickname** for all servers."
+    invalid_server = f"I cannot set your nickname in the specified server because I am not in the server with the ID `{server}`, or it does not exist.\n\nPlease enter another `server` or leave it **blank** to set your **default nickname** for all servers.\n\nTo get the ID of a server, follow [these instructions](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID)."
 
     server_messages = []
     if server is None or server == "":
