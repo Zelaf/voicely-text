@@ -17,5 +17,11 @@ If you don't want the bot to read *all* of your messages, but just want it to **
 ## Skipping messages
 If you want to **skip speaking messages** you may have already sent or are about to send, type `/tts skip`, with an optional `count` being the number of messages you want to skip.
 - If one of your messages is currently being read, the currently spoken message will be included in the `count`.
+## Nicknames
+You can set a **nickname** for Voicely Text to call you every time it refers to you. Both when it **announces your messages** and when it **reads mentions**. To do so, type `/set nickname` and set the `nickname` parameter to the name you want to be called.
+- Setting the `nickname` parameter to `reset` will remove the nickname.
+- This is useful for if you have **special characters** in your display name that you don’t want to be read, or if the bot **mispronounces** your display name by default. Or if your display name is just **super long** and you want to shorten it.
+
+If you want to **override** your nickname for a **specific server**, you can set the `server` parameter to the ID of the server you want to use the nickname in. This nickname will only be applied to messages sent in that server.
 # Support
 If you have any problems with the bot or want to request a feature, please create an [issue](https://github.com/Erallie/voicely-text/issues), and I will address it to the best of my ability!
