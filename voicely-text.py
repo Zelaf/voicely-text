@@ -1218,12 +1218,12 @@ async def nickname(ctx: commands.Context, nickname: return_stripped, server: ret
         server_messages.append("display name")
         server_messages.append("")
     elif isinstance(server, int):
-        server = bot.get_guild(server)
+        server_obj = bot.get_guild(server)
         server = str(server)
         if server is not None:
-            server_messages.append(f"for the server **{server.name}**")
+            server_messages.append(f"for the server **{server_obj.name}**")
             server_messages.append("default nickname")
-            server_messages.append(f" in the server **{server.name}**")
+            server_messages.append(f" in the server **{server_obj.name}**")
         else:
             await ctx.send(invalid_server, reference=ctx.message, ephemeral=True)
             return
