@@ -55,9 +55,20 @@ class Bot(commands.Bot):
 
 bot = Bot()
 
-# Read the bot token from external file
-with open('../token', 'r') as file:
-    TOKEN = file.read().strip()
+# Check token
+def get_token() -> str:
+    try:
+        with open('./token', 'r') as file:
+            token = file.read().strip()
+            if not token:
+                raise ValueError("The token file is empty. Make sure to put the token inside the token file.")
+                sys.exit(1)
+            return token
+    except FileNotFoundError as e:
+        raise FileNotFoundError("The token file wasn't found.") from e
+        sys.exit(1)
+    except Exception as e:
+        raise RuntimeError(f"An unexpected error occurred: {e}") from e
 
 # region save and load settings
 # region members settings
@@ -1638,7 +1649,7 @@ def run_bot():
     # signal.signal(signal.SIGTERM, run_shutdown)
 
     try:
-        loop.run_until_complete(bot.start(TOKEN))
+        loop.run_until_complete(bot.start(get_token()))
     except KeyboardInterrupt:
         print("Bot is shutting down...")
         loop.run_until_complete(shutdown())
